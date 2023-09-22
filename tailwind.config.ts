@@ -1,0 +1,31 @@
+import type { Config } from 'tailwindcss';
+import catppuccin from "@catppuccin/tailwindcss";
+import plugin from 'tailwindcss/plugin';
+
+const config = {
+	content: ['./src/**/*.{html,js,svelte,ts}'],
+	theme: {
+		extend: {}
+	},
+	plugins: [
+		catppuccin({
+      prefix: "ctp",
+      defaultFlavour: "mocha",
+    }),
+		plugin(function ({ addVariant, matchUtilities, theme }) {
+      addVariant('hocus', ['&:hover', '&:focus']);
+      // Square utility
+      matchUtilities(
+        {
+          square: (value) => ({
+            width: value,
+            height: value,
+          }),
+        },
+        { values: theme('spacing') }
+      );
+    }),
+	],
+} satisfies Config;
+
+module.exports = config;

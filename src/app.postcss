@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import font Inter located in fonts/Inter/Inter-VariableFont_slnt,wght.ttf */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 200 300 400 500 600 700 800 900;
+  src: url('../fonts/Inter/Inter-VariableFont_slnt,wght.ttf') format('truetype-variations');
+}
+
+/* Import font Fira_Code located in /fonts/Fira_Code/FiraCode-VariableFont_wght.ttf */
+@font-face {
+  font-family: 'Fira Code';
+  font-style: monospace;
+  font-weight: 300 400 500 600 700;
+  src: url('../fonts/Fira_Code/FiraCode-VariableFont_wght.ttf') format('truetype-variations');
+}
+
+body {
+  background-color: theme('colors.ctp-base.DEFAULT');
+  color: theme('colors.ctp-text.DEFAULT');
+  font-family: 'Inter', sans-serif;
+}
