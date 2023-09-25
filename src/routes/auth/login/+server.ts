@@ -7,7 +7,6 @@ import type { Document, WithId } from "mongodb";
 
 export const POST: RequestHandler = async ({ request }) => {
   const { email } = await request.json();
-  console.log(request)
 
   let user: WithId<Document> | null = await db.collection("users").findOne({ email: email });
   if (user === null) {
