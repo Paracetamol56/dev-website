@@ -2,7 +2,7 @@ import db from "$lib/db"
 import { JWT_SECRET } from '$env/static/private';
 import { error, json, type RequestHandler } from "@sveltejs/kit";
 import jwt from 'jsonwebtoken';
-import type { ObjectId } from "mongodb";
+import { ObjectId } from "mongodb";
 
 interface TokenPayload {
   userId: ObjectId;
@@ -18,14 +18,15 @@ export const GET: RequestHandler = async ({ url }) => {
   }
 
   // Use JWT to verify the token
-  const user = jwt.verify(token, JWT_SECRET, async (err: jwt.JsonWebTokenError | null, decoded: TokenPayload | undefined) => {
+  const user = await jwt.verify(token, JWT_SECRET, async (err: jwt.JsonWebTokenError | null, decoded: TokenPayload | undefined) => {
     if (err) {
       console.error(err);
       throw error(400, "Invalid token");
     }
 
     // Update the user
-    const userId: ObjectId = decoded?.userId as ObjectId;
+    const userId: ObjectId = new ObjectId(decoded?.userId);
+    console.log(userId);
     
     const result = await db.collection("users").updateOne(
       {
@@ -39,19 +40,17 @@ export const GET: RequestHandler = async ({ url }) => {
     );
   
     // Handle the result
-    if (result.acknowledged !== true) {
+    if (result.acknowledged !== true || result.modifiedCount !== 1) {
       console.error(result);
       throw error(500, "Failed to update user");
     }
   
-    const user = db.collection("users").findOne({ _id: userId });
-    console.log(user);
+    const user = await db.collection("users").findOne({ _id: userId });
 
     // Return the user
     return user;
   });
 
-  return json(
-    user,
-  );
+  // Return a redirect with the user
+  return json(user);
 };

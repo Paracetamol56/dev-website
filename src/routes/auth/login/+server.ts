@@ -27,7 +27,7 @@ export const POST: RequestHandler = async ({ request }) => {
   }
 
   // Generate a token
-  const link = `http://dev.matheo-galub4.com/verify?token=${generateToken(user?._id.toHexString() as string)}`;
+  const link = `${request.headers.get('origin')}/verify?token=${generateToken(user?._id.toHexString() as string)}`;
   
   // Send an email
   let mailId: string;
