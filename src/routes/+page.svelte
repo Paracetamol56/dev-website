@@ -1,12 +1,11 @@
-<script>
+<script lang="ts">
 </script>
 
 <svelte:head>
-	<title>Home</title>
-	<meta name="description" content="Svelte demo app" />
+	<title>Home - Mathéo Galuba</title>
 </svelte:head>
 
-<section class="container my-32">
+<section class="container mx-auto my-32">
 	<h1 class="mb-8 text-6xl text-center">
 		Welcome !
 	</h1>
