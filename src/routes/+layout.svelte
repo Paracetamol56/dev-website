@@ -7,9 +7,20 @@
 	import { writable } from 'svelte/store';
 	import Navbar from './Navbar.svelte';
 	import Footer from './Footer.svelte';
+	import { user } from '$lib/stores';
+	import { onMount } from 'svelte';
+	import { variants } from '@catppuccin/palette';
 
-	$: theme = writable('mocha')
-	export { theme };
+	$: theme = writable($user! ? $user!.flavour : 'mocha');
+
+	onMount(() => {
+		theme.subscribe((value) => {
+			const body = document.querySelector('body');
+			body?.classList.remove(...Object.keys(variants).map((v) => `ctp-${v}`));
+			body?.classList.add(`ctp-${value}`);
+		});
+	});
+
 </script>
 
 <script lang="ts" context="module">

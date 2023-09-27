@@ -1,11 +1,22 @@
 <script lang="ts">
 	import { createPopover, createRadioGroup, melt, type CreateRadioGroupProps } from '@melt-ui/svelte';
 	import { fade } from 'svelte/transition';
-  import { variants } from '@catppuccin/palette';
-	import { Palette, X } from 'lucide-svelte';
+	import { Check, Palette, X } from 'lucide-svelte';
 	import type { Writable } from 'svelte/store';
+	import { variants } from '@catppuccin/palette';
+  import catppuccinLogo from '$lib/images/catppuccin.png';
+	import { user } from '$lib/stores';
+	import { onMount } from 'svelte';
 
   export let theme: Writable<string>|undefined;
+
+  const onThemeChange: CreateRadioGroupProps['onValueChange']  = ({curr, next}) => {
+    theme?.set(next);
+    if ($user!._id !== null) {
+      $user!.flavour = next;
+    }
+    return next;
+  };
 
 	const {
 		elements: { trigger, content, arrow, close },
@@ -16,11 +27,19 @@
 
 	const {
 		elements: { root, item, hiddenInput },
-    states: { value },
 		helpers: { isChecked }
 	} = createRadioGroup({
     value: theme,
+    onValueChange: onThemeChange,
 	});
+
+  // Just to force tailwind to include the classes
+  const variantsClasses = [
+    'ctp-latte',
+    'ctp-frappe',
+    'ctp-macchiato',
+    'ctp-mocha',
+  ];
 </script>
 
 <button
@@ -49,32 +68,64 @@
         class="flex flex-col gap-3 data-[orientation=horizontal]:flex-row"
         aria-label="View density"
       >
-        {#each Object.keys(variants) as option}
-          <div class="flex items-center gap-3">
+        {#each Object.keys(variants) as variant, i}
+          <div class="flex max-h-full flex-col gap-0 overflow-y-auto">
             <button
-              use:melt={$item(option)}
-              class="grid h-6 w-6 cursor-default place-items-center rounded-full bg-white shadow-sm
-                      hover:bg-ctp-blue transition-colors"
-              id={option}
-              aria-labelledby="{option}-label"
+              use:melt={$item(variant)}
+              class="{variantsClasses[i]} bg-ctp-base relative cursor-pointer scroll-my-2 rounded-md py-2 pl-4 pr-4 text-ctp-text
+                    {$isChecked(variant) ? 'bg-ctp-mauve/25 text-ctp-mauve' : ''}
+                    hover:bg-ctp-mauve/25 hover:text-ctp-mauve"
             >
-              {#if $isChecked(option)}
-                <div class="h-3 w-3 rounded-full bg-ctp-mauve" />
+              {#if $isChecked(variant)}
+                <div class="check absolute left-2 top-1/2 z-10 text-ctp-mauve transform -translate-y-1/2">
+                  <Check class="square-4" />
+                </div>
               {/if}
+              <div class="pl-4">
+                <p class="text-left capitalize font-medium">
+                  {variant}
+                </p>
+                <div class="flex w-full justify-between">
+                  <div class="square-2 rounded-full bg-ctp-rosewater"></div>
+                  <div class="square-2 rounded-full bg-ctp-flamingo"></div>
+                  <div class="square-2 rounded-full bg-ctp-pink"></div>
+                  <div class="square-2 rounded-full bg-ctp-mauve"></div>
+                  <div class="square-2 rounded-full bg-ctp-red"></div>
+                  <div class="square-2 rounded-full bg-ctp-maroon"></div>
+                  <div class="square-2 rounded-full bg-ctp-peach"></div>
+                  <div class="square-2 rounded-full bg-ctp-yellow"></div>
+                  <div class="square-2 rounded-full bg-ctp-green"></div>
+                  <div class="square-2 rounded-full bg-ctp-teal"></div>
+                  <div class="square-2 rounded-full bg-ctp-sky"></div>
+                  <div class="square-2 rounded-full bg-ctp-sapphire"></div>
+                  <div class="square-2 rounded-full bg-ctp-blue"></div>
+                  <div class="square-2 rounded-full bg-ctp-lavender"></div>
+                  <!-- 
+                  <div class="square-3 bg-ctp-text"></div>
+                  <div class="square-3 bg-ctp-subtext1"></div>
+                  <div class="square-3 bg-ctp-subtext0"></div>
+                  <div class="square-3 bg-ctp-overlay2"></div>
+                  <div class="square-3 bg-ctp-overlay1"></div>
+                  <div class="square-3 bg-ctp-overlay0"></div>
+                  <div class="square-3 bg-ctp-surface2"></div>
+                  <div class="square-3 bg-ctp-surface1"></div>
+                  <div class="square-3 bg-ctp-surface0"></div>
+                  <div class="square-3 bg-ctp-base"></div>
+                  <div class="square-3 bg-ctp-mantle"></div>
+                  <div class="square-3 bg-ctp-crust"></div>
+                  -->
+                </div>
+              </div>
             </button>
-            <label
-              class="font-medium capitalize leading-none text-magnum-900"
-              for={option}
-              id="{option}-label"
-            >
-              {option}
-            </label>
           </div>
         {/each}
         <input name="line-height" use:melt={$hiddenInput} />
       </div>
 
-      <p class="font-medium text-sm text-ctp-text">Powered by Catppuccin</p>
+      <small class="text-center">
+        <img src={catppuccinLogo} alt="Catppuccin logo" class="inline-block rounded-full square-4 mr-1" />
+        Powered by <a class="text-ctp-blue" href="https://github.com/catppuccin/catppuccin">Catppuccin</a>
+      </small>
     </div>
     <button
       use:melt={$close}
