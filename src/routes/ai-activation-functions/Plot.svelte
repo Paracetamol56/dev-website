@@ -7,13 +7,10 @@
   export let yDomain: [number, number] = [0, 1];
   export let width: number = 500;
   export let height: number = 300;
-  export let margin = { top: 20, right: 20, bottom: 30, left: 40 };
+  let margin = { top: 20, right: 20, bottom: 30, left: 40 };
 
   let gx: SVGGElement;
   let gy: SVGGElement;
-
-  // x range = [-1, 1]
-  // y range = [0, 1]
 
   $: x = d3.scaleLinear(xDomain, [margin.left, width - margin.right]);
   $: y = d3.scaleLinear(yDomain, [height - margin.bottom, margin.top]);
