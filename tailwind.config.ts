@@ -5,6 +5,13 @@ import plugin from 'tailwindcss/plugin';
 const config = {
 	content: ['./src/**/*.{html,js,svelte,ts}'],
 	theme: {
+    container: {
+      padding: {
+        DEFAULT: '1rem',
+        sm: '2rem',
+        lg: '3rem',
+      },
+    },
 		extend: {}
 	},
 	plugins: [
