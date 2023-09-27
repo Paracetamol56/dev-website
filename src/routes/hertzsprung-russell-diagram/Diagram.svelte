@@ -16,7 +16,7 @@
 	export let margin = { top: 40, right: 40, bottom: 40, left: 40 };
 
 	const x = d3.scaleLinear([-0.39, 2.19], [margin.left, width - margin.right]);
-	const y = d3.scaleLinear([-7, 19], [margin.top, height - margin.bottom]);
+	const y = d3.scaleLinear([-9, 16], [margin.top, height - margin.bottom]);
 	const z = bv2rgb;
 
 	let g1: SVGGElement;
@@ -35,21 +35,6 @@
   $: d3.select(g2).call(d3.axisRight(y).ticks(null, '+'));
   $: d3.select(g3).call(d3.axisTop(d3.scaleLinear(x.domain().map(temperature), x.range())));
   $: d3.select(g4).call(d3.axisBottom(x).ticks(null, '+f'));
-
-	onMount(async () => {
-		let svg = d3.select('#plot');
-
-		svg
-			.append('g')
-			.selectAll('rect')
-			.data(data)
-			.join('rect')
-        .attr('x', (d: Star) => x(d.BV))
-        .attr('y', (d: Star) => y(d.Amag))
-        .attr('fill', (d: Star) => z(d.BV))
-        .attr('width', 0.75)
-        .attr('height', 0.75);
-	});
 </script>
 
 <div class="container mx-auto">
@@ -84,5 +69,16 @@
 			<tspan font-weight="bold">&nbsp;Color B-V&nbsp;</tspan>
 			<tspan fill-opacity="0.8">&nbsp;red →</tspan>
 		</text>
+		<g>
+			{#each data as star}
+				<rect
+					x={x(star.BV)}
+					y={y(star.Amag)}
+					fill={z(star.BV)}
+					width="0.75"
+					height="0.75"
+				></rect>
+			{/each}
+		</g>
 	</svg>
 </div>
