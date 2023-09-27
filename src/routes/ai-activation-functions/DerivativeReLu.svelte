@@ -20,12 +20,14 @@
   $: derivativeRelu = (x: number) => x > 0 ? 1 : 0;
 </script>
 
-<section class="flex flex-col gap-8 lg:flex-row lg:gap-16">
-  <div>
+<section class="flex flex-col gap-8 lg:flex-row lg:justify-between">
+  <div class="flex-1">
     <h2 class="mt-8 mb-4 text-lg font-semibold text-ctp-lavender">
       Formula
     </h2>
-    {@html display(`f(x)=\\left\\{\\begin{matrix}0 & \\textrm{if} \\quad x \\leq 0\\\\0 & \\textrm{if} \\quad x > 0\\end{matrix}\\right.`)}
+    <div class="flex flex-row items-center gap-5">
+      {@html display(`f(x)=\\left\\{\\begin{matrix}0 & \\textrm{if} \\quad x \\leq 0\\\\0 & \\textrm{if} \\quad x > 0\\end{matrix}\\right.`)}
+    </div>
   </div>
 
   <div class="flex-1" bind:clientWidth={containerWidth}>

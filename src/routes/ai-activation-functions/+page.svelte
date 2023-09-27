@@ -1,28 +1,35 @@
 <script lang="ts">
-	import { createCombobox, melt } from "@melt-ui/svelte";
-	import { Check, ChevronDown, ChevronUp } from "lucide-svelte";
-	import { fly } from "svelte/transition";
+	import { createTabs, melt } from "@melt-ui/svelte";
+	import { crossfade } from "svelte/transition";
+	import { cubicInOut } from "svelte/easing";
 	import Sigmoid from "./Sigmoid.svelte";
+	import ReLu from "./ReLu.svelte";
 	import LeakyReLu from "./LeakyReLu.svelte";
 	import DerivativeReLu from "./DerivativeReLu.svelte";
 	import TanH from "./TanH.svelte";
-	import ReLu from "./ReLu.svelte";
 
   const {
-    elements: { menu, input, option },
-    states: { open },
-    helpers: { isSelected },
-  } = createCombobox({
-    forceVisible: true,
+    elements: { root, list, content, trigger },
+    states: { value },
+  } = createTabs({
+    defaultValue: 'tab-1',
   });
-
-  $: functions = [
-    "Sigmoid",
-    "ReLU",
-    "LeakyReLU",
-    "DerivativeReLU",
-    "TanH",
+ 
+  let className = '';
+  export { className as class };
+ 
+  const triggers = [
+    { id: 'tab-1', title: 'Sigmoid' },
+    { id: 'tab-2', title: 'ReLU' },
+    { id: 'tab-3', title: 'LeakyReLU' },
+    { id: 'tab-4', title: 'DerivativeReLU' },
+    { id: 'tab-5', title: 'TanH' },
   ];
+ 
+  const [send, receive] = crossfade({
+    duration: 250,
+    easing: cubicInOut,
+  });
 
 </script>
 
@@ -31,77 +38,48 @@
     AI activation functions
   </h1>
 
-  <div class="relative">
-    <input
-      use:melt={$input}
-      class="flex h-10 items-center justify-between rounded-md bg-ctp-mantle w-full
-          px-3 pr-12 focus:outline-none focus:ring-2 focus:ring-ctp-mauve focus:border-transparent"
-      placeholder="Activation function"
-    />
-    <div class="absolute right-2 top-1/2 z-10 -translate-y-1/2 text-ctp-text">
-      {#if $open}
-        <ChevronUp class="square-4" />
-      {:else}
-        <ChevronDown class="square-4" />
-      {/if}
-    </div>
-  </div>
-
-  {#if $isSelected("Sigmoid")}
-    <Sigmoid />
-  {/if}
-  {#if $isSelected("ReLU")}
-    <ReLu />
-  {/if}
-  {#if $isSelected("LeakyReLU")}
-    <LeakyReLu />
-  {/if}
-  {#if $isSelected("DerivativeReLU")}
-    <DerivativeReLu />
-  {/if}
-  {#if $isSelected("TanH")}
-    <TanH />
-  {/if}
-</div>
-
-{#if $open}
-  <ul
-    class="z-10 flex max-h-[300px] flex-col overflow-hidden rounded-md"
-    use:melt={$menu}
-    transition:fly={{ duration: 150, y: -5 }}
+  <div
+    use:melt={$root}
+    class={'flex w-full flex-col overflow-hidden rounded-md shadow-md shadow-ctp-crust data-[orientation=vertical]:flex-row' + className}
   >
-    <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
     <div
-      class="flex max-h-full flex-col gap-0 overflow-y-auto bg-ctp-mantle px-2 py-2 text-ctp-text"
-      tabindex="0"
+      use:melt={$list}
+      class="flex shrink-0 overflow-x-auto bg-ctp-crust
+      data-[orientation=vertical]:flex-col data-[orientation=vertical]:border-r"
+      aria-label="Tabs"
     >
-      {#each functions as fn, index (index)}
-        <li
-          use:melt={$option({
-            value: fn,
-            label: fn,
-          })}
-          class="relative cursor-pointer scroll-my-2 rounded-md py-2 pl-4 pr-4
-                data-[highlighted]:bg-ctp-mauve/25 data-[highlighted]:text-ctp-mauve
-                data-[disabled]:opacity-50"
+      {#each triggers as triggerItem}
+        <button
+          use:melt={$trigger(triggerItem.id)}
+          class="relative flex items-center justify-center cursor-default select-none
+                rounded-none font-medium leading-1
+                flex-1 h-12 px-2 focus:relative { $value === triggerItem.id ? 'bg-ctp-mantle' : 'bg-ctp-crust'}"
         >
-          {#if $isSelected(fn)}
-            <div class="check absolute left-2 top-1/2 z-10 text-ctp-mauve transform -translate-y-1/2">
-              <Check class="square-4" />
-            </div>
+          {triggerItem.title}
+          {#if $value === triggerItem.id}
+            <div
+              in:send={{ key: 'trigger' }}
+              out:receive={{ key: 'trigger' }}
+              class="absolute bottom-1 left-1/2 h-1 w-6 -translate-x-1/2 rounded-full bg-ctp-mauve"
+            />
           {/if}
-          <div class="pl-4">
-            <span class="font-medium">{fn}</span>
-          </div>
-        </li>
-      {:else}
-        <li
-          class="relative cursor-pointer rounded-md py-1 pl-8 pr-4
-                data-[highlighted]:bg-ctp-mauve data-[highlighted]:text-ctp-mauve"
-        >
-          No results found
-        </li>
+        </button>
       {/each}
     </div>
-  </ul>
-{/if}
+    <div use:melt={$content('tab-1')} class="grow bg-ctp-mantle p-5 xl:px-32 2xl:px-64">
+      <Sigmoid />
+    </div>
+    <div use:melt={$content('tab-2')} class="grow bg-ctp-mantle p-5 xl:px-32 2xl:px-64">
+      <ReLu />
+    </div>
+    <div use:melt={$content('tab-3')} class="grow bg-ctp-mantle p-5 xl:px-32 2xl:px-64">
+      <LeakyReLu />
+    </div>
+    <div use:melt={$content('tab-4')} class="grow bg-ctp-mantle p-5 xl:px-32 2xl:px-64">
+      <DerivativeReLu />
+    </div>
+    <div use:melt={$content('tab-5')} class="grow bg-ctp-mantle p-5 xl:px-32 2xl:px-64">
+      <TanH />
+    </div>
+  </div>
+</div>

@@ -9,8 +9,8 @@
 	$: relu = (x: number) => Math.max(0, x);
 </script>
 
-<section class="flex flex-col gap-8 lg:flex-row lg:gap-16">
-	<div>
+<section class="flex flex-col gap-8 lg:flex-row lg:justify-between">
+	<div class="flex-1">
 		<h2 class="mt-8 mb-4 text-lg font-semibold text-ctp-lavender">Formula</h2>
 
 		<div class="flex flex-row items-center gap-5">
