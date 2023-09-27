@@ -2,7 +2,8 @@
 	import { createPopover, createRadioGroup, melt, type CreateRadioGroupProps } from '@melt-ui/svelte';
 	import { fade } from 'svelte/transition';
   import { variants } from '@catppuccin/palette';
-	import { Palette, Settings2, X } from 'lucide-svelte';
+	import { Palette, X } from 'lucide-svelte';
+	import type { Writable } from 'svelte/store';
 
   export let theme: Writable<string>|undefined;
 
@@ -37,11 +38,11 @@
   <div
     use:melt={$content}
     transition:fade={{ duration: 100 }}
-    class="z-10 w-60 rounded-[4px] bg-ctp-overlay0 p-5 shadow-sm"
+    class="z-10 w-60 rounded-[4px] bg-ctp-base p-5 shadow-md shadow-ctp-crust"
   >
     <div use:melt={$arrow} />
     <div class="flex flex-col gap-2.5">
-      <p class="mb-2 font-medium text-ctp-text">Theme</p>
+      <p class="mb-2 font-semibold text-ctp-text">Theme</p>
 
       <div
         use:melt={$root}

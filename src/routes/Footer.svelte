@@ -7,7 +7,7 @@
 		<p class="font-semibold">
       Source code available on <a class="text-ctp-blue" href="https://github.com/Paracetamol56/dev-showcase">GitHub</a>.
     </p>
-		<div class="flex">
+		<div class="flex gap-2">
 			<SocialButton href="https://github.com/Paracetamol56" tooltip="GitHub">
 				<svg
 					class="square-8"

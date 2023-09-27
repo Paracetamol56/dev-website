@@ -26,7 +26,7 @@
           return;
         }
         // Store the user in a cookie
-        document.cookie = `user=${JSON.stringify(reponse.data)}; path=/; max-age=${86400 * 30}; samesite=strict`;
+        document.cookie = `user=${JSON.stringify(reponse.data)}; path=/; max-age=2592000; samesite=strict`;
         user.set(reponse.data);
 
         addToast({

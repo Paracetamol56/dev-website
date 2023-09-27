@@ -93,7 +93,7 @@
 
 <!-- Button -->
 <button
-  class="rounded-md bg-ctp-mauve px-3 py-1 font-medium text-ctp-surface0 hover:opacity-75 active:opacity-50 transition-opacity"
+  class="rounded-md bg-ctp-mauve px-3 py-1 font-medium text-ctp-mantle hover:opacity-75 active:opacity-50 transition-opacity"
   use:melt={$trigger}
 >
   Login

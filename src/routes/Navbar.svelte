@@ -4,8 +4,14 @@
 	import type { Writable } from "svelte/store";
 	import LoginDialog from "./LoginDialog.svelte";
 	import { user } from "$lib/stores";
+	import { onMount } from "svelte";
+	import ProfilePopover from "./ProfilePopover.svelte";
 
   export let theme: Writable<string>;
+
+	onMount(() => {
+		console.log("user", $user);
+	});
 
   const {
     elements: { root, link },
@@ -40,8 +46,8 @@
 		</div>
 		<div class="ml-auto flex items-center gap-2" >
 			<ThemePopover {theme} />
-			{#if user !== null}
-			{$user}
+			{#if $user !== null}
+			<ProfilePopover />
 			{:else}
 			<LoginDialog />
 			{/if}
