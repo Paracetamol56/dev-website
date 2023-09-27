@@ -6,12 +6,7 @@
 </svelte:head>
 
 <section class="container mx-auto my-32">
-	<h1 class="mb-8 text-6xl text-center">
-		Welcome !
+	<h1 class="mb-8 text-6xl font-bold text-center">
+		<span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender">Welcome</span> to my website
 	</h1>
-	<p class="text-xl text-center">Take a seat and enjoy this collection of little projects of mine</p>
-</section>
-
-<section class="container my-32">
-	
 </section>
