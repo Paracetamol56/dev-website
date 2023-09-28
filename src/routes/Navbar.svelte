@@ -4,14 +4,9 @@
 	import type { Writable } from "svelte/store";
 	import LoginDialog from "./LoginDialog.svelte";
 	import { user } from "$lib/stores";
-	import { onMount } from "svelte";
 	import ProfilePopover from "./ProfilePopover.svelte";
 
   export let theme: Writable<string>;
-
-	onMount(() => {
-		console.log("user", $user);
-	});
 
   const {
     elements: { root, link },

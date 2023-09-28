@@ -1,10 +1,9 @@
 <script lang="ts">
-  import { page } from '$app/stores';
 	import { ArrowRight } from 'lucide-svelte';
 </script>
 
 <svelte:head>
-  <title>{$page.error.message||'Error'} - Mathéo Galuba</title>
+  <title>404 - Mathéo Galuba</title>
 </svelte:head>
 
 <main class="grid min-h-full place-items-center px-6 py-24 sm:py-32 lg:px-8">

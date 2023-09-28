@@ -1,4 +1,3 @@
-<!-- src/SigmoidPlot.svelte -->
 <script lang="ts">
   import * as d3 from "d3";
 
@@ -16,9 +15,9 @@
   $: y = d3.scaleLinear(yDomain, [height - margin.bottom, margin.top]);
   $: line = d3
     .line()
-    .x((d: any) => x(d.x))
-    .y((d: any) => y(fx(d.x)));
-  $: data = d3.range(-1, 1, 0.01).map((x: any) => ({ x }));
+    .x((d: [number, number]) => x(d[0]))
+    .y((d: [number, number]) => y(d[1]));
+  $: data = d3.range(-1, 1, 0.01).map((x) => [x, fx(x)] as [number, number]);
   $: d3.select(gy).call(d3.axisLeft(y));
   $: d3.select(gx).call(d3.axisBottom(x));
 </script>
