@@ -17,7 +17,6 @@ const config = {
 	plugins: [
 		catppuccin({
       prefix: "ctp",
-      defaultFlavour: "mocha",
     }),
 		plugin(function ({ addVariant, matchUtilities, theme }) {
       addVariant('hocus', ['&:hover', '&:focus']);

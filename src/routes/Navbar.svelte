@@ -5,6 +5,7 @@
 	import LoginDialog from "./LoginDialog.svelte";
 	import { user } from "$lib/stores";
 	import ProfilePopover from "./ProfilePopover.svelte";
+	import { ExternalLink } from "lucide-svelte";
 
   export let theme: Writable<string>;
 
@@ -35,9 +36,9 @@
 			</svg>
 		</a>
 		<div class="flex items-center gap-3 text-md font-semibold" >
-			<a class="hover:text-ctp-blue transition-colors" href="https://matheo-galuba.com" target="_blank" use:melt={$link}>Portfolio</a>
 			<a class="hover:text-ctp-blue transition-colors" href="/map" use:melt={$link}>Main map</a>
 			<a class="hover:text-ctp-blue transition-colors" href="/contact" use:melt={$link}>Contact</a>
+			<a class="hover:text-ctp-blue transition-colors hidden sm:inline-flex items-center gap-1" href="https://matheo-galuba.com" target="_blank" use:melt={$link}>Portfolio <ExternalLink size="16" stroke-width="3" /></a>
 		</div>
 		<div class="ml-auto flex items-center gap-2" >
 			<ThemePopover {theme} />
