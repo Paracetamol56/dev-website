@@ -1,22 +1,48 @@
 import db from '$lib/db';
-import type { PageLoad } from './$types';
+import type { PageServerLoad  } from './$types';
+import type { StarHR } from './utils';
 
-export const load: PageLoad = async () => {
-  // Select the Vmag, Plx, B-V from the Hipparcos collection (rename 'B-V' to BV) 
-	const stars = await db.collection('hipparcos')
+export const load: PageServerLoad = async () => {
+  // Use the B-V_1 index
+	const stars: StarHR[] = await db
+    .collection('hipparcos')
     .aggregate([
-      { $project: { _id: 0, Vmag: 1, Plx: 1, BV: '$B-V' } },
       { $match: {
-        BV: { $gte: -0.4, $lte: 2.2 },
-        Plx: { $gte: 0.1 }
-      }}
+          "B-V": { $gte: -0.4, $lte: 2.2 },
+          Plx: { $gte: 0.1 }
+        }
+      },
+      { $project: {
+          _id: 0,
+          HIP: 1,
+          Amag: {
+            $subtract: [
+              '$Vmag',
+              {
+                $multiply: [
+                  5,
+                  {
+                    $log10: {
+                      $divide: [
+                        {
+                          $divide: [1000, '$Plx']
+                        },
+                        10
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          BV: '$B-V' 
+        }
+      },
     ])
-    .toArray()
+    .toArray() as StarHR[];
 
-  // Compute the absolute magnitude for each star
-  for (const star of stars) {
-    star.Amag = star.Vmag - 5 * Math.log10((1000 / star.Plx) / 10)
-  }
+  console.log(stars.length);
+  console.log(stars[0]);
 
   return { stars };
 };
