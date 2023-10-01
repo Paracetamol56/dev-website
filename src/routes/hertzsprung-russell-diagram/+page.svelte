@@ -2,7 +2,7 @@
 	import axios from "axios";
   import type { PageData } from "./$types";
 	import Diagram from "./Diagram.svelte";
-	import { type StarHR } from "./utils";
+	import type { StarHR } from "./utils";
 	import { AlertTriangle, Search } from "lucide-svelte";
   import { page } from '$app/stores';
 	import { createDialog, melt } from "@melt-ui/svelte";
@@ -31,13 +31,10 @@
     event.preventDefault();
 
     if (search !== "" && search !== null) {
-      console.log("search", search);
       updateSelectedStar();
       $page.url.searchParams.set("q", search);
-      console.log($page.url.toString());
       goto($page.url.toString());
     } else {
-      console.log("empty");
       selectedStar = null;
       $page.url.searchParams.delete("q");
       goto($page.url.toString());
@@ -64,7 +61,7 @@
   });
 </script>
 
-<div class="container mx-auto">
+<div class="container mx-auto mb-16">
   <h1 class="my-16 text-6xl font-semibold text-center">
     Herzsprung-Russell diagram
   </h1>

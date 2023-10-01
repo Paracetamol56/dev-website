@@ -41,8 +41,5 @@ export const load: PageServerLoad = async () => {
     ])
     .toArray() as StarHR[];
 
-  console.log(stars.length);
-  console.log(stars[0]);
-
   return { stars };
 };
