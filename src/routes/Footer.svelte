@@ -2,7 +2,7 @@
 	import SocialButton from './SocialButton.svelte';
 </script>
 
-<footer class="min-w-max p-3">
+<footer class="sticky top-[100vh] min-w-max mt-16 p-3">
 	<div class="flex flex-col items-center gap-4 rounded-md bg-ctp-mantle p-3 text-ctp-text">
 		<p class="font-semibold">
 			Source code available on <a

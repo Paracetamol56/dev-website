@@ -61,7 +61,7 @@
   });
 </script>
 
-<div class="container mx-auto mb-16">
+<div class="container mx-auto">
   <h1 class="my-16 text-6xl font-semibold text-center">
     Herzsprung-Russell diagram
   </h1>
