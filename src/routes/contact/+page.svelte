@@ -135,8 +135,8 @@
           id="email"
           type="email"
           name="email"
-          class="flex h-8 w-full items-center justify-between rounded-md bg-ctp-text
-                px-3 pr-12 text-ctp-base focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
+          class="flex h-8 w-full items-center justify-between rounded-md bg-ctp-surface0
+                px-3 pr-12 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
           bind:value={email}
           on:blur={() => validateEmail(email)}
         />
@@ -150,8 +150,8 @@
           id="name"
           type="text"
           name="name"
-          class="flex h-8 w-full items-center justify-between rounded-md bg-ctp-text
-                px-3 text-ctp-base focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
+          class="flex h-8 w-full items-center justify-between rounded-md bg-ctp-surface0
+                px-3 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
           bind:value={name}
           on:blur={() => validateName(name)}
         />
@@ -164,8 +164,8 @@
         <textarea
           id="message"
           name="message"
-          class="flex h-32 w-full items-center justify-between rounded-md bg-ctp-text
-                px-3 py-2 text-ctp-base focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
+          class="flex h-32 w-full items-center justify-between rounded-md bg-ctp-surface0
+                px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
           bind:value={message}
           on:blur={() => validateMessage(message)}
         />
@@ -175,7 +175,7 @@
         <div class="flex items-center">
           <button
             use:melt={$root}
-            class="switch relative h-5 w-[2.5rem] cursor-default rounded-full bg-ctp-crust transition-colors data-[state=checked]:bg-ctp-mauve"
+            class="switch relative h-5 w-[2.5rem] cursor-default rounded-full bg-ctp-surface0 transition-colors data-[state=checked]:bg-ctp-mauve"
             id="privacy"
           >
             <span class="thumb block rounded-full bg-white transition" />

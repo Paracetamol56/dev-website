@@ -127,7 +127,7 @@
             Email
           </label>
           <input
-            class="h-8 flex-1 rounded-md border border-solid px-3 leading-none text-ctp-base
+            class="h-8 flex-1 rounded-md px-3 leading-none bg-ctp-surface0
                   focus:ring-2 focus:ring-ctp-mauve focus:outline-none {emailError != '' ? 'ring-2 ring-ctp-red' : ''}"
             id="email"
             bind:value={email}

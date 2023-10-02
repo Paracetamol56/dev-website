@@ -99,7 +99,7 @@
 
   {#if !$open}
   <div class="my-8 mx-auto w-fit">
-    <label for="hip" class="mb-1 text-sm font-medium">
+    <label for="hip" class="mb-2 text-sm font-semibold">
       Search by HIP number
     </label>
     <div>
@@ -109,8 +109,8 @@
           type="number"
           min="0"
           class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none
-                flex h-8 items-center justify-between rounded-md bg-ctp-text
-                px-3 pr-12 text-ctp-base focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
+                flex h-8 items-center justify-between rounded-md bg-ctp-surface0
+                px-3 pr-12 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
           bind:value={search}
         />
         <button
@@ -122,7 +122,7 @@
           <Search size="18" />
         </button>
       </div>
-      <p class="mb-4 text-left text-sm text-ctp-red">{searchError}</p>
+      <p class="mb-4 text-left text-sm font-semibold text-ctp-red">{searchError}</p>
     </div>
   </div>
   
