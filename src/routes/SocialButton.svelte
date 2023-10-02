@@ -18,7 +18,7 @@
   });
 </script>
 
-<a href={href} use:melt={$trigger}>
+<a href={href} target="_blank" rel="noopener noreferrer" use:melt={$trigger}>
   <slot />
 </a>
 
