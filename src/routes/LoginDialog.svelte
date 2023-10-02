@@ -56,8 +56,8 @@
 
     dialogOpen.set(false);
 
-    // Call the route /auth/login with the email as a parameter with axios
-    axios.post('/auth/login', { email })
+    // Call the route /api/auth/login with the email as a parameter with axios
+    axios.post('/api/auth/login', { email })
       .then((response) => {
         if (response.status != 200) {
           console.error(response);

@@ -11,7 +11,7 @@
     const redirect: string = $page.url.searchParams.get('redirect') ?? '/';
     
     // Send the token to the server
-    axios.get('/auth/verify', { params: { token: token } })
+    axios.get('/api/auth/verify', { params: { token: token } })
       .then((reponse) => {
         if (reponse.status !== 200) {
           console.error(reponse);
