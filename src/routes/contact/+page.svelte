@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { createSwitch, melt } from "@melt-ui/svelte";
+	import { createSwitch, melt, type CreateSwitchProps } from "@melt-ui/svelte";
 	import { Send } from "lucide-svelte";
-
 
   let email: string = "";
   let name: string = "";
@@ -10,10 +9,69 @@
   let emailError: string = "";
   let nameError: string = "";
   let messageError: string = "";
+  let privacyError: string = "";
+
+  const validateEmail = (email: string) => {
+    if (email.length === 0) {
+      emailError = "Email is required";
+      return false;
+    }
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      emailError = "Email address is invalid";
+      return false;
+    }
+    emailError = "";
+    return true;
+  };
+  const validateName = (name: string) => {
+    if (name.length === 0) {
+      nameError = "Name is required";
+      return false;
+    }
+    if (name.length < 3) {
+      nameError = "Name must be at least 3 characters long";
+      return false;
+    }
+    if (name.length > 100) {
+      nameError = "Name must be less than 100 characters long";
+      return false;
+    }
+    nameError = "";
+    return true;
+  };
+  const validateMessage = (message: string) => {
+    if (message.length === 0) {
+      messageError = "Message is required";
+      return false;
+    }
+    if (message.length < 10) {
+      messageError = "Message must be at least 10 characters long";
+      return false;
+    }
+    if (message.length > 1000) {
+      messageError = "Message must be less than 1000 characters long";
+      return false;
+    }
+    messageError = "";
+    return true;
+  };
+  const validatePrivacy: CreateSwitchProps['onCheckedChange'] = ({curr, next}) => {
+    if (!next) {
+      privacyError = "This field is required";
+    } else {
+      privacyError = "";
+    }
+    return next;
+  };
 
   const {
     elements: { root, input },
-  } = createSwitch();
+  } = createSwitch({
+    name: "privacy",
+    required: true,
+    defaultChecked: false,
+    onCheckedChange: validatePrivacy,
+  });
 </script>
 
 <svelte:head>
@@ -37,6 +95,7 @@
           class="flex h-8 w-full items-center justify-between rounded-md bg-ctp-text
                 px-3 pr-12 text-ctp-base focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
           bind:value={email}
+          on:blur={() => validateEmail(email)}
         />
         <p class="text-left text-sm font-semibold text-ctp-red">{emailError}</p>
       </fieldset>
@@ -51,6 +110,7 @@
           class="flex h-8 w-full items-center justify-between rounded-md bg-ctp-text
                 px-3 text-ctp-base focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
           bind:value={name}
+          on:blur={() => validateName(name)}
         />
         <p class="text-left text-sm font-semibold text-ctp-red">{nameError}</p>
       </fieldset>
@@ -64,6 +124,7 @@
           class="flex h-32 w-full items-center justify-between rounded-md bg-ctp-text
                 px-3 py-2 text-ctp-base focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
           bind:value={message}
+          on:blur={() => validateMessage(message)}
         />
         <p class="text-left text-sm font-semibold text-ctp-red">{messageError}</p>
       </fieldset>
@@ -84,6 +145,7 @@
             By checking this box, you agree to share your data with me.
           </label>
         </div>
+        <p class="text-left text-sm font-semibold text-ctp-red">{privacyError}</p>
       </fieldset>
       <div class="sm:col-span-2 flex justify-end">
         <button
