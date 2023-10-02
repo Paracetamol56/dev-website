@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { createSwitch, melt, type CreateSwitchProps } from "@melt-ui/svelte";
+	import axios from "axios";
 	import { Send } from "lucide-svelte";
+	import { addToast } from "../+layout.svelte";
+	import { user } from "$lib/stores";
 
   let email: string = "";
   let name: string = "";
@@ -64,11 +67,51 @@
     return next;
   };
 
+  const handleSubmit = (e: Event) => {
+    e.preventDefault();
+    if (!validateEmail(email) || !validateName(name) || !validateMessage(message) || !$checked) {
+      addToast({
+        data: {
+          title: "Invalid form",
+          description: "Please check your inputs",
+          color: "bg-ctp-red"
+        }
+      });
+      return;
+    }
+
+    axios.post('/api/contact', {
+      userId: $user?._id ?? null,
+      email,
+      name,
+      message,
+    }).then(() => {
+      addToast({
+        data: {
+          title: "Message sent",
+          description: "I will get back to you as soon as possible",
+          color: "bg-ctp-green"
+        }
+      });
+      email = "";
+      name = "";
+      message = "";
+    }).catch(() => {
+      addToast({
+        data: {
+          title: "Error",
+          description: "An error occured while sending your message",
+          color: "bg-ctp-red"
+        }
+      });
+    });
+  };
+
   const {
     elements: { root, input },
+    states: { checked },
   } = createSwitch({
     name: "privacy",
-    required: true,
     defaultChecked: false,
     onCheckedChange: validatePrivacy,
   });
@@ -82,7 +125,7 @@
 	<h1 class="mb-8 text-6xl font-bold text-center">
 		<span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender">Contact</span>
 	</h1>
-  <form class="mx-auto max-w-xl" method="post">
+  <form class="mx-auto max-w-xl" on:submit={handleSubmit}>
     <div class="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
       <fieldset class="w-full">
         <label for="hip" class="mb-2 text-sm font-semibold">
