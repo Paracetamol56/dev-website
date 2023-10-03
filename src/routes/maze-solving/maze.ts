@@ -1,10 +1,11 @@
-import { Node, QueueFrontier, type State } from "./utils";
+import { Node, PriorityQueueFrontier, QueueFrontier, StackFrontier, type State } from "./utils";
 
 class Cell {
   wall: boolean;
   start: boolean;
   end: boolean;
   visited: boolean;
+  solution: boolean;
   element: HTMLDivElement | null = null;
 
   constructor(wall: boolean) {
@@ -12,6 +13,7 @@ class Cell {
     this.start = false;
     this.end = false;
     this.visited = false;
+    this.solution = false;
   }
 }
 
@@ -22,7 +24,7 @@ class Maze {
   start: State = { x: 0, y: 0 };
   end: State = { x: 0, y: 0 };
   explored: State[] = [];
-  frontier: QueueFrontier = new QueueFrontier();
+  frontier: PriorityQueueFrontier = new PriorityQueueFrontier();
 
   /**
    * Creates a new maze.
@@ -34,7 +36,7 @@ class Maze {
    *   - `/` represents a new line.
    */
   constructor(mazeString: string) {
-    const splitedMazeString = mazeString.split("/");
+    const splitedMazeString = mazeString.split("\n");
     this.height = splitedMazeString.length;
     this.width = splitedMazeString[0].length;
 
@@ -96,9 +98,9 @@ class Maze {
     return neighbors;
   }
 
-  move(): State {
+  move(): Node {
     if (this.frontier.isEmpty()) {
-      throw new Error("No Solution");
+      throw new Error("No solution");
     }
 
     const node = this.frontier.remove();
@@ -122,7 +124,7 @@ class Maze {
       }
     }
 
-    return node!.state;
+    return node;
   }
 };
 

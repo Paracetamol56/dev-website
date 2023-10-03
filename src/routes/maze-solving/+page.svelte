@@ -1,5 +1,16 @@
 <script lang="ts">
 	import Maze from "./Maze.svelte";
+
+  const mazeString =
+`#############
+#          B#
+# ######### #
+# #       # #
+# # ##### # #
+#   #     # #
+### # ##### #
+A   #       #
+#############`;
 </script>
 
 <div class="container mx-auto">
@@ -7,5 +18,5 @@
     Maze solving
   </h1>
 
-  <Maze mazeString="#####B#/#     #/# ### #/# ##  #/   # ##/A#   ##" />
+  <Maze mazeString={mazeString} />
 </div>

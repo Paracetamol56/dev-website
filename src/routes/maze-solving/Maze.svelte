@@ -1,25 +1,70 @@
 <script lang="ts">
+	import { RedoDot, Rocket } from "lucide-svelte";
 	import { Maze } from "./maze";
-	import type { State } from "./utils";
+	import type { Node, State } from "./utils";
 
   export let mazeString = "#####B#/##### #/####  #/#### ##/     ##/A######";
 
   let maze = new Maze(mazeString);
-  let lastMove: State = maze.move();
-  let solved = false;
-  const handleAIMove = () => {
+  let lastNode: Node = maze.move();
+  let solved: boolean = false;
+  let solvable: boolean = true;
+
+  const getSolvedPath = (endNode: Node) => {
+    let solvedPath: State[] = [];
+    let node: Node = endNode;
+    while (node.parent) {
+      solvedPath.push(node.state);
+      maze.cells[node.state.x][node.state.y].solution = true;
+      node = node.parent;
+    }
+    solvedPath.push(node.state);
+    maze.cells[node.state.x][node.state.y].solution = true;
+    return solvedPath;
+  }
+
+  const handleAIStep = () => {
     if (solved) return;
     
     try {
-      lastMove = maze.move();
+      lastNode = maze.move();
     } catch (e) {
       console.log(e);
+      if (e instanceof Error) {
+        if (e.message == "No solution") {
+          solvable = false;
+        }
+      }
     }
 
-    if (lastMove.x == maze.end.x && lastMove.y == maze.end.y) {
+    if (lastNode.state.x == maze.end.x && lastNode.state.y == maze.end.y) {
       solved = true;
+      getSolvedPath(lastNode);
     }
-  }
+  };
+
+  const handleAISolve = () => {
+    if (solved) return;
+
+    try {
+      while (true) {
+        lastNode = maze.move();
+        if (lastNode.state.x == maze.end.x && lastNode.state.y == maze.end.y) {
+          solved = true;
+          getSolvedPath(lastNode);
+          break;
+        }
+      }
+    } catch (e) {
+      console.log(e);
+      if (e instanceof Error) {
+        if (e.message == "No solution") {
+          solvable = false;
+        }
+      }
+    }
+  };
+
   $: {
     for (let i = 0; i < maze.height; i++) {
       for (let j = 0; j < maze.width; j++) {
@@ -42,14 +87,20 @@
             cell.element!.classList.add("border-2", "border-ctp-green");
           }
 
-          if (i == lastMove.x && j == lastMove.y) {
+          if (i == lastNode.state.x && j == lastNode.state.y) {
             const stateElement = document.createElement("div");
             stateElement.classList.add("rounded-full", "bg-ctp-mauve", "aspect-square", "w-1/2", "h-1/2");
             cell.element!.appendChild(stateElement);
           } else if (cell.visited) {
-            const stateElement = document.createElement("div");
-            stateElement.classList.add("rounded-full", "bg-ctp-yellow", "w-1/2", "h-1/2");
-            cell.element!.appendChild(stateElement);
+            if (cell.solution) {
+              const stateElement = document.createElement("div");
+              stateElement.classList.add("rounded-full", "bg-ctp-green", "w-1/2", "h-1/2");
+              cell.element!.appendChild(stateElement);
+            } else {
+              const stateElement = document.createElement("div");
+              stateElement.classList.add("rounded-full", "bg-ctp-yellow", "w-1/2", "h-1/2");
+              cell.element!.appendChild(stateElement);
+            }
           }
         }
       }
@@ -68,15 +119,39 @@
   
   {#if solved}
     <div class="absolute rounded-md inset-0 flex flex-col justify-center items-center bg-ctp-green/25">
-      <h2 class="mb-8 text-4xl font-semibold text-ctp-green">
+      <h2 class="mb-4 text-4xl font-semibold text-ctp-green">
         Solved!
       </h2>
+      <p class="mb-4">
+        Explored states: {maze.explored.length}
+      </p>
       <button
         class="rounded-md bg-ctp-mauve px-3 py-1 font-medium text-ctp-mantle hover:opacity-75 active:opacity-50 transition-opacity"
         on:click={() => {
           maze = new Maze(mazeString);
-          lastMove = maze.move();
+          lastNode = maze.move();
           solved = false;
+        }}
+      >
+        Reset
+      </button>
+    </div>
+  {/if}
+  {#if !solvable}
+    <div class="absolute rounded-md inset-0 flex flex-col justify-center items-center bg-ctp-red/25">
+      <h2 class="mb-4 text-4xl font-semibold text-ctp-red">
+        No solution
+      </h2>
+      <p class="mb-4">
+        Explored states: {maze.explored.length}
+      </p>
+      <button
+        class="rounded-md bg-ctp-mauve px-3 py-1 font-medium text-ctp-mantle hover:opacity-75 active:opacity-50 transition-opacity"
+        on:click={() => {
+          maze = new Maze(mazeString);
+          lastNode = maze.move();
+          solved = false;
+          solvable = true;
         }}
       >
         Reset
@@ -85,11 +160,17 @@
   {/if}
 </div>
 
-<div class="my-8 flex justify-center">
+<div class="my-8 flex justify-center gap-2">
   <button
-    class="rounded-md bg-ctp-mauve px-3 py-1 font-medium text-ctp-mantle hover:opacity-75 active:opacity-50 transition-opacity"
-    on:click={() => handleAIMove()}
+    class="flex items-center rounded-md bg-ctp-mauve px-3 py-1 font-medium text-ctp-mantle hover:opacity-75 active:opacity-50 transition-opacity"
+    on:click={() => handleAIStep()}
   >
-    AI move
+    Single step&nbsp;<RedoDot size="18" />
+  </button>
+  <button
+    class="flex items-center rounded-md bg-ctp-mauve px-3 py-1 font-medium text-ctp-mantle hover:opacity-75 active:opacity-50 transition-opacity"
+    on:click={() => handleAISolve()}
+  >
+    Solve&nbsp;<Rocket size="18" />
   </button>
 </div>
