@@ -6,13 +6,12 @@
 	import { variants } from '@catppuccin/palette';
   import catppuccinLogo from '$lib/images/catppuccin.png';
 	import { user } from '$lib/stores';
-	import { onMount } from 'svelte';
 
-  export let theme: Writable<string>|undefined;
+  export let theme: Writable<string>;
 
   const onThemeChange: CreateRadioGroupProps['onValueChange']  = ({curr, next}) => {
     theme?.set(next);
-    if ($user!._id !== null) {
+    if ($user !== null) {
       $user!.flavour = next;
     }
     return next;
