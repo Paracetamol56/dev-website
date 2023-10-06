@@ -5,6 +5,7 @@
 	import { addToast } from "../+layout.svelte";
 	import { goto } from "$app/navigation";
 	import { user } from "$lib/stores";
+	import { User } from "lucide-svelte";
 
   onMount(() => {
     const token: string = $page.url.searchParams.get('token') ?? '';
@@ -25,9 +26,14 @@
           goto(redirect);
           return;
         }
-        // Store the user in a cookie
-        document.cookie = `user=${JSON.stringify(reponse.data)}; path=/; max-age=2592000; samesite=strict`;
-        user.set(reponse.data);
+        // Write the user to the store
+        user.set({
+          token: reponse.data.token,
+          id: reponse.data.user.id,
+          name: reponse.data.user.name,
+          email: reponse.data.user.email,
+          flavour: reponse.data.user.flavour,
+        });
 
         addToast({
           data: {
