@@ -4,6 +4,7 @@ node_modules
 .prettier*
 .git*
 .vscode
+.env
 README.md
 Dockerfile*
 docker-compose.yml

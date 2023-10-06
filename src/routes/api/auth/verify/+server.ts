@@ -1,5 +1,5 @@
 import db from "$lib/db"
-import { JWT_SECRET } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { error, json, type RequestHandler } from "@sveltejs/kit";
 import jwt from 'jsonwebtoken';
 import { ObjectId } from "mongodb";
@@ -19,7 +19,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
   // Use JWT to verify the token
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as TokenPayload;
+    const decoded = jwt.verify(token, env.JWT_SECRET!) as TokenPayload;
 
     // Update the user
     const userId: ObjectId = new ObjectId(decoded.userId);

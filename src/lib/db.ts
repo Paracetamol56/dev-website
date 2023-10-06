@@ -1,7 +1,8 @@
 
 import { MongoClient } from "mongodb"
-import { DB_URI } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
-const client = new MongoClient(DB_URI)
-await client.connect()
+const uri = env.DB_URI || 'mongodb://localhost:27017/dev';
+const client = new MongoClient(uri!);
+client.connect();
 export default client.db('dev')

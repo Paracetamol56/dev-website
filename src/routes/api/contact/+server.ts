@@ -2,7 +2,7 @@ import { error, type RequestHandler } from "@sveltejs/kit";
 import sgMail from '@sendgrid/mail';
 import type { ObjectId } from "mongodb";
 import db from "$lib/db";
-import { ADMIN_EMAIL, SENDGRID_API_KEY } from "$env/static/private";
+import { env } from "$env/dynamic/private";
 
 interface Contact {
 	userId: ObjectId | null;
@@ -25,9 +25,9 @@ export const POST: RequestHandler = async ({ request }) => {
 
 	let mailId: string;
   try {
-    sgMail.setApiKey(SENDGRID_API_KEY)
+    sgMail.setApiKey(env.SENDGRID_API_KEY!)
 		const msg: sgMail.MailDataRequired = {
-			to: ADMIN_EMAIL,
+			to: env.ADMIN_EMAIL,
 			from: 'matheo.galu56@gmail.com',
 			subject: 'New message from dev.matheo-galuba.com',
 			content: [{

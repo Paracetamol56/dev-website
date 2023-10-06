@@ -1,5 +1,5 @@
 import db from "$lib/db"
-import { JWT_SECRET, SENDGRID_API_KEY } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { error, json, type RequestHandler } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import sgMail from '@sendgrid/mail';
@@ -52,7 +52,7 @@ const generateToken = (userId: string) => {
     {
       userId: userId,
     },
-    JWT_SECRET,
+    env.JWT_SECRET!,
     {
       expiresIn: "1h",
     }
@@ -60,7 +60,7 @@ const generateToken = (userId: string) => {
 };
 
 const sendEmail = (email: string, link: string) => {
-  sgMail.setApiKey(SENDGRID_API_KEY)
+  sgMail.setApiKey(env.SENDGRID_API_KEY!)
   const msg: sgMail.MailDataRequired = {
     to: email, // Change to your recipient
     from: 'matheo.galu56@gmail.com', // Change to your verified sender
