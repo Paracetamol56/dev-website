@@ -10,3 +10,4 @@ FROM oven/bun:latest AS runner
 WORKDIR /app
 COPY --from=builder /app/build .
 ENTRYPOINT ["bun", "./index.js"]
+EXPOSE 3000
