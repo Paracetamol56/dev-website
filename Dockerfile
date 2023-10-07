@@ -1,13 +1,15 @@
-FROM oven/bun:latest AS builder
-
+FROM node:lts-alpine AS builder
 WORKDIR /app
+COPY ./package*.json ./
+RUN npm install
 COPY . .
-RUN bun install
-RUN bun run build
+RUN npm run build
 
-FROM oven/bun:latest AS runner
-
+FROM node:lts-alpine AS runner
 WORKDIR /app
 COPY --from=builder /app/build .
-ENTRYPOINT ["bun", "./index.js"]
+COPY --from=builder /app/package.json .
+COPY --from=builder /app/package-lock.json .
+RUN npm ci --omit dev
 EXPOSE 3000
+CMD ["node", "."]
