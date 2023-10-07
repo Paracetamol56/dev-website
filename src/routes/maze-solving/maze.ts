@@ -1,4 +1,4 @@
-import { Node, PriorityQueueFrontier, QueueFrontier, StackFrontier, type State } from "./utils";
+import { Node, QueueFrontier, type State } from "./utils";
 
 class Cell {
   wall: boolean;
@@ -23,19 +23,22 @@ class Maze {
   cells: Cell[][] = [];
   start: State = { x: 0, y: 0 };
   end: State = { x: 0, y: 0 };
-  explored: State[] = [];
-  frontier: PriorityQueueFrontier = new PriorityQueueFrontier();
+  explored: Node[] = [];
+  frontier: QueueFrontier = new QueueFrontier();
+  stepCallback: (node: Node) => void | null = () => null;
 
   /**
    * Creates a new maze.
-   * @param mazeString The string representation of the maze.
-   *   - `#` represents a wall.
-   *   - ` ` represents an empty cell.
-   *   - `A` represents the start cell.
-   *   - `B` represents the end cell.
-   *   - `/` represents a new line.
    */
-  constructor(mazeString: string) {
+  constructor(stepCallback?: (node: Node) => void | null) {
+    if (stepCallback) {
+      this.stepCallback = stepCallback;
+    }
+    this.height = 0;
+    this.width = 0;
+  }
+
+  loadFromString(mazeString: string) {
     const splitedMazeString = mazeString.split("\n");
     this.height = splitedMazeString.length;
     this.width = splitedMazeString[0].length;
@@ -63,6 +66,26 @@ class Maze {
         this.heuristic(this.start, this.end)
       )
     );
+  }
+
+  reset() {
+    this.explored = [];
+    this.frontier = new QueueFrontier();
+    this.frontier.add(
+      new Node(
+        this.start,
+        null,
+        null,
+        0,
+        this.heuristic(this.start, this.end)
+      )
+    );
+    for (const row of this.cells) {
+      for (const cell of row) {
+        cell.visited = false;
+        cell.solution = false;
+      }
+    }
   }
 
   /**
@@ -104,7 +127,7 @@ class Maze {
     }
 
     const node = this.frontier.remove();
-    this.explored.push(node!.state);
+    this.explored.push(node);
     this.cells[node!.state.x][node!.state.y].visited = true;
 
     for (const neighbor of this.neighbors(node!.state)) {
@@ -118,12 +141,15 @@ class Maze {
 
       if (
         !this.frontier.containsState(child.state) &&
-        !this.explored.some((state) => state.x === child.state.x && state.y === child.state.y)
+        !this.explored.some((node) => node.state.x === child.state.x && node.state.y === child.state.y)
       ) {
         this.frontier.add(child);
       }
     }
 
+    if (this.stepCallback) {
+      this.stepCallback(node);
+    }
     return node;
   }
 };
