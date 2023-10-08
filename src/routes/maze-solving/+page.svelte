@@ -1,33 +1,29 @@
 <script lang="ts">
+	import { onMount } from "svelte";
+	import MazeControls from "./MazeControls.svelte";
   import MazeGraph from "./MazeGraph.svelte";
 	import MazeGrid from "./MazeGrid.svelte";
 	import { Maze } from "./maze";
+	import type { Node } from "./utils";
+	import { readable, type Readable } from "svelte/store";
 
-  let maze: Maze = new Maze();
+  const updateMaze = (node: Node) => {
+    mazeGridRef.updateGrid();
+    mazeGraphRef.updateGraph();
+  };
 
-  // Maze 1:
-  //  # # ###  #B
-  //  # #   # ## 
-  //    # #   ## 
-  // # ## # #    
-  // #    # #####
-  // ### ## #####
-  // A   ##      
+  let maze: Readable<Maze> = readable(new Maze(updateMaze), (set) => {
+    set(new Maze(updateMaze));
+  });
+  let mazeGridRef: MazeGrid;
+  let mazeGraphRef: MazeGraph;
 
-  // Maze 2:
-  //  #####
-  //       
-  //  ## ##
-  //  ##B##
-  //  #  ##
-  //  # ###
-  // A  ###
 
   const loadMaze = (index: number) => {
-    maze = new Maze();
+    const newMaze = new Maze(updateMaze);
     switch (index) {
       case 1:
-        maze.loadFromString(
+        newMaze.loadFromString(
 ` # # ###  #B
  # #   # ## 
    # #   ## 
@@ -38,7 +34,7 @@ A   ##      `
         );
         break;
       case 2:
-        maze.loadFromString(
+        newMaze.loadFromString(
 ` #####
       
  ## ##
@@ -49,10 +45,10 @@ A  ###`
         );
         break;
       case 3:
-        maze.loadFromString(``);
+        newMaze.loadFromString(``);
         break;
       case 4:
-        maze.loadFromString(
+        newMaze.loadFromString(
 `          B
  #### #### 
  #     # # 
@@ -64,9 +60,19 @@ A      #   `);
       default:
         return;
     }
+
+    maze = readable(newMaze, (set) => {
+      set(newMaze);
+    });
+    if (mazeGridRef) mazeGridRef.updateGrid();
+    if (mazeGraphRef) mazeGraphRef.updateGraph();
   };
 
-  loadMaze(1);
+  loadMaze(2);
+  onMount(() => {
+    mazeGridRef.updateGrid();
+    mazeGraphRef.updateGraph();
+  });
 </script>
 
 <div class="container mx-auto">
@@ -74,7 +80,8 @@ A      #   `);
     <span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender">Maze solving</span>
   </h1>
   <section id="maze">
-    <MazeGrid maze={maze} loadMaze={loadMaze} />
-    <MazeGraph maze={maze} />
+    <MazeControls maze={maze} loadMaze={loadMaze}  />
+    <MazeGrid maze={maze} bind:this={mazeGridRef} />
+    <MazeGraph maze={maze} bind:this={mazeGraphRef} />
   </section>
 </div>

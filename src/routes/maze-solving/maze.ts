@@ -6,7 +6,6 @@ class Cell {
   end: boolean;
   visited: boolean;
   solution: boolean;
-  element: HTMLDivElement | null = null;
 
   constructor(wall: boolean) {
     this.wall = wall;
@@ -23,21 +22,27 @@ class Maze {
   cells: Cell[][] = [];
   start: State = { x: 0, y: 0 };
   end: State = { x: 0, y: 0 };
+  lastNode: Node | null = null;
   explored: Node[] = [];
+  solved: boolean = false;
+  solvable: boolean = true;
   frontier: QueueFrontier = new QueueFrontier();
-  stepCallback: (node: Node) => void | null = () => null;
+  stepCallback: (node: Node) => void;
 
   /**
-   * Creates a new maze.
+   * Creates a new instance of the Maze class.
+   * @param stepCallback Optional callback function to be called on each step of the maze solving algorithm.
    */
-  constructor(stepCallback?: (node: Node) => void | null) {
-    if (stepCallback) {
-      this.stepCallback = stepCallback;
-    }
+  constructor(stepCallback: (node: Node) => void) {
+    this.stepCallback = stepCallback;
     this.height = 0;
     this.width = 0;
   }
 
+  /**
+   * Loads a maze from a string representation.
+   * @param mazeString - The string representation of the maze.
+   */
   loadFromString(mazeString: string) {
     const splitedMazeString = mazeString.split("\n");
     this.height = splitedMazeString.length;
@@ -57,6 +62,10 @@ class Maze {
         }
       }
     }
+    this.solved = false;
+    this.solvable = true;
+    this.explored = [];
+    this.frontier = new QueueFrontier();
     this.frontier.add(
       new Node(
         this.start,
@@ -66,9 +75,13 @@ class Maze {
         this.heuristic(this.start, this.end)
       )
     );
+    // First step
+    this.lastNode = this.move();
   }
 
   reset() {
+    this.solved = false;
+    this.solvable = true;
     this.explored = [];
     this.frontier = new QueueFrontier();
     this.frontier.add(
@@ -86,6 +99,8 @@ class Maze {
         cell.solution = false;
       }
     }
+    this.lastNode = this.move();
+    this.stepCallback(this.lastNode);
   }
 
   /**
@@ -147,10 +162,72 @@ class Maze {
       }
     }
 
-    if (this.stepCallback) {
-      this.stepCallback(node);
-    }
     return node;
+  }
+
+  getPathTo(endNode: Node) {
+    const solvedPath: State[] = [];
+    let node: Node = endNode;
+    while (node.parent) {
+      solvedPath.push(node.state);
+      this.cells[node.state.x][node.state.y].solution = true;
+      node = node.parent;
+    }
+    solvedPath.push(node.state);
+    this.cells[node.state.x][node.state.y].solution = true;
+    return solvedPath;
+  }
+
+  aiStep() {
+    if (this.solved) return;
+
+    try {
+      this.lastNode = this.move();
+      if (this.lastNode?.state.x === this.end.x && this.lastNode?.state.y === this.end.y) {
+        this.solved = true;
+        for (const state of this.getPathTo(this.lastNode)) {
+          this.cells[state.x][state.y].solution = true;
+        }
+      }
+      this.stepCallback(this.lastNode);
+    } catch (e) {
+      console.log(e);
+      if (e instanceof Error) {
+        if (e.message == "No solution") {
+          this.solvable = false;
+        } else {
+          console.error(e);
+        }
+      }
+    }
+  }
+
+  aiSolve() {
+    if (this.solved) return;
+
+    try {
+      while (true) {
+        this.lastNode = this.move();
+        if (this.lastNode?.state.x == this.end.x && this.lastNode?.state.y == this.end.y) {
+          this.solved = true;
+          for (const state of this.getPathTo(this.lastNode)) {
+            this.cells[state.x][state.y].solution = true;
+          }
+          this.stepCallback(this.lastNode);
+          break;
+        }
+        this.stepCallback(this.lastNode);
+      }
+    } catch (e) {
+      console.log(e);
+      if (e instanceof Error) {
+        if (e.message == "No solution") {
+          this.solvable = false;
+        } else {
+          console.error(e);
+        }
+      }
+    }
   }
 };
 
