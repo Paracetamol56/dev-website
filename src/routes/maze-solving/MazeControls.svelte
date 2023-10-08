@@ -3,29 +3,30 @@
 	import MeltSelect from "$lib/components/MeltSelect.svelte";
 	import { RedoDot, Rocket } from "lucide-svelte";
 	import type { Maze } from "./maze";
-	import { writable, type Writable } from "svelte/store";
+	import type { Writable } from "svelte/store";
 	import type { SelectOption } from "@melt-ui/svelte";
 	import type { Readable } from "svelte/motion";
+	import type { Frontier } from "./utils";
 
-  export let maze: Readable<Maze>;
-  export let loadMaze: (index: number) => void;
-  export let algorithm: Writable<SelectOption<string>> = writable({value: "Depth-first search", label: "Depth-first search"});
+  export let maze: Readable<Maze<Frontier>>;
+  export let presetMaze: Writable<number>;
+  export let algorithm: Writable<SelectOption<string>>;
 </script>
 
 <div class="mb-8 p-4 rounded-md bg-ctp-mantle flex flex-col items-start md:flex-row md:items-end justify-center gap-2">
   <div class="flex flex-col gap-1">
     <p class="block text-ctp-text font-semibold text-sm">Load a preset maze</p>
     <div class="flex items-center gap-2">
-      <Button on:click={() => loadMaze(1)}>
+      <Button on:click={() => presetMaze.set(1)}>
         <span>1</span>
       </Button>
-      <Button on:click={() => loadMaze(2)}>
+      <Button on:click={() => presetMaze.set(2)}>
         <span>2</span>
       </Button>
-      <Button on:click={() => loadMaze(3)}>
+      <Button on:click={() => presetMaze.set(3)}>
         <span>3</span>
       </Button>
-      <Button on:click={() => loadMaze(4)}>
+      <Button on:click={() => presetMaze.set(4)}>
         <span>4</span>
       </Button>
     </div>

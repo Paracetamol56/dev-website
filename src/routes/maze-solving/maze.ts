@@ -1,4 +1,4 @@
-import { Node, QueueFrontier, type State } from "./utils";
+import { Node, type Frontier, type State } from "./utils";
 
 class Cell {
   wall: boolean;
@@ -16,7 +16,7 @@ class Cell {
   }
 }
 
-class Maze {
+class Maze<F extends Frontier> {
   height: number;
   width: number;
   cells: Cell[][] = [];
@@ -26,14 +26,16 @@ class Maze {
   explored: Node[] = [];
   solved: boolean = false;
   solvable: boolean = true;
-  frontier: QueueFrontier = new QueueFrontier();
+  frontier: F;
   stepCallback: (node: Node) => void;
 
   /**
    * Creates a new instance of the Maze class.
+   * @param frontier The type of frontier to use for the maze solving algorithm.
    * @param stepCallback Optional callback function to be called on each step of the maze solving algorithm.
    */
-  constructor(stepCallback: (node: Node) => void) {
+  constructor(frontier: F, stepCallback: (node: Node) => void) {
+    this.frontier = frontier;
     this.stepCallback = stepCallback;
     this.height = 0;
     this.width = 0;
@@ -65,7 +67,6 @@ class Maze {
     this.solved = false;
     this.solvable = true;
     this.explored = [];
-    this.frontier = new QueueFrontier();
     this.frontier.add(
       new Node(
         this.start,
@@ -83,7 +84,7 @@ class Maze {
     this.solved = false;
     this.solvable = true;
     this.explored = [];
-    this.frontier = new QueueFrontier();
+    this.frontier.clear();
     this.frontier.add(
       new Node(
         this.start,
@@ -136,6 +137,11 @@ class Maze {
     return neighbors;
   }
 
+  /**
+   * Moves the current node to the next node in the frontier.
+   * @returns The next node in the frontier.
+   * @throws An error if there is no solution.
+   */
   move(): Node {
     if (this.frontier.isEmpty()) {
       throw new Error("No solution");
@@ -165,6 +171,11 @@ class Maze {
     return node;
   }
 
+  /**
+   * Returns the path to the given end node.
+   * @param endNode - The end node to find the path to.
+   * @returns An array of States representing the path to the end node.
+   */
   getPathTo(endNode: Node) {
     const solvedPath: State[] = [];
     let node: Node = endNode;
@@ -178,6 +189,13 @@ class Maze {
     return solvedPath;
   }
 
+  /**
+   * Performs a single step of the AI algorithm to solve the maze.
+   * If the maze is already solved, this function does nothing.
+   * 
+   * @returns The last node visited during the step, or null if no node was visited.
+   * @throws An error if the maze has no solution.
+   */
   aiStep() {
     if (this.solved) return;
 
@@ -202,6 +220,10 @@ class Maze {
     }
   }
 
+  /**
+   * Solves the maze using an AI algorithm.
+   * @returns void
+   */
   aiSolve() {
     if (this.solved) return;
 

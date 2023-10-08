@@ -2,8 +2,9 @@
 	import type { Cell, Maze } from "./maze";
 	import Button from "$lib/components/Button.svelte";
 	import type { Readable } from "svelte/store";
+	import type { Frontier } from "./utils";
 
-  export let maze: Readable<Maze>;
+  export let maze: Readable<Maze<Frontier>>;
   let solved = false;
   let solvable = true;
   let cells: Cell[][] = [];

@@ -4,24 +4,33 @@
   import MazeGraph from "./MazeGraph.svelte";
 	import MazeGrid from "./MazeGrid.svelte";
 	import { Maze } from "./maze";
-	import type { Node } from "./utils";
-	import { readable, type Readable } from "svelte/store";
+	import { StackFrontier, type Frontier, type Node, QueueFrontier, PriorityQueueFrontier } from "./utils";
+	import { readable, writable, type Readable, type Writable } from "svelte/store";
+	import type { SelectOption } from "@melt-ui/svelte";
 
-  const updateMaze = (node: Node) => {
+  const updateMaze = (_: Node) => {
     mazeGridRef.updateGrid();
     mazeGraphRef.updateGraph();
   };
 
-  let maze: Readable<Maze> = readable(new Maze(updateMaze), (set) => {
-    set(new Maze(updateMaze));
-  });
-  let mazeGridRef: MazeGrid;
-  let mazeGraphRef: MazeGraph;
+  const createMaze = () => {
+    switch ($algorithm.value) {
+      case "Depth-first search":
+        return new Maze<StackFrontier>(new StackFrontier(), updateMaze);
+      case "Breadth-first search":
+        return new Maze<QueueFrontier>(new QueueFrontier(), updateMaze);
+      case "Greedy best-first search":
+        return new Maze<PriorityQueueFrontier>(new PriorityQueueFrontier(), updateMaze);
+      case "A* search":
+        return new Maze<PriorityQueueFrontier>(new PriorityQueueFrontier(), updateMaze);
+      default:
+        throw new Error("Invalid algorithm");
+    }
+  };
 
-
-  const loadMaze = (index: number) => {
-    const newMaze = new Maze(updateMaze);
-    switch (index) {
+  const loadMaze = () => {
+    const newMaze = createMaze();
+    switch ($presetMaze) {
       case 1:
         newMaze.loadFromString(
 ` # # ###  #B
@@ -68,7 +77,28 @@ A      #   `);
     if (mazeGraphRef) mazeGraphRef.updateGraph();
   };
 
-  loadMaze(2);
+  let presetMaze: Writable<number> = writable(1);
+  let algorithm: Writable<SelectOption<string>> = writable({value: "Depth-first search", label: "Depth-first search"});
+  let maze: Readable<Maze<Frontier>> = readable(createMaze(), (set) => {
+    set(createMaze());
+  });
+  let mazeGridRef: MazeGrid;
+  let mazeGraphRef: MazeGraph;
+
+  presetMaze.subscribe((value) => {
+    loadMaze();
+  });
+
+  algorithm.subscribe((value) => {
+    maze = readable(createMaze(), (set) => {
+      set(createMaze());
+    });
+    loadMaze();
+    if (mazeGridRef) mazeGridRef.updateGrid();
+    if (mazeGraphRef) mazeGraphRef.updateGraph();
+  });
+
+  loadMaze();
   onMount(() => {
     mazeGridRef.updateGrid();
     mazeGraphRef.updateGraph();
@@ -80,7 +110,7 @@ A      #   `);
     <span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender">Maze solving</span>
   </h1>
   <section id="maze">
-    <MazeControls maze={maze} loadMaze={loadMaze}  />
+    <MazeControls maze={maze} presetMaze={presetMaze} algorithm={algorithm} />
     <MazeGrid maze={maze} bind:this={mazeGridRef} />
     <MazeGraph maze={maze} bind:this={mazeGraphRef} />
   </section>

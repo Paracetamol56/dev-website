@@ -28,7 +28,17 @@ class Node {
   };
 }
 
-class StackFrontier {
+interface Frontier {
+  frontier: Node[];
+
+  add(node: Node): void;
+  containsState(state: State): boolean;
+  isEmpty(): boolean;
+  clear(): void;
+  remove(): Node;
+}
+
+class StackFrontier implements Frontier {
   frontier: Node[];
 
   constructor() {
@@ -47,6 +57,10 @@ class StackFrontier {
     return this.frontier.length === 0;
   }
 
+  clear() {
+    this.frontier = [];
+  }
+
   remove() {
     if (this.isEmpty()) {
       throw new Error('Empty frontier');
@@ -55,7 +69,7 @@ class StackFrontier {
   }
 }
 
-class QueueFrontier extends StackFrontier {
+class QueueFrontier extends StackFrontier implements Frontier {
   remove() {
     if (this.isEmpty()) {
       throw new Error('Empty frontier');
@@ -64,7 +78,21 @@ class QueueFrontier extends StackFrontier {
   }
 }
 
-class PriorityQueueFrontier extends QueueFrontier {
+class GreedyPriorityQueueFrontier extends QueueFrontier implements Frontier {
+  add(node: Node) {
+    this.frontier.push(node);
+    this.frontier.sort((a, b) => a.h - b.h);
+  }
+
+  remove() {
+    if (this.isEmpty()) {
+      throw new Error('Empty frontier');
+    }
+    return this.frontier.shift() as Node;
+  }
+}
+
+class PriorityQueueFrontier extends QueueFrontier implements Frontier {
   add(node: Node) {
     this.frontier.push(node);
     this.frontier.sort((a, b) => a.f - b.f);
@@ -78,4 +106,4 @@ class PriorityQueueFrontier extends QueueFrontier {
   }
 }
 
-export { type State, Node, StackFrontier, QueueFrontier, PriorityQueueFrontier };
+export { type State, Node, type Frontier, StackFrontier, QueueFrontier, GreedyPriorityQueueFrontier, PriorityQueueFrontier };
