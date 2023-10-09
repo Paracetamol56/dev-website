@@ -5,6 +5,10 @@ import { escapeSvelte, mdsvex } from 'mdsvex'
 import { preprocessMeltUI } from '@melt-ui/pp'
 import shiki from 'shiki'
 import fs from 'fs'
+import remarkUnwrapImages from 'remark-unwrap-images'
+import remarkToc from 'remark-toc'
+import rehypeSlug from 'rehype-slug'
+import remarkMermaid from 'remark-mermaidjs';
 
 /** @type {import('mdsvex').MdsvexOptions} */
 const mdsvexOptions = {
@@ -16,6 +20,14 @@ const mdsvexOptions = {
 			return `{@html \`${html}\` }`
 		}
 	},
+	remarkPlugins: [
+		remarkUnwrapImages,
+		remarkToc,
+		remarkMermaid
+	],
+	rehypePlugins: [
+		rehypeSlug
+	]
 }
 
 
