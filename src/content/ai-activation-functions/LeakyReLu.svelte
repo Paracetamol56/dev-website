@@ -22,9 +22,9 @@
 
 <section class="flex flex-col gap-8 lg:flex-row lg:justify-between">
   <div class="flex-1">
-    <h2 class="mt-8 mb-4 text-lg font-semibold text-ctp-lavender">
+    <h3 class="mt-8 mb-4 text-lg font-semibold text-ctp-lavender">
       Formula
-    </h2>
+    </h3>
 
     <div class="flex flex-row items-center gap-5">
       <div>
@@ -45,44 +45,9 @@
   </div>
 
   <div class="flex-1" bind:clientWidth={containerWidth}>
-    <h2 class="mt-8 mb-4 text-lg font-semibold text-ctp-lavender">
+    <h3 class="mt-8 mb-4 text-lg font-semibold text-ctp-lavender">
       Result
-    </h2>
+    </h3>
     <Plot fx={leakyRelu} yDomain={[-1, 1]} width={plotWidth} height={plotWidth * 2 / 3} />
   </div>
-</section>
-
-<section>
-  <h2 class="mt-8 mb-4 text-lg font-semibold text-ctp-lavender">
-    Description
-  </h2>
-
-  <h3 class="mt-3 mb-2 font-semibold">
-    Mathematical properties
-  </h3>
-  <ul class="mb-2 list-disc list-inside">
-    <li>Continuous on {@html math(`\\mathbb{R}`)} and differentiable on {@html math(`\\mathbb{R}\\setminus\\{0\\}`)}</li>
-    <li>Similar to ReLU for {@html math(`x>0`)}, but with a small gradient for {@html math(`x<0`)}</li>
-    <li>Output range of {@html math(`[-\\lambda,1]`)}</li>
-  </ul>
-  <h3 class="mt-3 mb-2">
-    <strong>Application</strong>
-  </h3>
-  <p class="mb-2">
-    Leaky ReLU addresses the dead ReLU problem by allowing a small gradient for negative inputs.
-  </p>
-  <h3 class="mt-3 mb-2 font-semibold">
-    Pros
-  </h3>
-  <ul class="mb-2 list-disc list-inside">
-    <li>Addresses the dead ReLU problem</li>
-    <li>Efficient and easy to implement</li>
-  </ul>
-  <h3 class="mt-3 mb-2 font-semibold">
-    Cons
-  </h3>
-  <ul class="mb-2 list-disc list-inside">
-    <li>The choice of {@html math(`\\lambda`)} is important and can affect performance</li>
-    <li>Not zero-centered.</li>
-  </ul>
 </section>

@@ -7,8 +7,10 @@ import shiki from 'shiki'
 import fs from 'fs'
 import remarkUnwrapImages from 'remark-unwrap-images'
 import remarkToc from 'remark-toc'
-import rehypeSlug from 'rehype-slug'
 import remarkMermaid from 'remark-mermaidjs';
+import remarkMath from 'remark-math'
+import rehypeSlug from 'rehype-slug'
+import rehypeKatex from 'rehype-katex-svelte'
 
 /** @type {import('mdsvex').MdsvexOptions} */
 const mdsvexOptions = {
@@ -23,10 +25,12 @@ const mdsvexOptions = {
 	remarkPlugins: [
 		remarkUnwrapImages,
 		remarkToc,
-		remarkMermaid
+		remarkMermaid,
+		remarkMath
 	],
 	rehypePlugins: [
-		rehypeSlug
+		rehypeSlug,
+		rehypeKatex
 	]
 }
 

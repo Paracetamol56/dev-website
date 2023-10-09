@@ -22,9 +22,9 @@
 
 <section class="flex flex-col gap-8 lg:flex-row lg:justify-between">
   <div class="flex-1">
-    <h2 class="mt-8 mb-4 text-lg font-semibold text-ctp-lavender">
+    <h3 class="mt-8 mb-4 text-lg font-semibold text-ctp-lavender">
       Formula
-    </h2>
+    </h3>
 
     <div class="flex flex-row items-center gap-5">
       <div>
@@ -45,44 +45,9 @@
   </div>
 
   <div class="flex-1" bind:clientWidth={containerWidth}>
-    <h2 class="mt-8 mb-4 text-lg font-semibold text-ctp-lavender">
+    <h3 class="mt-8 mb-4 text-lg font-semibold text-ctp-lavender">
       Result
-    </h2>
+    </h3>
     <Plot fx={sigmoid} width={plotWidth} height={plotWidth * 2 / 3} />
   </div>
-</section>
-
-<section>
-  <h2 class="mt-8 mb-4 text-lg font-semibold text-ctp-lavender">
-    Description
-  </h2>
-
-  <h3 class="mt-3 mb-2 font-semibold">
-    Mathematical properties
-  </h3>
-  <ul class="mb-2 list-disc list-inside">
-    <li>Continuous and differentiable on {@html math(`\\mathbb{R}`)}</li>
-    <li>Output range of {@html math(`[0,1]`)}</li>
-  </ul>
-  <h3 class="mt-3 mb-2">
-    <strong>Application</strong>
-  </h3>
-  <p class="mb-2">
-    Commonly used in the output layer of a binary classifier.
-    It is also sensitive to changes in the input, which makes it useful for backpropagation.
-  </p>
-  <h3 class="mt-3 mb-2 font-semibold">
-    Pros
-  </h3>
-  <ul class="mb-2 list-disc list-inside">
-    <li>Smooth gradient, which helps in stable training</li>
-    <li>Outputs are in a bounded range, making it suitable for certain types of problems</li>
-  </ul>
-  <h3 class="mt-3 mb-2 font-semibold">
-    Cons
-  </h3>
-  <ul class="mb-2 list-disc list-inside">
-    <li>Vanishing gradient problem: Gradients become very small for extreme inputs, which can slow down training</li>
-    <li>Outputs are not centered around zero, which can lead to slower convergence in some cases</li>
-  </ul>
 </section>

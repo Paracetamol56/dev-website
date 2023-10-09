@@ -20,11 +20,9 @@
 
     <div class="flex gap-2 justify-center">
       {#each data.meta.categories as category}
-        <div class="px-2 py-1 rounded-md border-2 border-ctp-lavender">
-          <span class="font-semibold text-ctp-lavender">
-            &num;{category}
-          </span>
-        </div>
+        <span class="font-semibold text-ctp-lavender">
+          &num;{category}
+        </span>
       {/each}
     </div>
   </section>
