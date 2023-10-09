@@ -4,14 +4,18 @@
 	import type { ToastData } from '$lib/toastData';
 	import { flip } from 'svelte/animate';
 	import Toast from './Toast.svelte';
-	import { writable } from 'svelte/store';
 	import Navbar from './Navbar.svelte';
+	import Transition from './Transition.svelte';
 	import Footer from './Footer.svelte';
+	import { writable } from 'svelte/store';
 	import { user } from '$lib/stores';
 	import { onMount } from 'svelte';
 	import { variants } from '@catppuccin/palette';
 
 	$: theme = writable($user! ? $user!.flavour : 'mocha');
+
+	export let data;
+	export const prerender = true
 
 	onMount(() => {
 		theme.subscribe((value) => {
@@ -54,7 +58,11 @@
 </div>
 
 <Navbar theme={theme} />
+
 <main class="mb-auto">
-	<slot />
+	<Transition url={data.url}>
+		<slot />
+	</Transition>
 </main>
+
 <Footer />
