@@ -1,5 +1,6 @@
 <script lang="ts">
   import '../app.postcss';
+  import Button from '$lib/components/Button.svelte';
   import { createDialog, melt } from '@melt-ui/svelte';
   import { Send, X } from 'lucide-svelte';
 	import { addToast } from './+layout.svelte';
@@ -93,7 +94,9 @@
 
 <!-- Button -->
 <button
-  class="rounded-md bg-ctp-mauve px-3 py-1 font-medium text-ctp-mantle hover:opacity-75 active:opacity-50 transition-opacity"
+  class="flex items-center gap-1 rounded-md bg-ctp-mauve px-3 py-1
+  font-semibold text-ctp-mantle
+  shadow-md shadow-ctp-crust transition-opacity hover:opacity-80 active:opacity-60"
   use:melt={$trigger}
 >
   Login
@@ -137,13 +140,12 @@
         </fieldset>
         <p class="mb-4 text-right text-sm text-ctp-red">{emailError}</p>
         <div class="mt-6 flex justify-end gap-4">
-          <button
-            class="flex justify-center items-center rounded-md bg-ctp-mauve px-3 py-1 font-medium
-                  text-ctp-surface0 hover:opacity-75 active:opacity-50 transition-opacity"
+          <Button
             type="submit"
           >
-            Send the magic link&nbsp;<Send size="16" />
-          </button>
+            <span>Send the magic link</span>
+            <Send size="16" />
+        </Button>
         </div>
       </form>
       <button

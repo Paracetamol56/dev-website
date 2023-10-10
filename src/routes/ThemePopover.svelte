@@ -48,7 +48,7 @@
 	use:melt={$trigger}
 	aria-label="Update dimensions"
 >
-	<Palette size="16" />
+	<Palette size="16" stroke-width="3" />
 	<span class="sr-only">Open theme popover</span>
 </button>
 
@@ -123,7 +123,7 @@
 
       <small class="text-center">
         <img src={catppuccinLogo} alt="Catppuccin logo" class="inline-block rounded-full square-4 mr-1" />
-        Powered by <a class="text-ctp-blue" href="https://github.com/catppuccin/catppuccin">Catppuccin</a>
+        Powered by <a class="text-ctp-blue" href="https://github.com/catppuccin/catppuccin" target="_blank">Catppuccin</a>
       </small>
     </div>
     <button

@@ -1,10 +1,11 @@
 <script lang="ts">
   import { page } from '$app/stores'
+	import Button from '$lib/components/Button.svelte';
 	import { ArrowRight } from 'lucide-svelte';
 </script>
 
 <svelte:head>
-  <title>404 - Mathéo Galuba</title>
+  <title>{$page.status} - Mathéo Galuba</title>
 </svelte:head>
 
 <main class="grid min-h-full place-items-center px-6 py-24 sm:py-32 lg:px-8">
@@ -22,7 +23,11 @@
         </pre>
       </div>
       <div class="mt-10 flex items-center justify-center gap-x-6">
-        <a href="/" class="rounded-md bg-ctp-mauve px-3 py-1 font-medium text-ctp-surface0 hover:opacity-75 active:opacity-50 transition-opacity">Go back home</a>
+        <Button link="/">
+          <span>
+            Go back home
+          </span>
+        </Button>
         <a href="/contact" class="flex justify-center items-center text-sm font-semibold text-ctp-text">Contact support&nbsp;<ArrowRight size="16"/></a>
       </div>
     </div>
