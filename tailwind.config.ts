@@ -3,7 +3,7 @@ import catppuccin from "@catppuccin/tailwindcss";
 import plugin from 'tailwindcss/plugin';
 
 const config = {
-	content: ['./src/**/*.{html,js,svelte,ts}'],
+	content: ['./src/**/*.{html,js,svelte,ts,md}'],
 	theme: {
     container: {
       padding: {
