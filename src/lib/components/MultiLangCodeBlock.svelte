@@ -4,12 +4,13 @@
 	import { crossfade } from 'svelte/transition';
 	import { Highlight } from "svelte-highlight";
 	import { python, cpp, javascript, rust } from 'svelte-highlight/languages';
+	import { onMount } from 'svelte';
 
 	const {
 		elements: { root, list, content, trigger },
 		states: { value }
 	} = createTabs({
-		defaultValue: 'tab-1'
+		defaultValue: 'tab-0'
 	});
 
   const [send, receive] = crossfade({
@@ -17,37 +18,48 @@
     easing: cubicInOut,
   });
 
-	export let code = [
-		{
-			id: 'tab-1',
-			title: 'Python',
-      lang: python,
-			code: 'print("Hello World!")'
-		},
-		{
-			id: 'tab-2',
-			title: 'JavaScript',
-      lang: javascript,
-			code: 'console.log("Hello World!")'
-		},
-		{
-			id: 'tab-3',
-			title: 'Rust',
-      lang: rust,
-			code: 'fn main() { println!("Hello, world!"); }'
-		},
-		{
-			id: 'tab-4',
-			title: 'C++',
-      lang: cpp,
-			code: 'std::cout << "Hello World!" << std::endl;'
-		}
-	];
+	export let code: {id: string, title: string, code: string}[] = [];
+
+  let slot: HTMLDivElement;
+  onMount(() => {
+    // Iterate over the slot elements and add them to the list
+    Array.from(slot.children).forEach((element: Element, index: number) => {
+      let language = element.getAttribute('data-lang');
+      switch (language) {
+        case 'py':
+          language = 'Python';
+          break;
+        case 'cpp':
+          language = 'C++';
+          break;
+        case 'js':
+          language = 'JavaScript';
+          break;
+        case 'rs':
+          language = 'Rust';
+          break;
+        default:
+          language = 'Text';
+          break;
+      }
+      code.push({
+        id: `tab-${index}`,
+        title: language,
+        code: element.innerHTML
+      });
+    });
+    // Reassign the array to trigger a reactive update
+    code = code;
+  });
 </script>
+
+<div class="hidden" bind:this={slot}>
+  <slot />
+</div>
 
 <div
   use:melt={$root}
-  class={'flex xl:mx-32 2xl:mx-64 flex-col overflow-hidden rounded-md shadow-md shadow-ctp-crust data-[orientation=vertical]:flex-row'}
+  class="flex my-8 xl:mx-32 2xl:mx-64 flex-col overflow-hidden rounded-md shadow-md shadow-ctp-crust data-[orientation=vertical]:flex-row"
 >
   <div
     use:melt={$list}
@@ -74,8 +86,8 @@
     {/each}
   </div>
   {#each code as tab}
-    <div use:melt={$content(tab.id)} class="grow bg-ctp-mantle p-5">
-      <Highlight language={tab.lang} code={tab.code} />
+    <div use:melt={$content(tab.id)} class="grow bg-ctp-mantle p-5 overflow-x-auto">
+      <pre>{@html tab.code}</pre>
     </div>
   {/each}
 </div>
