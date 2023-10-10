@@ -1,6 +1,6 @@
 import db from "$lib/db";
 import { error, json, type RequestHandler } from "@sveltejs/kit";
-import type { Star, StarHR } from "../utils";
+import type { Star, StarHR } from "../../../../content/hertzsprung-russell-diagram/utils";
 
 export const GET: RequestHandler = async ({ params }) => {
   // Validation : slug must be a positive integer

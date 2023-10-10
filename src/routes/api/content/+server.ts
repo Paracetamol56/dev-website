@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit'
 import type { Page } from '$lib/page'
 
-async function getContent() {
+const getContent = async () => {
 	const pages: Page[] = []
 
 	const paths = import.meta.glob('/src/content/*.md', { eager: true })
@@ -24,7 +24,7 @@ async function getContent() {
 	return pages
 }
 
-export async function GET() {
+export const GET = async () => {
 	const pages = await getContent()
 	return json(pages)
 }

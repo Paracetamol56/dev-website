@@ -1,8 +1,8 @@
 import db from '$lib/db';
-import type { PageServerLoad  } from './$types';
-import type { StarHR } from './utils';
+import { json, type RequestHandler } from '@sveltejs/kit';
+import type { StarHR } from '../../../content/hertzsprung-russell-diagram/utils';
 
-export const load: PageServerLoad = async () => {
+export const GET: RequestHandler = async () => {
   // Use the B-V_1 index
 	const stars: StarHR[] = await db
     .collection('hipparcos')
@@ -41,5 +41,5 @@ export const load: PageServerLoad = async () => {
     ])
     .toArray() as StarHR[];
 
-  return { stars };
+  return json(stars);
 };
