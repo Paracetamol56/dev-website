@@ -18,7 +18,8 @@ const mdsvexOptions = {
 	highlight: {
 		highlighter: async (code, lang = 'text') => {
 			const highlighter = await shiki.getHighlighter({ theme: JSON.parse(fs.readFileSync('./src/themes/mocha.json', 'utf-8')) })
-			const html = escapeSvelte(highlighter.codeToHtml(code, { lang }))
+			let html = escapeSvelte(highlighter.codeToHtml(code, { lang }))
+			html = html.replace('<pre ', '<pre data-lang="' + lang + '" ')
 			return `{@html \`${html}\` }`
 		}
 	},
