@@ -2,8 +2,6 @@
 	import { createTabs, melt } from '@melt-ui/svelte';
 	import { cubicInOut } from 'svelte/easing';
 	import { crossfade } from 'svelte/transition';
-	import { Highlight } from "svelte-highlight";
-	import { python, cpp, javascript, rust } from 'svelte-highlight/languages';
 	import { onMount } from 'svelte';
 
 	const {

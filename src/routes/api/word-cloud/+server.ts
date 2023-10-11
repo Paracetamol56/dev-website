@@ -1,7 +1,7 @@
 import db from "$lib/db";
 import jwt from 'jsonwebtoken';
 import { error, json, type Cookies, type RequestHandler } from "@sveltejs/kit";
-import { JWT_SECRET } from "$env/static/private";
+import { env } from '$env/dynamic/private';
 import type TokenPayload from "$lib/token";
 
 const getSessionsByUser = async (cookies: Cookies) => {
@@ -11,7 +11,7 @@ const getSessionsByUser = async (cookies: Cookies) => {
   if (token === undefined) {
     throw error(401, "No token provided");
   }
-  const decoded = jwt.verify(token, JWT_SECRET) as TokenPayload;
+  const decoded = jwt.verify(token, env.JWT_SECRET) as TokenPayload;
 
   // Fetch the sessions from the database (ordered by creation date)
   const res = await db.collection("word_cloud_sessions").find(
@@ -76,7 +76,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
   if (token === undefined) {
     throw error(401, "No token provided");
   }
-  const decoded = jwt.verify(token, JWT_SECRET) as TokenPayload;
+  const decoded = jwt.verify(token, env.JWT_SECRET) as TokenPayload;
 
   const body = await request.json();
 

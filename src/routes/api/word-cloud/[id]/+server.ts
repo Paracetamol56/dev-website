@@ -2,7 +2,7 @@ import db from "$lib/db";
 import { error, json, type RequestHandler } from "@sveltejs/kit";
 import { ObjectId } from "mongodb";
 import jwt, { type JwtPayload } from "jsonwebtoken";
-import { JWT_SECRET } from "$env/static/private";
+import { env } from '$env/dynamic/private';
 
 export const GET: RequestHandler = async ({ params, cookies }) => {
   // Get the session
@@ -21,7 +21,7 @@ export const GET: RequestHandler = async ({ params, cookies }) => {
   if (userCookie) {
     const token = JSON.parse(userCookie).token;
     try {
-      const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+      const decoded = jwt.verify(token, env.JWT_SECRET) as JwtPayload;
       if (decoded.userId === result.user) {
         return json({
           id: result._id,
@@ -112,7 +112,7 @@ export const DELETE: RequestHandler = async ({ params, cookies }) => {
   if (userCookie) {
     const token = JSON.parse(userCookie).token;
     try {
-      const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+      const decoded = jwt.verify(token, env.JWT_SECRET) as JwtPayload;
       if (decoded.userId === result.user) {
         // Delete the session
         await db.collection("word_cloud_sessions").updateOne(

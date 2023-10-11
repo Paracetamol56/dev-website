@@ -43,7 +43,7 @@ export const GET: RequestHandler = async ({ url }) => {
       {
         userId: userId,
       },
-      JWT_SECRET,
+      env.JWT_SECRET,
       {
         expiresIn: "1d",
       }
