@@ -3,12 +3,7 @@ import { env } from '$env/dynamic/private';
 import { error, json, type RequestHandler } from "@sveltejs/kit";
 import jwt from 'jsonwebtoken';
 import { ObjectId } from "mongodb";
-
-interface TokenPayload {
-  userId: ObjectId;
-  iat: number;
-  exp: number;
-}
+import type TokenPayload from "$lib/token";
 
 export const GET: RequestHandler = async ({ url }) => {
   const token = url.searchParams.get("token");
@@ -23,7 +18,6 @@ export const GET: RequestHandler = async ({ url }) => {
 
     // Update the user
     const userId: ObjectId = new ObjectId(decoded.userId);
-    console.log(userId);
 
     const result = await db.collection("users").updateOne(
       {
@@ -44,8 +38,27 @@ export const GET: RequestHandler = async ({ url }) => {
 
     const user = await db.collection("users").findOne({ _id: userId });
 
+    // Sign a new token
+    const newToken = jwt.sign(
+      {
+        userId: userId,
+      },
+      JWT_SECRET,
+      {
+        expiresIn: "1d",
+      }
+    );
+
     // Return the user
-    return json(user);
+    return json({
+      token: newToken,
+      user: {
+        id: user?._id.toHexString(),
+        name: user?.name,
+        email: user?.email,
+        flavour: user?.flavour,
+      }
+    });
   } catch (err) {
     console.error(err);
     throw error(400, "Invalid token");

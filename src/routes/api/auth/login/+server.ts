@@ -14,6 +14,7 @@ export const POST: RequestHandler = async ({ request }) => {
     const result = await db.collection("users").insertOne(
       {
         email: email,
+        flavour: "mocha",
         createdAt: new Date(),
       }
     );
@@ -27,7 +28,7 @@ export const POST: RequestHandler = async ({ request }) => {
   }
 
   // Generate a token
-  const link = `${request.headers.get('origin')}/verify?token=${generateToken(user?._id.toHexString() as string)}`;
+  const link = `${request.headers.get('origin')}/verify?token=${generateToken(user?._id.toHexString() as string)}&redirect=${request.headers.get('referer')}`;
   
   // Send an email
   let mailId: string;
