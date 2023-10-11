@@ -32,9 +32,6 @@
           }})
           goto("/word-cloud");
         }
-        if (session.words.length === 0) {
-          distribution.push({ text: "No words yet", occurence: 1 });
-        }
         for (const word of session.words) {
           const wDistribition = distribution.find((w) => w.text.toLowerCase() === word.text);
           if (wDistribition) {
@@ -132,18 +129,18 @@
       transition:fly={{ duration: 200, y: 10 }}
       use:melt={$content}
     >
-      <h2 use:melt={$title} class="mt-4 mb-8 text-4xl text-center font-bold">
+      <h2 use:melt={$title} class="mt-4 mb-8 text-center text-4xl font-bold">
         Join the session !
       </h2>
-      <div class="w-full flex justify-center" bind:clientWidth={qrWidthAvailable}>
+      <div class="w-full flex flex-col items-center " bind:clientWidth={qrWidthAvailable}>
         <canvas bind:this={canvas} />
+        <a class="my-8 text-3xl font-medium" href="{window.location.origin}/word-cloud?code={session.code}" target="_blank">
+          {window.location.origin}/word-cloud
+        </a>
+        <p class="my-8 text-4xl font-bold">
+          Code: <span class="text-ctp-mauve">{session.code}</span>
+        </p>
       </div>
-      <p class="my-8 text-3xl text-center font-medium">
-        {window.location.origin}/word-cloud
-      </p>
-      <p class="my-8 text-4xl text-center font-bold">
-        Code: <span class="text-ctp-mauve">{session.code}</span>
-      </p>
 
       <button
         use:melt={$close}

@@ -59,7 +59,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
     throw error(400, "Invalid name");
   }
 
-  if (body.description !== undefined && (body.description.length < 10 || body.description.length > 1000)) {
+  if (body.description && (body.description.length < 10 || body.description.length > 1000)) {
     throw error(400, "Invalid description");
   }
 

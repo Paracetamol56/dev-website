@@ -46,7 +46,7 @@
         .padding(2)
         .rotate(0)
         .font("Helvetica")
-        .fontSize(d => Math.sqrt(d.size!) * 20)
+        .fontSize(d => Math.sqrt(d.size!) * 30)
         .on("word", (word) => {
           words = [...words, word];
         })
