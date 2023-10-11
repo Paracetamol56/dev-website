@@ -31,6 +31,7 @@ export const GET: RequestHandler = async ({ params, cookies }) => {
           open: result.open,
           words: result.words,
           createdAt: result.createdAt,
+          closedAt: result.closedAt,
         });
       } else {
         // Not the owner
@@ -92,4 +93,50 @@ export const PUT: RequestHandler = async ({ params, request }) => {
   );
 
   return new Response(null, { status: 204 });
+};
+
+export const DELETE: RequestHandler = async ({ params, cookies }) => {
+  // Get the session
+  const id = params.id;
+  const result = await db.collection("word_cloud_sessions").findOne(
+    {
+      _id: new ObjectId(id),
+    }
+  );
+  if (result === null) {
+    throw error(404, "Session not found");
+  }
+
+  // Check if the user owns the session
+  const userCookie = cookies.get("user");
+  if (userCookie) {
+    const token = JSON.parse(userCookie).token;
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+      if (decoded.userId === result.user) {
+        // Delete the session
+        await db.collection("word_cloud_sessions").updateOne(
+          {
+            _id: new ObjectId(id),
+          },
+          {
+            $set: {
+              open: false,
+              closedAt: new Date(),
+            },
+          }
+        );
+        return new Response(null, { status: 204 });
+      } else {
+        // Not the owner
+        throw error(401, "Unauthorized");
+      }
+    } catch (err) {
+      // Invalid token
+      throw error(401, "Unauthorized");
+    }
+  }
+
+  // Not logged in
+  throw error(401, "Unauthorized");
 };

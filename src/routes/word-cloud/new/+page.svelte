@@ -82,10 +82,14 @@
 </svelte:head>
 
 <section class="container mx-auto my-32">
-	<h1 class="mb-8 text-6xl font-bold text-center">
-		<span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender">Word cloud</span>
-	</h1>
+	<hgroup>
+		<h1 class="mb-8 text-6xl font-bold text-center">
+			<span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender">Word cloud</span>
+		</h1>
+	</hgroup>
+</section>
 
+<section class="container mx-auto my-32">
   <h2 class="mb-8 text-2xl font-semibold text-center">
     Create a new session
   </h2>

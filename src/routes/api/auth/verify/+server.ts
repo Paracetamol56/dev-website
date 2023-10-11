@@ -3,12 +3,7 @@ import { JWT_SECRET } from '$env/static/private';
 import { error, json, type RequestHandler } from "@sveltejs/kit";
 import jwt from 'jsonwebtoken';
 import { ObjectId } from "mongodb";
-
-interface TokenPayload {
-  userId: ObjectId;
-  iat: number;
-  exp: number;
-}
+import type TokenPayload from "$lib/token";
 
 export const GET: RequestHandler = async ({ url }) => {
   const token = url.searchParams.get("token");

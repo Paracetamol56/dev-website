@@ -70,43 +70,37 @@
   };
 </script>
 
-<section class="container mx-auto my-32">
-  <h2 class="mb-8 text-2xl font-semibold text-center">
-    Join a session
-  </h2>
-
-  <form on:submit={handleSubmit}>
-    <div class="flex flex-col gap-8 items-center">
-      <div class="w-fit">
-        <label for="code" class="mb-2 text-sm font-semibold">
-          Session code
-        </label>
-        <div use:melt={$root} class="flex items-center gap-2">
-          {#each Array.from({ length: 5 }) as _}
-            <input
-              id="code"
-              class="rounded-md bg-ctp-surface0 text-center text-lg text-ctp-text shadow-sm square-12
-                    focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
-              use:melt={$input()}
-            />
-          {/each}
-        </div>
-        <p class="text-left text-sm font-semibold text-ctp-red">{codeError}</p>
+<form on:submit={handleSubmit}>
+  <div class="flex flex-col gap-8 items-center">
+    <div class="w-fit">
+      <label for="code" class="mb-2 text-sm font-semibold">
+        Session code
+      </label>
+      <div use:melt={$root} class="flex items-center gap-2">
+        {#each Array.from({ length: 5 }) as _}
+          <input
+            id="code"
+            class="rounded-md bg-ctp-surface0 text-center text-lg text-ctp-text shadow-sm square-12
+                  focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
+            use:melt={$input()}
+          />
+        {/each}
       </div>
-      <button
-        class="flex justify-center items-center rounded-md bg-ctp-mauve px-3 py-1 font-medium
-              text-ctp-surface0 hover:opacity-75 active:opacity-50 transition-opacity"
-        type="submit"
-      >
-        Join&nbsp;<ArrowRightToLine size="18" />
-      </button>
+      <p class="text-left text-sm font-semibold text-ctp-red">{codeError}</p>
     </div>
-  </form>
-  
-  <div class="mt-8 flex justify-center gap-4">
-    <a class="font-semibold hover:text-ctp-blue transition-colors" href="/word-cloud/new">Create a new session</a>
-    {#if $user !== null}
-      <a class="font-semibold hover:text-ctp-blue transition-colors" href="/word-cloud/view">View your sessions</a>
-    {/if}
+    <button
+      class="flex justify-center items-center rounded-md bg-ctp-mauve px-3 py-1 font-medium
+            text-ctp-surface0 hover:opacity-75 active:opacity-50 transition-opacity"
+      type="submit"
+    >
+      Join&nbsp;<ArrowRightToLine size="18" />
+    </button>
   </div>
-</section>
+</form>
+
+<div class="mt-8 flex justify-center gap-4">
+  <a class="font-semibold hover:text-ctp-blue transition-colors" href="/word-cloud/new">Create a new session</a>
+  {#if $user !== null}
+    <a class="font-semibold hover:text-ctp-blue transition-colors" href="/word-cloud/all">View your sessions</a>
+  {/if}
+</div>

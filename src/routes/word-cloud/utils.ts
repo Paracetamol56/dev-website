@@ -15,6 +15,7 @@ interface WordCloudSession {
   open: boolean,
   words: WordCloudWord[],
   createdAt: Date,
+  closedAt: Date | null,
 }
 
 export type { WordCloudWord, WordCloudSession };

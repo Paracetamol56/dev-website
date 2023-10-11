@@ -53,7 +53,6 @@
   $: {
     if (canvas !== undefined) {
       const url = `${window.location.origin}/word-cloud?code=${session.code}`;
-      console.log(qrWidthAvailable);
       QRCode.toCanvas(
         canvas,
         url,
@@ -68,9 +67,36 @@
     }
   }
 
-  const humanReadableDate = (date: string) => {
-		return new Date(date).toLocaleString();
+  const humanReadableDate = (date: Date | null) => {
+    if (date === null) return "";
+		return date.toLocaleString();
 	};
+
+  const closeSession = (e: Event) => {
+    e.preventDefault();
+    
+    axios
+      .delete(`/api/word-cloud/${session.id}`)
+      .then((res) => {
+        if (res.status === 204) {
+          addToast({data: {
+            title: "Success",
+            description: "The session has been closed",
+            color: "bg-ctp-green",
+          }})
+          session.open = false;
+          session.closedAt = new Date();
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        addToast({data: {
+          title: "Error",
+          description: "An error occured while closing the session",
+          color: "bg-ctp-red",
+        }})
+      });
+  }
 
   const {
     elements: {
@@ -87,31 +113,45 @@
   });
 </script>
 
-<section class="container mx-auto my-16">
-  <h1 class="mb-16 text-6xl font-bold text-center">
-		<span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender">Word cloud</span>&nbsp;{session?.name || ""}
-	</h1>
+<svelte:head>
+	<title>Word cloud - Mathéo Galuba</title>
+</svelte:head>
 
+<section class="container mx-auto my-32">
+	<hgroup>
+		<h1 class="mb-8 text-6xl font-bold text-center">
+			<span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender">Word cloud</span>
+      {session?.name || ""}
+		</h1>
+	</hgroup>
+</section>
+
+<section class="container mx-auto my-32">
   {#if session}
     <WordCloud data={distribution}/>
     <div class="mb-4 p-4 w-full bg-ctp-mantle rounded-md">
-      <p><strong>Participants:</strong> {session.words.length}</p>
+      <p><strong>Submitions:</strong> {session.words.length}</p>
       <p><strong>Unique words:</strong> {distribution.length}</p>
-      <p><strong>Created at:</strong> {humanReadableDate(session.createdAt.toString())}</p>
+      <p><strong>Created at:</strong> {humanReadableDate(new Date(session.createdAt))}</p>
+      {#if !session.open}
+        <p><strong>Closed at:</strong> {humanReadableDate(session.closedAt ? new Date(session.closedAt) : null)}</p>
+      {/if}
 
       <div class="mt-2 flex justify-start gap-2">
-        <button
-          class="rounded-md bg-ctp-mauve px-3 py-1 font-medium text-ctp-mantle flex items-center gap-1 hover:opacity-75 active:opacity-50 transition-opacity"
-          use:melt={$trigger}
-        >
-          Session info <QrCode size="18" />
-        </button>
-        <button
-          class="rounded-md bg-ctp-red px-3 py-1 font-medium text-ctp-mantle flex items-center gap-1 hover:opacity-75 active:opacity-50 transition-opacity"
-          use:melt={$trigger}
-        >
-          Close session <X size="18" />
-        </button>
+        {#if session.open}
+          <button
+            class="rounded-md bg-ctp-mauve px-3 py-1 font-medium text-ctp-mantle flex items-center gap-1 hover:opacity-75 active:opacity-50 transition-opacity"
+            use:melt={$trigger}
+          >
+            Session info <QrCode size="18" />
+          </button>
+          <button
+            class="rounded-md bg-ctp-red px-3 py-1 font-medium text-ctp-mantle flex items-center gap-1 hover:opacity-75 active:opacity-50 transition-opacity"
+            on:click={closeSession}
+          >
+            Close session <X size="18" />
+          </button>
+        {/if}
       </div>
     </div>
     <BarChart data={distribution}/>

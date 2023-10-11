@@ -10,6 +10,7 @@
   let ip: string | null = null;
   let text: string = "";
   let textError: string = "";
+  let textSuccess: boolean = false;
 
   onMount(() => {
     axios
@@ -41,6 +42,8 @@
       .put(`/api/word-cloud/${session.id}`, { text, ip })
       .then((res) => {
         text = "";
+        textError = "";
+        textSuccess = true;
       })
       .catch((error) => {
         console.error(error);
@@ -56,44 +59,45 @@
   };
 </script>
 
-<section class="container mx-auto my-32">
-  <h2 class="mb-4 text-2xl font-semibold text-center">
+<div class="mx-auto max-w-xl">
+  <h2 class="mb-4 text-4xl font-bold text-center">
     {session.name}
   </h2>
-  <div class="mx-auto max-w-xl">
-    <p class="text-center">
-      {session.description}
-    </p>
+  <p class="text-center">
+    {session.description}
+  </p>
 
-    <form class="my-16" on:submit={handleSubmit}>
-      <div class="flex flex-col gap-8 items-center">
-        <div class="w-full">
-          <label for="text" class="mb-2 text-sm font-semibold">
-            Write something
-          </label>
-          <input
-            id="text"
-            name="text"
-            type="text"
-            class="flex h-8 w-full items-center justify-between rounded-md bg-ctp-surface0
-                  px-3 pr-12 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
-            bind:value={text}
-            on:blur={() => validateWord(text)}
-          />
-          <p class="text-left text-sm font-semibold text-ctp-red">{textError}</p>
-        </div>
-        <button
-          class="flex justify-center items-center rounded-md bg-ctp-mauve px-3 py-1 font-medium
-                text-ctp-surface0 hover:opacity-75 active:opacity-50 transition-opacity"
-          type="submit"
-        >
-          Send&nbsp;<Send size="18" />
-        </button>
+  <form class="my-16" on:submit={handleSubmit}>
+    <div class="flex flex-col gap-8 items-center">
+      <div class="w-full">
+        <label for="text" class="mb-2 text-sm font-semibold">
+          Write something
+        </label>
+        <input
+          id="text"
+          name="text"
+          type="text"
+          class="flex h-8 w-full items-center justify-between rounded-md bg-ctp-surface0
+                px-3 pr-12 focus:outline-none
+                {textError ? 'ring-2 ring-ctp-red' : '' }
+                {textSuccess ? 'ring-2 ring-ctp-green' : 'focus:ring-2 focus:ring-ctp-mauve'} transition-colors"
+          bind:value={text}
+          on:blur={() => validateWord(text)}
+          on:input={() => textSuccess = false}
+        />
+        <p class="text-left text-sm font-semibold text-ctp-red">{textError}</p>
       </div>
-    </form>
+      <button
+        class="flex justify-center items-center rounded-md bg-ctp-mauve px-3 py-1 font-medium
+              text-ctp-surface0 hover:opacity-75 active:opacity-50 transition-opacity"
+        type="submit"
+      >
+        Send&nbsp;<Send size="18" />
+      </button>
+    </div>
+  </form>
 
-    <p class="mt-8 text-center">
-      The session code is <strong>{session.code}</strong>,<br>share it with your neighbors.
-    </p>
-  </div>
-</section>
+  <p class="mt-8 text-center">
+    The session code is <strong>{session.code}</strong>,<br>share it with your neighbors.
+  </p>
+</div>
