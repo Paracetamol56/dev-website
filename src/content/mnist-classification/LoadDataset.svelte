@@ -3,8 +3,9 @@
 	import type * as tf from "@tensorflow/tfjs";
   import MnistPreview from "./MnistPreview.svelte";
 	import type { MnistData } from "./mnistData";
+	import type { Writable } from "svelte/store";
 
-  export let data: MnistData;
+  export let data: Writable<MnistData>;
   let loading: boolean = false;
 
   let preview: [tf.Tensor4D, tf.Tensor2D];
@@ -13,8 +14,8 @@
     e.preventDefault();
     loading = true;
     
-    await data.load(40000, 10000);
-    preview = data.getTestData(8);
+    await $data.load(40000, 10000);
+    preview = $data.getTestData(8);
 
     loading = false;
   };

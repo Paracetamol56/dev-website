@@ -3,18 +3,34 @@
 	import Button from "$lib/components/Button.svelte";
 	import { createRadioGroup, melt } from "@melt-ui/svelte";
 	import { getModelArchitecture } from "./mnistUtils";
+	import type { Writable } from "svelte/store";
 
-  let modelArchitecture: string = getModelArchitecture("");
-  let model = tf.sequential();
+  export let model: Writable<tf.Sequential>;
+  
+  let modelLayers: tf.layers.Layer[] = [];
 
   const initModel = () => {
-    let modelCode = modelArchitecture.trim();
-    eval(modelCode);
-    // Trigger an update to the summary table
-    model = model;
+    let newModel = tf.sequential( )
+
+    if ($value === 'ANN') {
+      newModel.add( tf.layers.flatten( { inputShape: [28, 28, 1] } ) )
+      newModel.add( tf.layers.dense( { units: 42, activation: 'relu' } ) )
+      newModel.add( tf.layers.dense( { units: 10, activation: 'softmax' } ) )  
+    } else if ($value === 'CNN') {
+      newModel.add( tf.layers.conv2d( { kernelSize: 3, filters: 16, activation: 'relu' , inputShape: [28, 28, 1]} ) )
+      newModel.add( tf.layers.conv2d( { kernelSize: 3, filters: 16, activation: 'relu' } ) )
+      newModel.add( tf.layers.maxPooling2d( { poolSize: 2, strides: 2 } ) )
+      newModel.add( tf.layers.flatten( { } ) )
+      newModel.add( tf.layers.dense( { units: 10, activation: 'softmax' } ) )
+    }
+
+    const myOptim = 'rmsprop'
+    newModel.compile( { loss: 'categoricalCrossentropy', optimizer: myOptim, metrics:['accuracy'] } )
+
+    modelLayers = newModel.layers
+    $model = newModel
   };
 
-  $: modelArchitecture = getModelArchitecture($value)
 
   const {
     elements: { root, item, hiddenInput },
@@ -28,13 +44,13 @@
 
 <div>
 	<h3>Model Architecture</h3>
-	<div>
+	<!-- <div>
 		<textarea
       class="flex h-44 w-full items-center justify-between rounded-md bg-ctp-surface0 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
       spellcheck="false"
       bind:value={modelArchitecture}
     ></textarea>
-	</div>
+	</div> -->
 	<div class="my-4 p-4 rounded-md bg-ctp-mantle flex flex-col md:flex-row gap-4 justify-between items-center">
 		<div
       use:melt={$root}
@@ -69,7 +85,7 @@
       Initialize Model
     </Button>
 	</div>
-  {#if model.layers.length > 0}
+  {#if modelLayers.length > 0}
     <h3>Model Summary</h3>
     <div class="mb-8 w-full p-4 bg-ctp-mantle rounded-md">
       <table class="w-full table-auto">
@@ -82,7 +98,7 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-ctp-surface0 ">
-          {#each model.layers as layer}
+          {#each modelLayers as layer}
             <tr class="hover:bg-ctp-crust">
               <td class="px-4 py-1">{layer.name}</td>
               <td class="px-4 py-1">[batch, {layer.outputShape.slice(1).join(", ")}]</td>
