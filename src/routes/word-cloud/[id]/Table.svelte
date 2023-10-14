@@ -30,7 +30,7 @@
 
 <div class="mb-8 w-full p-4 bg-ctp-mantle rounded-md">
   <div class="mb-4 flex justify-between">
-    <h2 class="text-2xl font-bold text-ctp-blue">
+    <h2 class="text-2xl font-bold text-ctp-lavender">
       Raw data
     </h2>
     <button

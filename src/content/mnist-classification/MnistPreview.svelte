@@ -2,9 +2,9 @@
 	import * as tf from "@tensorflow/tfjs";
 	import { onMount } from "svelte";
 
-  export let data: Tensor4D;
-  export let label: Tensor2D;
-  export let prediction: Tensor2D | null = null;
+  export let data: tf.Tensor4D;
+  export let label: tf.Tensor2D;
+  export let prediction: tf.Tensor2D | null = null;
 
   const labels = Array.from(label.argMax(1).dataSync());
   const previewCount = data.shape[0];
@@ -18,14 +18,16 @@
   });
 </script>
 
-<div class="grid grid-cols-8 gap-2">
+<div class="grid gap-2 grid-cols-2 md:grid-cols-4 lg:grid-cols-8">
   {#each Array.from({ length: previewCount }) as _, i}
-    <div class="p-2 bg-ctp-mantle rounded-md">
-      <div class="flex flex-col items-center gap-2">
-        <p class="text-ctp-peach">
-          Label: {labels[i]}
-        </p>
-        <div class="square-24">
+    <div class="bg-black rounded-md overflow-hidden">
+      <div class="flex flex-col items-stretch">
+        <div class="bg-ctp-green">
+          <p class="my-2 mx-3 text-center text-ctp-mantle font-semibold">
+            Label: {labels[i]}
+          </p>
+        </div>
+        <div class="mx-auto square-24">
           <canvas
             bind:this={canvas[i]}
             class="w-full h-full"

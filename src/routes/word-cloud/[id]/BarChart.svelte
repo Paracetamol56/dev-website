@@ -32,7 +32,7 @@
 </script>
 
 <div class="mb-8 w-full p-4 bg-ctp-mantle rounded-md">
-  <h2 class="text-2xl font-bold text-ctp-blue">
+  <h2 class="text-2xl font-bold text-ctp-lavender">
     Bar chart
   </h2>
 </div>

@@ -45,7 +45,7 @@ export const GET: RequestHandler = async ({ url }) => {
       },
       env.JWT_SECRET,
       {
-        expiresIn: "1d",
+        expiresIn: "30d",
       }
     );
 

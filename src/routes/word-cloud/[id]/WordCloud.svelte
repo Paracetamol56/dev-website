@@ -111,7 +111,7 @@
 
 <div class="mb-4 p-4 bg-ctp-mantle rounded-md">
   <div class="flex justify-between">
-    <h2 class="text-2xl font-bold text-ctp-blue">
+    <h2 class="text-2xl font-bold text-ctp-lavender">
       Word cloud
     </h2>
     <button
