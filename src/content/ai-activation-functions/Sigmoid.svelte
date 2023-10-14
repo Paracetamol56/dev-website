@@ -40,7 +40,7 @@
         </span>
         <p>{@html math(`\\lambda=${$value[0]}`)}</p>
       </div>
-      {@html display(`\\phi(x)=\\frac{1}{1+e^{\\lambda*x}}`)}
+      {@html display(`\\phi(x)=\\frac{1}{1+e^{-\\lambda*x}}`)}
     </div>
   </div>
 
