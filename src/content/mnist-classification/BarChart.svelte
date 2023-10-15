@@ -2,7 +2,7 @@
 <script lang="ts">
   import * as d3 from "d3";
 
-  export let data: number[] = [];
+  export let data: Map<string, {correct: number, total: number}> = new Map();
   export let margin: { top: number, right: number, bottom: number, left: number } = {
     top: 30,
     right: 30,
@@ -13,12 +13,14 @@
   let width: number;
   let height: number;
 
-  $: x = d3.scaleLinear([0, data.length], [margin.left, width - margin.right]);
-  $: y = d3.scaleLinear([0, d3.max(data) || 1], [height - margin.bottom, margin.top]);
-
-  const line = d3.line<number>()
-    .x((d, i) => x(i))
-    .y((d) => y(d));
+  $: x = d3.scaleBand<string>()
+		.domain(data.keys())
+		.range([margin.left, width - margin.right])
+		.padding(0.1);
+	
+	$: y = d3.scaleLinear<number>()
+		.domain([0, 1])
+		.range([height - margin.bottom, margin.top]);
 
   let g1: SVGGElement;
 	let g2: SVGGElement;
@@ -54,10 +56,14 @@
         />
       {/each}
     </g>
-    <path
-      class="stroke-ctp-blue fill-none stroke-1"
-      stroke-width="1"
-      d={line(data)}
-    />
+    {#each data.entries() as d, i}
+      <rect
+        class="fill-ctp-blue"
+        x={x(d[0])}
+        y={y(d[1].correct / d[1].total)}
+        width={x.bandwidth()}
+        height={height - margin.bottom - y(d[1].correct / d[1].total)}
+      />
+    {/each}
   </svg>
 </div>

@@ -8,7 +8,7 @@
 	export let data: Writable<MnistData>;
 	export let model: Writable<tf.Sequential>;
 
-	let maxEpoch: number = 10;
+	let maxEpoch: number = 1;
 	let maxEpochError: string = '';
 
 	let batchSize: number = 100;
@@ -25,7 +25,7 @@
 
 		const [trainData, trainLabels] = $data.getTrainData();
 		let counter = 0;
-		const history = await $model.fit(trainData, trainLabels, {
+		await $model.fit(trainData, trainLabels, {
 			batchSize,
 			epochs: maxEpoch,
 			shuffle: true,
@@ -89,8 +89,14 @@
 		<div class="w-full">
 			<h3>Training Progress</h3>
 			<div class="w-full flex flex-col gap-4 md:flex-row justify-stretch">
-				<LineChart data={lossLogs} maxY={10} title="Loss" />
-				<LineChart data={accLogs} maxY={1} title="Accuracy" />
+				<div class="w-full">
+					<h4>Loss{lossLogs.length > 0 ? ` - ${lossLogs[lossLogs.length - 1].toFixed(4)}` : ''}</h4>
+					<LineChart data={lossLogs} />
+				</div>
+				<div class="w-full">
+					<h4>Accuracy{accLogs.length > 0 ? ` - ${accLogs[accLogs.length - 1].toFixed(4)}` : ''}</h4>
+					<LineChart data={accLogs} />
+				</div>
       </div>
 		</div>
 	</div>

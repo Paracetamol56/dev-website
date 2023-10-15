@@ -86,8 +86,8 @@
     </Button>
 	</div>
   {#if modelLayers.length > 0}
-    <h3>Model Summary</h3>
-    <div class="mb-8 w-full p-4 bg-ctp-mantle rounded-md">
+    <h4>Model Summary</h4>
+    <div class="mb-8 w-full p-4 bg-ctp-mantle rounded-md overflow-x-auto">
       <table class="w-full table-auto">
         <thead>
           <tr>

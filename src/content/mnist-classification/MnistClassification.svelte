@@ -18,6 +18,6 @@
 <LoadDataset {data} />
 <InitModel {model}/>
 <TrainModel {data} {model}/>
-<EvaluateModel />
+<EvaluateModel {data} {model} />
 <SaveLoadModel />
 <TestModel />
