@@ -5,6 +5,7 @@
 	import type * as tf from '@tensorflow/tfjs';
 	import BarChart from './BarChart.svelte';
 	import ConfusionMatrix from './ConfusionMatrix.svelte';
+	import MnistPreview from './MnistPreview.svelte';
 
 	export let data: Writable<MnistData>;
 	export let model: Writable<tf.Sequential>;
@@ -51,6 +52,16 @@
 		classAccuracy = new Map(classAccuracy);
 		confusionMatrix = new Map(confusionMatrix);
 	};
+
+	let testData: tf.Tensor4D;
+	let testLabels: tf.Tensor2D;
+	let predictions: tf.Tensor;
+
+	const showPredicions = () => {
+		[testData, testLabels] = $data.getTestData(32);
+		
+		predictions = ($model.predict(testData) as tf.Tensor).argMax(1);
+	}
 </script>
 
 <div>
@@ -69,6 +80,9 @@
 	</div>
 
 	<h3>Prediction Example</h3>
-	<Button>Show Prediction</Button>
-	<div class="mt-4 w-full h-96 p-4 rounded-md bg-ctp-mantle" />
+	<Button on:click={showPredicions}>Show Prediction</Button>
+	<h4 />
+	{#if predictions !== undefined}
+		<MnistPreview data={testData} label={testLabels} prediction={predictions} />
+	{/if}
 </div>
