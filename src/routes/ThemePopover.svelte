@@ -3,7 +3,7 @@
 	import { fade } from 'svelte/transition';
 	import { Check, Palette, X } from 'lucide-svelte';
 	import { variants } from '@catppuccin/palette';
-	import { theme, user } from '$lib/stores';
+	import { theme } from '$lib/stores';
 
   const onThemeChange: CreateRadioGroupProps['onValueChange']  = ({curr, next}) => {
     $theme = next;

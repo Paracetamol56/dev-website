@@ -209,14 +209,13 @@ class Maze<F extends Frontier> {
       }
       this.stepCallback(this.lastNode);
     } catch (e) {
-      console.log(e);
       if (e instanceof Error) {
         if (e.message == "No solution") {
           this.solvable = false;
-        } else {
-          console.error(e);
+          return;
         }
       }
+      console.error(e);
     }
   }
 
@@ -241,14 +240,13 @@ class Maze<F extends Frontier> {
         this.stepCallback(this.lastNode);
       }
     } catch (e) {
-      console.log(e);
       if (e instanceof Error) {
         if (e.message == "No solution") {
           this.solvable = false;
-        } else {
-          console.error(e);
+          return;
         }
       }
+      console.error(e);
     }
   }
 };

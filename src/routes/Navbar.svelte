@@ -1,24 +1,33 @@
 <script lang="ts">
 	import { createToolbar, melt } from "@melt-ui/svelte";
 	import ThemePopover from "./ThemePopover.svelte";
-	import type { Writable } from "svelte/store";
 	import LoginDialog from "./LoginDialog.svelte";
 	import { user } from "$lib/stores";
 	import ProfilePopover from "./ProfilePopover.svelte";
 	import { ExternalLink } from "lucide-svelte";
 
-  export let theme: Writable<string>;
-
   const {
     elements: { root, link },
   } = createToolbar();
+
+	let scrollY: number = 0;
+	let scrollYdelta: number = 0;
+	const handleMouseWheel = (e: WheelEvent) => {
+		scrollYdelta = e.deltaY;
+	};
 </script>
 
+<svelte:window on:wheel={handleMouseWheel} bind:scrollY={scrollY} />
+
 <nav
-	class="min-w-max p-3"
+	class="min-w-max p-3 fixed top-0 left-0 right-0 transition-transform duration-200
+				transform {scrollYdelta > 0 && scrollY >= 250 ? "-translate-y-full": ""} z-50"
 	use:melt={$root}
 >
-	<div class="flex items-center gap-4 rounded-md bg-ctp-mantle p-3 text-ctp-text">
+	<div 
+		class="flex items-center gap-4 rounded-md p-3 text-ctp-text
+					shadow-md shadow-ctp-crust backdrop-blur-lg bg-ctp-crust/50"
+	>
 		<a href="/">
 			<svg class="square-8" width="750" height="606" viewBox="0 0 750 606" fill="none" xmlns="http://www.w3.org/2000/svg">
 				<g clip-path="url(#clip0_22_3)">
@@ -40,7 +49,7 @@
 			<a class="hover:text-ctp-blue transition-colors flex items-center gap-1" href="https://matheo-galuba.com" target="_blank" use:melt={$link}>Portfolio <ExternalLink size="16" stroke-width="3" /></a>
 		</div>
 		<div class="ml-auto flex items-center gap-2" >
-			<ThemePopover {theme} />
+			<ThemePopover />
 			{#if $user !== null}
 			<ProfilePopover />
 			{:else}

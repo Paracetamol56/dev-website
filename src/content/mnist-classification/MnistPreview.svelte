@@ -6,7 +6,7 @@
   export let label: tf.Tensor2D;
   export let prediction: tf.Tensor | null = null;
 
-  $: labels = Array.from(label.argMax(1).dataSync()); console.log(labels);
+  $: labels = Array.from(label.argMax(1).dataSync());
   $: predictions = prediction ? Array.from(prediction.dataSync()) : null;
   $: previewCount = data.shape[0];
   $: canvas = new Array<HTMLCanvasElement>(previewCount);

@@ -7,7 +7,6 @@
 	import Navbar from './Navbar.svelte';
 	import Transition from './Transition.svelte';
 	import Footer from './Footer.svelte';
-	import { theme } from '$lib/stores';
 
 	export let data;
 </script>
@@ -50,7 +49,7 @@
 	{/each}
 </div>
 
-<Navbar theme={theme} />
+<Navbar />
 
 <main class="mb-auto">
 	<Transition url={data.url}>
