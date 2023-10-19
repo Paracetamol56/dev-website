@@ -31,6 +31,8 @@ const MNIST_LABELS_PATH =
 
 export class MnistData {
   isDownloaded: boolean;
+  trainSize: number;
+  testSize: number;
   datasetImages: Float32Array | null;
   datasetLabels: Uint8Array | null;
   trainImages: Float32Array | null;
@@ -40,6 +42,8 @@ export class MnistData {
 
   constructor() {
     this.isDownloaded = false;
+    this.trainSize = 0;
+    this.testSize = 0;
     this.datasetImages = null;
     this.datasetLabels = null;
     this.trainImages = null;
@@ -49,6 +53,9 @@ export class MnistData {
   }
 
   async load(nTrain = 40000, nTest = 10000) {
+    this.trainSize = nTrain;
+    this.testSize = nTest;
+    
     // Image request
     const img = new Image();
     const canvas = document.createElement('canvas');

@@ -5,6 +5,7 @@
 	import type * as tf from '@tensorflow/tfjs';
 	import LineChart from './LineChart.svelte';
 	import { BrainCircuit } from 'lucide-svelte';
+	import { addToast } from '../../routes/+layout.svelte';
 
 	export let data: Writable<MnistData>;
 	export let model: Writable<tf.Sequential>;
@@ -15,33 +16,69 @@
 	let batchSize: number = 100;
 	let batchSizeError: string = '';
 
-	let loading: boolean = false;
+	let training: boolean = false;
+	let currentEpoch: number = 0;
+	let currentBatch: number = 0;
 	let lossLogs: number[] = [];
 	let accLogs: number[] = [];
 
 	const trainModel = async () => {
-		loading = true;
+		if (maxEpoch < 1) {
+			maxEpochError = 'Max Epoch must be greater than 0';
+			return;
+		}
+		if (maxEpoch > 100) {
+			maxEpochError = 'Max Epoch must be less than 100';
+			return;
+		}
+		if (batchSize < 1) {
+			batchSizeError = 'Batch Size must be greater than 0';
+			return;
+		}
+		if (batchSize > 10000) {
+			batchSizeError = 'Batch Size must be less than 10000';
+			return;
+		}
+		maxEpochError = '';
+		batchSizeError = '';
+
+		training = true;
 		lossLogs = [];
 		accLogs = [];
 
 		const [trainData, trainLabels] = $data.getTrainData();
 		let counter = 0;
-		await $model.fit(trainData, trainLabels, {
-			batchSize,
-			epochs: maxEpoch,
-			shuffle: true,
-			callbacks: {
-				onBatchEnd: async (batch, logs) => {
-					counter++;
-					if (logs) {
-						lossLogs = [...lossLogs, logs.loss];
-						accLogs = [...accLogs, logs.acc];
-					}
+		try {
+			await $model.fit(trainData, trainLabels, {
+				batchSize,
+				epochs: maxEpoch,
+				shuffle: true,
+				callbacks: {
+					onBatchEnd: async (batch, logs) => {
+						counter++;
+						currentBatch = batch;
+						if (logs) {
+							lossLogs = [...lossLogs, logs.loss];
+							accLogs = [...accLogs, logs.acc];
+						}
+					},
+					onEpochEnd: async (epoch, logs) => {
+						currentEpoch = epoch;
+					},
 				}
-			}
-		});
+			});
+		} catch (e) {
+			console.error(e);
+			addToast({
+				data: {
+					title: 'Error',
+					description: 'There was an error training your model.',
+					color: 'bg-ctp-red'
+				}
+			});
+		}
 
-		loading = false;
+		training = false;
 	};
 </script>
 
@@ -86,8 +123,12 @@
 				<span>Train Model</span>
 				<BrainCircuit size="18" stroke-width="3" />
 			</Button>
-			{#if loading}
+			{#if training}
     		<p class="mt-2 text-ctp-peach font-semibold">Training...</p>
+				<p class="text-sm">
+					<strong>Epoch:</strong> {currentEpoch + 1} / {maxEpoch}<br />
+					<strong>Batch:</strong> {currentBatch + 1} / {Math.ceil($data.trainSize / batchSize)}
+				</p>
 			{/if}
 		</div>
 		<div class="w-full">

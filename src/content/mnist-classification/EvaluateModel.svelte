@@ -81,8 +81,8 @@
 		</div>
 	</div>
 	
-	<h4>Prediction Example</h4>
 	{#if examplePredictions !== undefined}
+		<h4>Prediction Example</h4>
 		<MnistPreview data={exampleTestData} label={exampleTestLabels} prediction={examplePredictions} />
 	{/if}
 </div>

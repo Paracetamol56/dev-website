@@ -64,6 +64,15 @@
         width={x.bandwidth()}
         height={height - margin.bottom - y(d[1])}
       />
+      <text
+        class="text-ctp-lavender"
+        x={(x(d[0]) ?? 0) + x.bandwidth() / 2}
+        y={(y(d[1]) ?? 0) - 3}
+        text-anchor="middle"
+        dominant-baseline="baseline"
+      >
+        {d[1].toFixed(2)}
+      </text>
     {/each}
   </svg>
 </div>
