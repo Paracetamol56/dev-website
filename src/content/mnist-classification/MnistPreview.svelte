@@ -25,13 +25,13 @@
       <div class="flex flex-col items-stretch">
         <div class="{predictions !== null ? predictions[i] === labels[i] ? 'bg-ctp-green' : 'bg-ctp-red' : 'bg-ctp-green'} flex flex-col items-center">
           {#if predictions === null}
-            <p class="my-2 mx-3 text-center text-ctp-mantle font-semibold">
+            <span class="my-1 mx-3 text-center text-ctp-mantle font-semibold">
               Label: {labels[i]}
-            </p>
+            </span>
           {:else}
-            <p class="my-2 mx-3 text-center text-ctp-mantle font-semibold">
+            <span class="my-1 mx-3 text-center text-ctp-mantle font-semibold">
               Label: {labels[i]}/Pred: {predictions[i]}
-            </p>
+            </span>
           {/if}
         </div>
         <div class="mx-auto square-24">

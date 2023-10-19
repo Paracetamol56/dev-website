@@ -19,5 +19,5 @@
 <InitModel {model}/>
 <TrainModel {data} {model}/>
 <EvaluateModel {data} {model} />
-<SaveLoadModel />
-<TestModel />
+<SaveLoadModel {model} />
+<TestModel {model} />

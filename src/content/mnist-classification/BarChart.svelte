@@ -2,7 +2,7 @@
 <script lang="ts">
   import * as d3 from "d3";
 
-  export let data: Map<string, {correct: number, total: number}> = new Map();
+  export let data: Map<string, number> = new Map();
   export let margin: { top: number, right: number, bottom: number, left: number } = {
     top: 30,
     right: 30,
@@ -19,7 +19,7 @@
 		.padding(0.1);
 	
 	$: y = d3.scaleLinear<number>()
-		.domain([0, 1])
+		.domain([0, d3.max(data.values()) ?? 1])
 		.range([height - margin.bottom, margin.top]);
 
   let g1: SVGGElement;
@@ -60,9 +60,9 @@
       <rect
         class="fill-ctp-blue"
         x={x(d[0])}
-        y={y(d[1].correct / d[1].total)}
+        y={y(d[1])}
         width={x.bandwidth()}
-        height={height - margin.bottom - y(d[1].correct / d[1].total)}
+        height={height - margin.bottom - y(d[1])}
       />
     {/each}
   </svg>

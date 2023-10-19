@@ -4,6 +4,7 @@
 	import type { MnistData } from './mnistData';
 	import type * as tf from '@tensorflow/tfjs';
 	import LineChart from './LineChart.svelte';
+	import { BrainCircuit } from 'lucide-svelte';
 
 	export let data: Writable<MnistData>;
 	export let model: Writable<tf.Sequential>;
@@ -81,7 +82,10 @@
 					</p>
 				</fieldset>
 			</div>
-			<Button on:click={trainModel}>Train Model</Button>
+			<Button on:click={trainModel} disabled={$data.isDownloaded === false || $model.layers.length === 0}>
+				<span>Train Model</span>
+				<BrainCircuit size="18" stroke-width="3" />
+			</Button>
 			{#if loading}
     		<p class="mt-2 text-ctp-peach font-semibold">Training...</p>
 			{/if}

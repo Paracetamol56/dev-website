@@ -4,6 +4,7 @@
   import MnistPreview from "./MnistPreview.svelte";
 	import type { MnistData } from "./mnistData";
 	import type { Writable } from "svelte/store";
+	import { DownloadCloud } from "lucide-svelte";
 
   export let data: Writable<MnistData>;
   let loading: boolean = false;
@@ -25,7 +26,8 @@
 <div>
   <h3>MNIST Dataset</h3>
   <Button on:click={loadData}>
-    Load Data
+    <span>Load Data</span>
+    <DownloadCloud size="18" stroke-width="3" />
   </Button>
   {#if loading}
     <p class="mt-2 text-ctp-peach font-semibold">Loading...</p>

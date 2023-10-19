@@ -139,6 +139,15 @@
         </linearGradient>
       </defs>
       <g>
+        <text
+          x={0}
+          y={2 * margin.top / 3}
+          text-anchor="left"
+          dominant-baseline="middle"
+          font-size="0.75rem"
+        >
+          Loss
+        </text>
         <rect
           x={0}
           y={margin.top}
@@ -149,6 +158,15 @@
         <g bind:this={g3} transform={`translate(15, 0)`} />
       </g>
       <g transform={`translate(40, 0)`}>
+        <text
+          x={0}
+          y={2 * margin.top / 3}
+          text-anchor="left"
+          dominant-baseline="middle"
+          font-size="0.75rem"
+        >
+          True Positive
+        </text>
         <rect
           x={0}
           y={margin.top}

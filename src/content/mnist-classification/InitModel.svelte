@@ -2,8 +2,9 @@
   import * as tf from "@tensorflow/tfjs";
 	import Button from "$lib/components/Button.svelte";
 	import { createRadioGroup, melt } from "@melt-ui/svelte";
-	import { getModelArchitecture } from "./mnistUtils";
 	import type { Writable } from "svelte/store";
+	import { BrainCog } from "lucide-svelte";
+	import { addToast } from "../../routes/+layout.svelte";
 
   export let model: Writable<tf.Sequential>;
   
@@ -22,6 +23,15 @@
       newModel.add( tf.layers.maxPooling2d( { poolSize: 2, strides: 2 } ) )
       newModel.add( tf.layers.flatten( { } ) )
       newModel.add( tf.layers.dense( { units: 10, activation: 'softmax' } ) )
+    } else {
+      addToast({
+        data: {
+          title: 'Warning',
+          description: 'Please select a model architecture.',
+          color: 'bg-ctp-peach'
+        }
+      });
+      return;
     }
 
     const myOptim = 'rmsprop'
@@ -82,7 +92,8 @@
       <input name="line-height" use:melt={$hiddenInput} />
     </div>
     <Button on:click={initModel}>
-      Initialize Model
+      <span>Initialize Model</span>
+      <BrainCog size="18" stroke-width="3" />
     </Button>
 	</div>
   {#if modelLayers.length > 0}
