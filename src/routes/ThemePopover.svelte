@@ -2,18 +2,11 @@
 	import { createPopover, createRadioGroup, melt, type CreateRadioGroupProps } from '@melt-ui/svelte';
 	import { fade } from 'svelte/transition';
 	import { Check, Palette, X } from 'lucide-svelte';
-	import type { Writable } from 'svelte/store';
 	import { variants } from '@catppuccin/palette';
-  import catppuccinLogo from '$lib/images/catppuccin.png';
-	import { user } from '$lib/stores';
-
-  export let theme: Writable<string>;
+	import { theme, user } from '$lib/stores';
 
   const onThemeChange: CreateRadioGroupProps['onValueChange']  = ({curr, next}) => {
-    theme?.set(next);
-    if ($user !== null) {
-      $user!.flavour = next;
-    }
+    $theme = next;
     return next;
   };
 
@@ -122,7 +115,7 @@
       </div>
 
       <small class="text-center">
-        <img src={catppuccinLogo} alt="Catppuccin logo" class="inline-block rounded-full square-4 mr-1" />
+        <img src={$theme === "latte" ? "/img/catppuccin-light.png" : "/img/catppuccin-dark.png"} alt="Catppuccin logo" class="inline-block rounded-full square-4 mr-1" />
         Powered by <a class="text-ctp-blue" href="https://github.com/catppuccin/catppuccin" target="_blank">Catppuccin</a>
       </small>
     </div>

@@ -7,24 +7,9 @@
 	import Navbar from './Navbar.svelte';
 	import Transition from './Transition.svelte';
 	import Footer from './Footer.svelte';
-	import { writable } from 'svelte/store';
-	import { user } from '$lib/stores';
-	import { onMount } from 'svelte';
-	import { variants } from '@catppuccin/palette';
-
-	$: theme = writable($user! ? $user!.flavour : 'mocha');
+	import { theme } from '$lib/stores';
 
 	export let data;
-	export const prerender = true
-
-	onMount(() => {
-		theme.subscribe((value) => {
-			const body = document.querySelector('body');
-			body?.classList.remove(...Object.keys(variants).map((v) => `ctp-${v}`));
-			body?.classList.add(`ctp-${value}`);
-		});
-	});
-
 </script>
 
 <script lang="ts" context="module">

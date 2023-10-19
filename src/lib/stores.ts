@@ -2,6 +2,7 @@ import { browser } from '$app/environment';
 import type { ObjectId } from 'mongodb';
 import { writable, type Writable } from 'svelte/store';
 
+// User store
 type User = {
   token: string;
   id: ObjectId;
@@ -11,27 +12,69 @@ type User = {
 };
 const user: Writable<User|null> = writable(null);
 
-// Write and read the user from cookies on page load
-if (browser) {
-  const cookie = document.cookie
-    .split('; ')
-    .find(row => row.startsWith('user='));
-  if (cookie) {
-    const userString: string = cookie.split('=')[1];
-    const userObject: User = JSON.parse(userString);
-    user.set(userObject);
-  }
-}
-
 // Overide the user store's set method to write to cookies
-const { set } = user;
+const { set: userSet } = user;
 user.set = (userObject: User|null) => {
   if (userObject === null) {
     document.cookie = 'user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; sameSite=strict';
   } else {
+    // Expiration: 30 days
     document.cookie = `user=${JSON.stringify(userObject)}; expires=${new Date(Date.now() + 2592000000).toUTCString()} path=/; sameSite=strict`;
   }
-  set(userObject);
+  userSet(userObject);
 };
 
-export { user };
+// Theme store
+const theme: Writable<string> = writable();
+theme.set("mocha");
+
+// Overide the theme store's set method to write to cookies
+const { set: themeSet } = theme;
+theme.set = (themeName: string) => {
+  // Expiration: 30 days
+  document.cookie = `theme=${themeName}; expires=${new Date(Date.now() + 2592000000).toUTCString()} path=/; sameSite=strict`;
+  if (browser) {
+    const body = document.querySelector('body');
+    body?.classList.forEach((className) => {
+      if (className.startsWith('ctp-')) {
+        body?.classList.remove(className);
+      }
+    });
+    body?.classList.add(`ctp-${themeName}`);
+  }
+  themeSet(themeName);
+};
+
+const readCookieAndSetStore = <T>(cookieName: string, store: Writable<T>) => {
+  const cookie = document
+    .cookie
+    .split('; ')
+    .find((item) => item.startsWith(cookieName));
+  if (cookie) {
+    try {
+      store.set(JSON.parse(cookie.split('=')[1]));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+}
+
+// Read persistant data from cookies
+if (browser) {
+  // User cookie
+  readCookieAndSetStore<User | null>('user', user);
+  // Theme cookie
+  const cookie = document
+    .cookie
+    .split('; ')
+    .find((item) => item.startsWith("theme"));
+  if (cookie) {
+    try {
+      theme.set(cookie.split('=')[1]);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+}
+
+export { user, theme };
