@@ -1,8 +1,20 @@
 <script lang="ts">
-	import { createPopover, createRadioGroup, melt, type CreateRadioGroupProps } from '@melt-ui/svelte';
+	import { createPopover, melt } from '@melt-ui/svelte';
 	import { fade } from 'svelte/transition';
-  import { variants } from '@catppuccin/palette';
-	import { User, X } from 'lucide-svelte';
+	import { Cog, LogOut, User, X } from 'lucide-svelte';
+  import { user } from '$lib/stores';
+	import { addToast } from './+layout.svelte';
+
+  const logOut = () => {
+    $user = null;
+    addToast({
+      data: {
+        title: 'Logged out',
+        description: 'You have been logged out.',
+        color: 'bg-ctp-green',
+      }
+    });
+  };
 
 	const {
 		elements: { trigger, content, arrow, close },
@@ -27,12 +39,31 @@
   <div
     use:melt={$content}
     transition:fade={{ duration: 100 }}
-    class="z-10 w-60 rounded-[4px] bg-ctp-base p-5 shadow-md shadow-ctp-crust"
+    class="z-10 w-48 rounded-[4px] bg-ctp-base p-5 shadow-md shadow-ctp-crust"
   >
     <div use:melt={$arrow} />
     <div class="flex flex-col gap-2.5">
       <p class="mb-2 font-semibold text-ctp-text">Profile</p>
-      <p>TODO</p>
+      <ul>
+        <li class="mb-2 text-ctp-text hover:text-ctp-blue transition-colors">
+          <a href="/profile" class="flex justify-start items-center gap-2">
+            <User size="18" stroke-width="3" />
+            <span>Profile</span>
+          </a>
+        </li>
+        <li class="mb-2 text-ctp-text hover:text-ctp-blue transition-colors">
+          <a href="settings" class="flex justify-start items-center gap-2">
+            <Cog size="18" stroke-width="3" />
+            <span>Settings</span>
+          </a>
+        </li>
+        <li class="mb-2 text-ctp-text hover:text-ctp-blue transition-colors">
+          <button type="button" class="flex justify-start items-center gap-2" on:click={logOut}>
+            <LogOut size="18" stroke-width="3" />
+            <span>Log out</span>
+          </button>
+        </li>
+      </ul>
     </div>
     <button
       use:melt={$close}
