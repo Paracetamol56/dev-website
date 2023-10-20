@@ -14,6 +14,7 @@
 	import { onMount } from 'svelte';
   import QRCode from 'qrcode';
 	import { create } from 'd3';
+	import Button from '$lib/components/Button.svelte';
 
   export let data: PageLoad;
   const distribution: {text: string, occurence: number}[] = [];
@@ -117,7 +118,7 @@
 	<title>Word cloud - Mathéo Galuba</title>
 </svelte:head>
 
-<section class="container mx-auto my-32">
+<section class="container mx-auto mb-32">
 	<hgroup>
 		<h1 class="mb-8 text-6xl font-bold text-center">
 			<span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender">Word cloud</span>
@@ -126,7 +127,7 @@
 	</hgroup>
 </section>
 
-<section class="container mx-auto my-32">
+<section class="container mx-auto">
   {#if session}
     <WordCloud data={distribution}/>
     <div class="mb-4 p-4 w-full bg-ctp-mantle rounded-md">
@@ -140,16 +141,22 @@
       <div class="mt-2 flex justify-start gap-2">
         {#if session.open}
           <button
-            class="rounded-md bg-ctp-mauve px-3 py-1 font-medium text-ctp-mantle flex items-center gap-1 hover:opacity-75 active:opacity-50 transition-opacity"
+            class="flex items-center gap-1 rounded-md bg-ctp-mauve px-3 py-1
+                  font-semibold text-ctp-mantle
+                  shadow-md shadow-ctp-crust transition-opacity
+                  hover:opacity-80 active:opacity-60"
             use:melt={$trigger}
           >
-            Session info <QrCode size="18" />
+            Session info <QrCode size="20" stroke-width="3" />
           </button>
           <button
-            class="rounded-md bg-ctp-red px-3 py-1 font-medium text-ctp-mantle flex items-center gap-1 hover:opacity-75 active:opacity-50 transition-opacity"
+            class="flex items-center gap-1 rounded-md bg-ctp-red px-3 py-1
+                  font-semibold text-ctp-mantle
+                  shadow-md shadow-ctp-crust transition-opacity
+                  hover:opacity-80 active:opacity-60"
             on:click={closeSession}
           >
-            Close session <X size="18" />
+            Close session <X size="20" stroke-width="3" />
           </button>
         {/if}
       </div>

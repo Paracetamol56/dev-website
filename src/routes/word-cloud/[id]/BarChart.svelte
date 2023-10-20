@@ -13,7 +13,7 @@
   let containerHeight: number;
 
   $: width = containerWidth;
-  $: height = data.length * 40 + margin.top + margin.bottom;
+  $: height = data.length * 20 + margin.top + margin.bottom;
   
   $: x = d3.scaleLinear()
     .domain([0, d3.max(data, (d: any) => d.occurence)])
@@ -31,35 +31,35 @@
 
 </script>
 
-<div class="mb-8 w-full p-4 bg-ctp-mantle rounded-md">
+<div class="mb-4 w-full p-4 bg-ctp-mantle rounded-md">
   <h2 class="text-2xl font-bold text-ctp-lavender">
     Bar chart
   </h2>
-</div>
-<div
-  class="mb-8 w-full"
-  bind:clientWidth={containerWidth}
-  bind:clientHeight={containerHeight}
->
-  <svg
-    id="chart"
-    class="mx-auto fill-ctp-blue text-xs max-w-full"
-    width={width}
-    height={height}
-    viewBox={`0 0 ${width} ${height}`}
+  <div
+    class="w-full"
+    bind:clientWidth={containerWidth}
+    bind:clientHeight={containerHeight}
   >
-  <g bind:this={g1} transform="translate({margin.left}, 0)" />
-  <g bind:this={g2} transform="translate(0, {margin.top})" />
-  {#each data as d}
-    <rect
-      x={x(0)}
-      y={y(d.text)}
-      width={x(d.occurence) - x(0)}
-      height={y.bandwidth()}
-      class="fill-ctp-mauve"
-      text-anchor="middle"
+    <svg
+      id="chart"
+      class="mx-auto fill-ctp-lavender text-xs max-w-full"
+      width={width}
+      height={height}
+      viewBox={`0 0 ${width} ${height}`}
     >
-    </rect>
-  {/each}
-  </svg>
+    <g bind:this={g1} transform="translate({margin.left}, 0)" />
+    <g bind:this={g2} transform="translate(0, {margin.top})" />
+    {#each data as d}
+      <rect
+        x={x(0)}
+        y={y(d.text)}
+        width={x(d.occurence) - x(0)}
+        height={y.bandwidth()}
+        class="fill-ctp-mauve"
+        text-anchor="middle"
+      >
+      </rect>
+    {/each}
+    </svg>
+  </div>
 </div>

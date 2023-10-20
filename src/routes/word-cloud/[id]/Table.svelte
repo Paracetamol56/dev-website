@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { FileSpreadsheet } from "lucide-svelte";
 	import type { WordCloudWord } from "../utils";
+	import Button from "$lib/components/Button.svelte";
 
   export let id: string;
   export let data: WordCloudWord[];
@@ -33,12 +34,12 @@
     <h2 class="text-2xl font-bold text-ctp-lavender">
       Raw data
     </h2>
-    <button
-      class="rounded-md bg-ctp-mauve px-3 py-1 font-medium text-ctp-mantle flex items-center gap-1 hover:opacity-75 active:opacity-50 transition-opacity"
+    <Button
       on:click={exportCSV}
     >
-      Export as CSV <FileSpreadsheet size="18" />
-    </button>
+      <span>Export as CSV</span>
+      <FileSpreadsheet size="18" />
+    </Button>
   </div>
   <table class="w-full table-auto">
     <thead>

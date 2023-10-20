@@ -51,7 +51,7 @@
 	<title>Word cloud - Mathéo Galuba</title>
 </svelte:head>
 
-<section class="container mx-auto my-32">
+<section class="container mx-auto mb-32">
 	<hgroup>
 		<h1 class="mb-8 text-6xl font-bold text-center">
 			<span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender">Word cloud</span>
@@ -59,7 +59,7 @@
 	</hgroup>
 </section>
 
-<section class="container mx-auto my-32">
+<section class="container mx-auto">
   {#if !session}
     <JoinForm joinSession={joinSession} />
   {:else}

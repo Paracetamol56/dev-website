@@ -52,7 +52,7 @@
 
 <Navbar />
 
-<main class="mb-auto">
+<main class="py-32 mb-auto">
 	<Transition url={data.url}>
 		<slot />
 	</Transition>

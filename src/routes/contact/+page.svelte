@@ -4,6 +4,7 @@
 	import { Send } from "lucide-svelte";
 	import { addToast } from "../+layout.svelte";
 	import { user } from "$lib/stores";
+	import Button from "$lib/components/Button.svelte";
 
   let email: string = "";
   let name: string = "";
@@ -121,7 +122,7 @@
 	<title>Contact - Mathéo Galuba</title>
 </svelte:head>
 
-<section class="container mx-auto my-32">
+<section class="container mx-auto">
 	<h1 class="mb-8 text-6xl font-bold text-center">
 		<span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender">Contact</span>
 	</h1>
@@ -175,10 +176,11 @@
         <div class="flex items-center">
           <button
             use:melt={$root}
-            class="switch relative h-5 w-[2.5rem] cursor-default rounded-full bg-ctp-surface0 transition-colors data-[state=checked]:bg-ctp-mauve"
+            class="switch relative h-5 w-[2.5rem] cursor-default rounded-full bg-ctp-surface0
+                  shadow-md shadow-ctp-crust transition-colors data-[state=checked]:bg-ctp-mauve"
             id="privacy"
           >
-            <span class="thumb block rounded-full bg-white transition" />
+            <span class="thumb block rounded-full bg-ctp-text transition" />
           </button>
           <input use:melt={$input} />
           <label
@@ -191,13 +193,10 @@
         <p class="text-left text-sm font-semibold text-ctp-red">{privacyError}</p>
       </fieldset>
       <div class="sm:col-span-2 flex justify-end">
-        <button
-          class="flex justify-center items-center rounded-md bg-ctp-mauve px-3 py-1 font-medium
-                text-ctp-surface0 hover:opacity-75 active:opacity-50 transition-opacity"
-          type="submit"
-        >
-          Send&nbsp;<Send size="16" />
-        </button>
+        <Button type="submit">
+          <span>Send</span>
+          <Send size="16" />
+        </Button>
       </div>
     </div>
   </form>

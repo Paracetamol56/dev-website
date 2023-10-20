@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Button from '$lib/components/Button.svelte';
   import cloud from 'd3-cloud'
 	import { FileCode } from 'lucide-svelte';
 
@@ -114,12 +115,12 @@
     <h2 class="text-2xl font-bold text-ctp-lavender">
       Word cloud
     </h2>
-    <button
-      class="rounded-md bg-ctp-mauve px-3 py-1 font-medium text-ctp-mantle flex items-center gap-1 hover:opacity-75 active:opacity-50 transition-opacity"
+    <Button
       on:click={exportSVG}
     >
-      Export as SVG <FileCode size="18" />
-    </button>
+      <span>Export as SVG</span>
+      <FileCode size="18" />
+  </Button>
   </div>
   <div
     class="mb-8 w-full"

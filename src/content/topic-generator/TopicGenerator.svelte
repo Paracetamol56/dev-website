@@ -57,7 +57,7 @@
 	};
 </script>
 
-<section class="my-32">
+<section class="my-16">
 	<form class="mx-auto mb-8 max-w-xl" on:submit={handleSubmit}>
 		<fieldset class="mb-4 w-full">
 			<label

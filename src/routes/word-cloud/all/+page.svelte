@@ -5,7 +5,7 @@
   export let data: PageData;
 </script>
 
-<section class="container mx-auto my-32">
+<section class="container mx-auto mb-32">
 	<hgroup>
 		<h1 class="mb-8 text-6xl font-bold text-center">
 			<span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender">Your sessions</span>
@@ -13,7 +13,7 @@
 	</hgroup>
 </section>
 
-<section class="container mx-auto my-16">
+<section class="container mx-auto">
   <div class="mb-8 flex justify-center">
     <a href="/word-cloud/new">
       <button class="flex justify-center items-center rounded-md bg-ctp-mauve px-3 py-1 font-medium

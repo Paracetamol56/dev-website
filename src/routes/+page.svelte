@@ -15,7 +15,7 @@
 	<title>Home - Mathéo Galuba</title>
 </svelte:head>
 
-<section class="container mx-auto my-32" bind:this={section0}>
+<section class="container mx-auto mb-32" bind:this={section0}>
 	<hgroup>
 		<h1 class="mb-8 text-6xl font-bold text-center">
 			<span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender">Welcome</span> to my website
@@ -23,7 +23,7 @@
 	</hgroup>
 </section>
 
-<section class="relative container mx-auto my-32" bind:this={section1}>
+<section class="relative container mx-auto mb-32" bind:this={section1}>
 	<span
 		class="absolute top-0 left-1/2 transform -translate-x-1/2
 					text-9xl font-black text-transparent text-outline-2 opacity-20 z-0"
@@ -55,7 +55,7 @@
 	</div>
 </section>
 
-<section class="relative container mx-auto my-32" bind:this={section2}>
+<section class="relative container mx-auto" bind:this={section2}>
 	<span
 		class="absolute top-0 left-1/2 transform -translate-x-1/2
 					text-9xl font-black text-transparent text-outline-2 opacity-20 z-0"
@@ -70,7 +70,7 @@
 	</div>
 	<div class="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
 		{#each data.tools as tool}
-			<div class="p-8 bg-ctp-mantle rounded-md shadow-md shadow-ctp-crust z-10">
+			<div class="p-8 bg-ctp-crust/50 backdrop-blur-sm rounded-md shadow-md shadow-ctp-crust z-10">
 				<div class="mb-2 flex justify-left flex-wrap gap-x-2 items-center">
 					<!-- {#each page.categories as category}
 						<a href="/">
