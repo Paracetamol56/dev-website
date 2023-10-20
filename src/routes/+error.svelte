@@ -8,7 +8,7 @@
   <title>{$page.status} - Mathéo Galuba</title>
 </svelte:head>
 
-<main class="grid min-h-full place-items-center px-6 py-24 sm:py-32 lg:px-8">
+<main class="grid min-h-full place-items-center px-6 lg:px-8">
   <div class="container">
     <div class="text-center">
       <p class="text-base font-semibold text-ctp-mauve">{$page.status}</p>
