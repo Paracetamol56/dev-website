@@ -23,9 +23,9 @@ I decided to buy a Noctua NF-A4x20 5V PWM fan and build my own fan controller us
 ## Hardware
 
 - Raspberry Pi 4 (4GB)
-- Passive cooling heatsink [Amazon](https://www.amazon.fr/gp/product/B07VXJLW4X/ref=ppx_yo_dt_b_asin_title_o00_s00?ie=UTF8&psc=1)
+- Passive cooling heatsink [Amazon](https://www.amazon.com/GeeekPi-Raspberry-Aluminum-Dissipation-Heatsink/dp/B085XPHY77/)
   Note that this heatsink is not meant to be used with a fan, other models are available with dedicated fan support.
-- Noctua NF-A4x20 5V PWM fan [Amazon](https://www.amazon.fr/gp/product/B071W6HJP6/ref=ppx_yo_dt_b_asin_title_o00_s00?ie=UTF8&psc=1)
+- Noctua NF-A4x20 5V PWM fan [Amazon](https://www.amazon.com/Noctua-NF-A4x20-PWM-Premium-Quality-Quiet/dp/B071W93333/)
 - A NPN transistor (S8050 but you are free to use any other model)
 - A 1K resistor
 - A diode
