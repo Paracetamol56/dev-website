@@ -30,26 +30,31 @@
   let moving: number | null = null;
   let startY: number;
   let mouseY: number;
-
+  
+  const flipListItems = (a: number, b: number) => {
+    const tmp = todos[a];
+    todos[a] = todos[b];
+    todos[b] = tmp;
+  }
+  
   const updateMouseY = (event: MouseEvent) => {
     mouseY = event.clientY - listoffset;
     if (moving === null) return;
     const deltaY = mouseY - startY;
     if (deltaY < -30 && moving > 0) {
-      const todo = todos[moving];
-      todos[moving] = todos[moving - 1];
-      todos[moving - 1] = todo;
+      flipListItems(moving, moving - 1);
       moving--;
+      const target = list.querySelector(`[data-index="${moving}"]`) as HTMLElement;
+      if (target) {
+        startY = target.getBoundingClientRect().top - listoffset + 20;
+      }
     } else if (deltaY > 30 && moving < todos.length - 1) {
-      const todo = todos[moving];
-      todos[moving] = todos[moving + 1];
-      todos[moving + 1] = todo;
+      flipListItems(moving, moving + 1);
       moving++;
-    }
-    // Update startY
-    const target = document.querySelector(`[data-index="${moving}"]`) as HTMLElement;
-    if (target) {
-      startY = document.querySelector(`[data-index="${moving}"]`)!.getBoundingClientRect().top - listoffset + 20;
+      const target = list.querySelector(`[data-index="${moving}"]`) as HTMLElement;
+      if (target) {
+        startY = target.getBoundingClientRect().top - listoffset + 20;
+      }
     }
   }
 
@@ -71,7 +76,7 @@
   {#each todos as todo, index (todo._id)}
     <li
       class="rounded-md bg-ctp-mantle/50 min-h-[40px]"
-      animate:flip={{ duration: moving === index ? 0 : 200 }}
+      animate:flip={{ duration: moving === index ? 0 : 150 }}
       data-index={index}
     >
       <div
