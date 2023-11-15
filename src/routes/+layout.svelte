@@ -24,21 +24,14 @@
 </script>
 
 <svelte:head>
-	<!-- Matomo -->
-	<script>
-		var _paq = window._paq = window._paq || [];
-		/* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-		_paq.push(['trackPageView']);
-		_paq.push(['enableLinkTracking']);
-		(function() {
-			var u="//analytics.matheo-galuba.com/";
-			_paq.push(['setTrackerUrl', u+'matomo.php']);
-			_paq.push(['setSiteId', '1']);
-			var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-			g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
-		})();
-	</script>
-	<!-- End Matomo Code -->
+	<script
+		data-host="https://cdn.micrometrics.es"
+		data-dnt="false"
+		src="https://cdn.micrometrics.es/js/script.js"
+		id="ZwSg9rf6GA"
+		async
+		defer
+	></script>
 	<title>Dev - Mathéo Galuba</title>
 	<meta name="description" content="A showcase of my little dev projects" />
 </svelte:head>
