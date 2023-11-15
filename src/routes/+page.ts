@@ -7,11 +7,11 @@ const tools = [
     description: 'Interractive word cloud to know public opinion about a subject',
     path: 'word-cloud',
   },
-  {
-    title: 'Ormi',
-    description: 'ToDo app to encourage productivity take advantage of your momentum',
-    path: 'ormi',
-  },
+//   {
+//     title: 'Ormi',
+//     description: 'ToDo app to encourage productivity take advantage of your momentum',
+//     path: 'ormi',
+//   },
 ]
 
 export const load: PageLoad = async () => {
