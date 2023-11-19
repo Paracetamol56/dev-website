@@ -9,7 +9,6 @@
 	import Footer from './Footer.svelte';
 
 	export let data;
-	export const prerender = true
 </script>
 
 <script lang="ts" context="module">
