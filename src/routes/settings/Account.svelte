@@ -7,6 +7,7 @@
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import { addToast } from '../+layout.svelte';
+	import Button from '$lib/components/Button.svelte';
 
   let name: string;
   let nameError: string = "";
@@ -207,12 +208,11 @@
 		{/if}
 	</fieldset>
 	<div class="flex justify-end">
-		<button
-			class="flex items-center gap-1 rounded-md bg-ctp-mauve px-3 py-1 font-semibold text-ctp-mantle shadow-md shadow-ctp-crust transition-opacity hover:opacity-80 active:opacity-60"
+		<Button
 			type="submit"
     >
       <span>Save</span>
 			<Save size="16" />
-		</button>
+		</Button>
 	</div>
 </form>
