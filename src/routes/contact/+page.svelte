@@ -82,7 +82,7 @@
     }
 
     axios.post('/api/contact', {
-      userId: $user?._id ?? null,
+      userId: $user?.id ?? null,
       email,
       name,
       message,
@@ -129,7 +129,7 @@
   <form class="mx-auto max-w-xl" on:submit={handleSubmit}>
     <div class="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
       <fieldset class="w-full">
-        <label for="hip" class="mb-2 text-sm font-semibold">
+        <label for="email" class="mb-2 text-sm font-semibold">
           Email
         </label>
         <input
@@ -137,14 +137,14 @@
           type="email"
           name="email"
           class="flex h-8 w-full items-center justify-between rounded-md bg-ctp-surface0
-                px-3 pr-12 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
+                shadow-md shadow-ctp-crust px-3 pr-12 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
           bind:value={email}
           on:blur={() => validateEmail(email)}
         />
         <p class="text-left text-sm font-semibold text-ctp-red">{emailError}</p>
       </fieldset>
       <fieldset class="w-full">
-        <label for="hip" class="mb-2 text-sm font-semibold">
+        <label for="name" class="mb-2 text-sm font-semibold">
           Name
         </label>
         <input
@@ -152,31 +152,31 @@
           type="text"
           name="name"
           class="flex h-8 w-full items-center justify-between rounded-md bg-ctp-surface0
-                px-3 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
+                shadow-md shadow-ctp-crust px-3 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
           bind:value={name}
           on:blur={() => validateName(name)}
         />
         <p class="text-left text-sm font-semibold text-ctp-red">{nameError}</p>
       </fieldset>
       <fieldset class="sm:col-span-2">
-        <label for="hip" class="mb-2 text-sm font-semibold">
+        <label for="message" class="mb-2 text-sm font-semibold">
           Message
         </label>
         <textarea
           id="message"
           name="message"
           class="flex h-32 w-full items-center justify-between rounded-md bg-ctp-surface0
-                px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
+                shadow-md shadow-ctp-crust px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
           bind:value={message}
           on:blur={() => validateMessage(message)}
         />
         <p class="text-left text-sm font-semibold text-ctp-red">{messageError}</p>
       </fieldset>
       <fieldset class="sm:col-span-2">
-        <div class="flex items-center">
+        <div class="flex items-center justify-start">
           <button
             use:melt={$root}
-            class="switch relative h-5 w-[2.5rem] cursor-default rounded-full bg-ctp-surface0
+            class="switch relative h-5 min-w-[2.25rem] cursor-default rounded-full bg-ctp-surface0
                   shadow-md shadow-ctp-crust transition-colors data-[state=checked]:bg-ctp-mauve"
             id="privacy"
           >
