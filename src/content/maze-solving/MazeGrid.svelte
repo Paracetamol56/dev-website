@@ -20,7 +20,7 @@
   };
 </script>
 
-<div class="mb-8 relative p-1 md:p-2 rounded-md bg-ctp-mantle">
+<div class="mb-8 relative p-1 md:p-2 rounded-md bg-ctp-mantle shadow-md shadow-ctp-crust">
   <div class="mx-auto lg:w-2/3 grid gap-1 md:gap-2" style={`grid-template-columns: repeat(${$maze.width}, minmax(0, 1fr)); grid-template-rows: repeat(${$maze.height}, minmax(0, 1fr));`}>
     {#each cells as row, i}
       {#each row as cell, j}

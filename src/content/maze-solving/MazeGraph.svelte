@@ -35,7 +35,7 @@
 
 <div class="w-full" bind:clientWidth={containerWidth}>
   <svg
-    class="bg-ctp-mantle rounded-md"
+    class="bg-ctp-mantle rounded-md shadow-md shadow-ctp-crust"
     width={width}
     height={height}
   >

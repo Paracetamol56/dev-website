@@ -13,9 +13,9 @@
   export let algorithm: Writable<SelectOption<string>>;
 </script>
 
-<div class="mb-8 p-4 rounded-md bg-ctp-mantle flex flex-col items-start md:flex-row md:items-end justify-center gap-2">
+<div class="mb-8 p-4 rounded-md bg-ctp-mantle shadow-md shadow-ctp-crust flex flex-col items-start md:flex-row md:items-end justify-center gap-2">
   <div class="flex flex-col gap-1">
-    <p class="block text-ctp-text font-semibold text-sm">Load a preset maze</p>
+    <span class="text-ctp-text font-semibold text-sm">Load a preset maze</span>
     <div class="flex items-center gap-2">
       <Button on:click={() => presetMaze.set(1)}>
         <span>1</span>
