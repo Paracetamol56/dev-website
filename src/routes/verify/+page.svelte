@@ -5,7 +5,6 @@
 	import { addToast } from "../+layout.svelte";
 	import { goto } from "$app/navigation";
 	import { user } from "$lib/stores";
-	import { User } from "lucide-svelte";
 
   onMount(() => {
     const token: string = $page.url.searchParams.get('token') ?? '';

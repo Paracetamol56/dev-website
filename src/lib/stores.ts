@@ -1,4 +1,5 @@
 import { browser } from '$app/environment';
+import { variants } from '@catppuccin/palette';
 import type { ObjectId } from 'mongodb';
 import { writable, type Writable } from 'svelte/store';
 
@@ -18,19 +19,22 @@ user.set = (userObject: User|null) => {
   if (userObject === null) {
     document.cookie = 'user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; sameSite=strict';
   } else {
-    // Expiration: 30 days
     document.cookie = `user=${JSON.stringify(userObject)}; expires=${new Date(Date.now() + 2592000000).toUTCString()} path=/; sameSite=strict`;
   }
   userSet(userObject);
 };
 
 // Theme store
-const theme: Writable<string> = writable();
+const theme: Writable<keyof typeof variants> = writable();
 theme.set("mocha");
 
 // Overide the theme store's set method to write to cookies
 const { set: themeSet } = theme;
 theme.set = (themeName: string) => {
+  // Validate
+  if (!Object.keys(variants).includes(themeName)) {
+    throw new Error(`Invalid theme: ${themeName}`);
+  }
   // Expiration: 30 days
   document.cookie = `theme=${themeName}; expires=${new Date(Date.now() + 2592000000).toUTCString()} path=/; sameSite=strict`;
   if (browser) {
@@ -42,7 +46,7 @@ theme.set = (themeName: string) => {
     });
     body?.classList.add(`ctp-${themeName}`);
   }
-  themeSet(themeName);
+  themeSet(themeName as keyof typeof variants);
 };
 
 const readCookieAndSetStore = <T>(cookieName: string, store: Writable<T>) => {
@@ -70,7 +74,7 @@ if (browser) {
     .find((item) => item.startsWith("theme"));
   if (cookie) {
     try {
-      theme.set(cookie.split('=')[1]);
+      theme.set(cookie.split('=')[1] as keyof typeof variants);
     } catch (e) {
       console.error(e);
     }

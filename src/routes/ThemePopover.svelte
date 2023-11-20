@@ -3,10 +3,29 @@
 	import { fade } from 'svelte/transition';
 	import { Check, Palette, X } from 'lucide-svelte';
 	import { variants } from '@catppuccin/palette';
-	import { theme } from '$lib/stores';
+	import { user, theme } from '$lib/stores';
+	import axios from 'axios';
+	import { addToast } from './+layout.svelte';
 
   const onThemeChange: CreateRadioGroupProps['onValueChange']  = ({curr, next}) => {
     $theme = next;
+    // API call to persist the theme on the user's profile if logged in
+    if ($user) {
+      axios
+        .patch(`/api/user/${$user?.id}`, { flavour: next })
+        .then((res) => {
+          $user!.flavour = next;
+        })
+        .catch((err) => {
+          addToast({
+            data: {
+              title: 'Internal Error',
+              description: 'Could not persist theme preference',
+              color: 'bg-ctp-red',
+            },
+          });
+        });
+    }
     return next;
   };
 
