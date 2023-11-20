@@ -5,5 +5,3 @@ export async function load({ url }) {
 		url: url.pathname
 	}
 }
-
-export const prerender = true;
