@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { user } from '$lib/stores';
 	import axios from 'axios';
-	import { Github } from 'lucide-svelte';
+	import { Check, Github } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import { addToast } from '../+layout.svelte';
 
@@ -33,14 +33,21 @@
 </script>
 
 <h4 class="flex items-center gap-1 text-base font-semibold mb-2"><Github size="18" /> GitHub integration</h4>
+<p>
+	Connect your GitHub account to enable features such as activity feed and
+	repositories informations.
+</p>
 {#if !loading}
 	{#if githubUser}
-		<p>
-			Connected to GitHub as <a
+		<p class="flex items-center gap-1">
+			<Check size="16" class="text-ctp-green" />
+			<strong>
+				Connected to GitHub as <a
 				class="text-ctp-blue"
 				href="https://github.com/{githubUser.login}"
 				target="_blank">{githubUser.login}</a
 			>.
+			</strong>
 		</p>
 	{:else}
 		<div class="flex justify-start">

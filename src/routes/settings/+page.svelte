@@ -5,8 +5,9 @@
 	import { createAccordion, melt } from '@melt-ui/svelte';
 	import { onMount } from 'svelte';
 	import { slide } from 'svelte/transition';
-	import Account from './Account.svelte';
 	import Integration from './Integration.svelte';
+	import Appearance from './Appearance.svelte';
+	import Profile from './Profile.svelte';
 
 	onMount(() => {
 		if (!$user) {
@@ -24,9 +25,14 @@
 
 	const items = [
 		{
-			id: 'account',
-			title: 'Account',
-			component: Account
+			id: 'profile',
+			title: 'Profile',
+			component: Profile
+		},
+		{
+			id: 'appearance',
+			title: 'Appearance',
+			component: Appearance
 		},
 		{
 			id: 'integration',
@@ -39,7 +45,7 @@
 		elements: { content, item, trigger, root },
 		helpers: { isSelected }
 	} = createAccordion({
-		defaultValue: 'account'
+		defaultValue: 'profile'
 	});
 </script>
 
