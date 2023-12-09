@@ -1,64 +1,61 @@
 <script lang="ts">
 	import Button from '$lib/components/Button.svelte';
-  import cloud from 'd3-cloud'
+	import cloud from 'd3-cloud';
 	import { FileCode } from 'lucide-svelte';
 
-  export let data: {text: string, occurence: number}[];
-  export let margin: { top: number; right: number; bottom: number; left: number; } = {
-    top: 40,
-    right: 40,
-    bottom: 40,
-    left: 40
-  };
+	export let data: { text: string; occurence: number }[];
+	export let margin: { top: number; right: number; bottom: number; left: number } = {
+		top: 40,
+		right: 40,
+		bottom: 40,
+		left: 40
+	};
 
-  let containerWidth: number;
-  let containerHeight: number;
+	let containerWidth: number;
+	let containerHeight: number;
 
-  $: width = containerWidth;
-  $: height = width * 9 / 16;
+	$: width = containerWidth;
+	$: height = (width * 9) / 16;
 
-  const colors = [
-    "fill-ctp-rosewater",
-    "fill-ctp-flamingo",
-    "fill-ctp-pink",
-    "fill-ctp-mauve",
-    "fill-ctp-red",
-    "fill-ctp-maroon",
-    "fill-ctp-peach",
-    "fill-ctp-yellow",
-    "fill-ctp-green",
-    "fill-ctp-teal",
-    "fill-ctp-sky",
-    "fill-ctp-sapphire",
-    "fill-ctp-blue",
-    "fill-ctp-lavender",
-  ]
+	const colors = [
+		'fill-ctp-rosewater',
+		'fill-ctp-flamingo',
+		'fill-ctp-pink',
+		'fill-ctp-mauve',
+		'fill-ctp-red',
+		'fill-ctp-maroon',
+		'fill-ctp-peach',
+		'fill-ctp-yellow',
+		'fill-ctp-green',
+		'fill-ctp-teal',
+		'fill-ctp-sky',
+		'fill-ctp-sapphire',
+		'fill-ctp-blue',
+		'fill-ctp-lavender'
+	];
 
-  let words: cloud.Word[] = [];
-  $: {
-    if (width && height && data) {
-      words = [];
-      cloud()
-        .size([
-          width - margin.left - margin.right,
-          height - margin.top - margin.bottom
-        ])
-        .words(data.map(d => ({ text: d.text, size: d.occurence })))
-        .padding(2)
-        .rotate(0)
-        .font("Helvetica")
-        .fontSize(d => Math.sqrt(d.size!) * 30)
-        .on("word", (word) => {
-          words = [...words, word];
-        })
-        .start();
-    }
-  }
+	let words: cloud.Word[] = [];
+	$: {
+		if (width && height && data) {
+			words = [];
+			cloud()
+				.size([width - margin.left - margin.right, height - margin.top - margin.bottom])
+				.words(data.map((d) => ({ text: d.text, size: d.occurence })))
+				.padding(2)
+				.rotate(0)
+				.font('Helvetica')
+				.fontSize((d) => Math.sqrt(d.size!) * 30)
+				.on('word', (word) => {
+					words = [...words, word];
+				})
+				.start();
+		}
+	}
 
-  const exportSVG = (e: Event) => {
-    e.preventDefault();
+	const exportSVG = (e: Event) => {
+		e.preventDefault();
 
-    const svg = `<?xml version="1.0" encoding="utf-8"?>
+		const svg = `<?xml version="1.0" encoding="utf-8"?>
     <svg
       xmlns="http://www.w3.org/2000/svg" 
       version="1.1"
@@ -95,63 +92,50 @@
         .fill-ctp-mantle{ fill: rgb(230, 233, 239); }
         .fill-ctp-crust{ fill: rgb(220, 224, 232); }
       </style>
-      ${document.getElementById("word-cloud")?.innerHTML}
+      ${document.getElementById('word-cloud')?.innerHTML}
     </svg>`;
-    const blob = new Blob([svg], { type: "image/svg+xml" });
-    const url = window.URL.createObjectURL(blob);
+		const blob = new Blob([svg], { type: 'image/svg+xml' });
+		const url = window.URL.createObjectURL(blob);
 
-    const a = document.createElement("a");
-    a.setAttribute("hidden", "");
-    a.setAttribute("href", url);
-    a.setAttribute("download", `word-cloud.svg`);
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  }
+		const a = document.createElement('a');
+		a.setAttribute('hidden', '');
+		a.setAttribute('href', url);
+		a.setAttribute('download', `word-cloud.svg`);
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+	};
 </script>
 
 <div class="mb-4 p-4 bg-ctp-mantle rounded-md">
-  <div class="flex justify-between">
-    <h2 class="text-2xl font-bold text-ctp-lavender">
-      Word cloud
-    </h2>
-    <Button
-      on:click={exportSVG}
-    >
-      <span>Export as SVG</span>
-      <FileCode size="18" />
-  </Button>
-  </div>
-  <div
-    class="mb-8 w-full"
-    bind:clientWidth={containerWidth}
-    bind:clientHeight={containerHeight}
-  >
-    <svg
-      id="word-cloud"
-      class="text-xs max-w-full"
-      width={width}
-      height={height}
-      viewBox={`0 0 ${width} ${height}`}
-      text-anchor="middle"
-    >
-      <g
-        x={width / 2}
-        y={height / 2}
-        transform={`translate(${width / 2}, ${height / 2})`}
-      >
-        {#each words as word}
-          <text
-            class={colors[Math.floor(Math.random() * colors.length)]}
-            font-size={word.size}
-            font-family={word.font}
-            transform={`translate(${word.x}, ${word.y}) rotate(${word.rotate})`}
-          >
-            {word.text}
-          </text>
-        {/each}
-      </g>
-    </svg>
-  </div>
+	<div class="flex justify-between">
+		<h2 class="text-2xl font-bold text-ctp-lavender">Word cloud</h2>
+		<Button on:click={exportSVG}>
+			<span>Export as SVG</span>
+			<FileCode size="18" />
+		</Button>
+	</div>
+	<div class="mb-8 w-full" bind:clientWidth={containerWidth} bind:clientHeight={containerHeight}>
+		<svg
+			id="word-cloud"
+			class="text-xs max-w-full"
+			{width}
+			{height}
+			viewBox={`0 0 ${width} ${height}`}
+			text-anchor="middle"
+		>
+			<g x={width / 2} y={height / 2} transform={`translate(${width / 2}, ${height / 2})`}>
+				{#each words as word}
+					<text
+						class={colors[Math.floor(Math.random() * colors.length)]}
+						font-size={word.size}
+						font-family={word.font}
+						transform={`translate(${word.x}, ${word.y}) rotate(${word.rotate})`}
+					>
+						{word.text}
+					</text>
+				{/each}
+			</g>
+		</svg>
+	</div>
 </div>
-

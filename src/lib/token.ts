@@ -1,9 +1,9 @@
-import type { ObjectId } from "mongodb";
+import type { ObjectId } from 'mongodb';
 
 interface TokenPayload {
-  userId: ObjectId;
-  iat: number;
-  exp: number;
-};
+	userId: ObjectId;
+	iat: number;
+	exp: number;
+}
 
 export default TokenPayload;

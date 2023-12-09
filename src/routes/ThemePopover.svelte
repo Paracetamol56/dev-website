@@ -1,5 +1,10 @@
 <script lang="ts">
-	import { createPopover, createRadioGroup, melt, type CreateRadioGroupProps } from '@melt-ui/svelte';
+	import {
+		createPopover,
+		createRadioGroup,
+		melt,
+		type CreateRadioGroupProps
+	} from '@melt-ui/svelte';
 	import { fade } from 'svelte/transition';
 	import { Check, Palette, X } from 'lucide-svelte';
 	import { variants } from '@catppuccin/palette';
@@ -7,27 +12,27 @@
 	import axios from 'axios';
 	import { addToast } from './+layout.svelte';
 
-  const onThemeChange: CreateRadioGroupProps['onValueChange']  = ({curr, next}) => {
-    $theme = next;
-    // API call to persist the theme on the user's profile if logged in
-    if ($user) {
-      axios
-        .patch(`/api/user/${$user?.id}`, { flavour: next })
-        .then((res) => {
-          $user!.flavour = next;
-        })
-        .catch((err) => {
-          addToast({
-            data: {
-              title: 'Internal Error',
-              description: 'Could not persist theme preference',
-              color: 'bg-ctp-red',
-            },
-          });
-        });
-    }
-    return next;
-  };
+	const onThemeChange: CreateRadioGroupProps['onValueChange'] = ({ curr, next }) => {
+		$theme = next;
+		// API call to persist the theme on the user's profile if logged in
+		if ($user) {
+			axios
+				.patch(`/api/user/${$user?.id}`, { flavour: next })
+				.then((res) => {
+					$user!.flavour = next;
+				})
+				.catch((err) => {
+					addToast({
+						data: {
+							title: 'Internal Error',
+							description: 'Could not persist theme preference',
+							color: 'bg-ctp-red'
+						}
+					});
+				});
+		}
+		return next;
+	};
 
 	const {
 		elements: { trigger, content, arrow, close },
@@ -40,17 +45,12 @@
 		elements: { root, item, hiddenInput },
 		helpers: { isChecked }
 	} = createRadioGroup({
-    value: theme,
-    onValueChange: onThemeChange,
+		value: theme,
+		onValueChange: onThemeChange
 	});
 
-  // Just to force tailwind to include the classes
-  const variantsClasses = [
-    'ctp-latte',
-    'ctp-frappe',
-    'ctp-macchiato',
-    'ctp-mocha',
-  ];
+	// Just to force tailwind to include the classes
+	const variantsClasses = ['ctp-latte', 'ctp-frappe', 'ctp-macchiato', 'ctp-mocha'];
 </script>
 
 <button
@@ -65,53 +65,57 @@
 </button>
 
 {#if $open}
-  <div
-    use:melt={$content}
-    transition:fade={{ duration: 100 }}
-    class="z-10 w-60 rounded-[4px] bg-ctp-base p-5 shadow-md shadow-ctp-crust"
-  >
-    <div use:melt={$arrow} />
-    <div class="flex flex-col gap-2.5">
-      <p class="mb-2 font-semibold text-ctp-text">Theme</p>
+	<div
+		use:melt={$content}
+		transition:fade={{ duration: 100 }}
+		class="z-10 w-60 rounded-[4px] bg-ctp-base p-5 shadow-md shadow-ctp-crust"
+	>
+		<div use:melt={$arrow} />
+		<div class="flex flex-col gap-2.5">
+			<p class="mb-2 font-semibold text-ctp-text">Theme</p>
 
-      <div
-        use:melt={$root}
-        class="flex flex-col gap-3 data-[orientation=horizontal]:flex-row"
-        aria-label="View density"
-      >
-        {#each Object.keys(variants) as variant, i}
-          <div class="flex max-h-full flex-col gap-0 overflow-y-auto">
-            <button
-              use:melt={$item(variant)}
-              class="{variantsClasses[i]} bg-ctp-base relative cursor-pointer scroll-my-2 rounded-md py-2 pl-4 pr-4 text-ctp-text
+			<div
+				use:melt={$root}
+				class="flex flex-col gap-3 data-[orientation=horizontal]:flex-row"
+				aria-label="View density"
+			>
+				{#each Object.keys(variants) as variant, i}
+					<div class="flex max-h-full flex-col gap-0 overflow-y-auto">
+						<button
+							use:melt={$item(variant)}
+							class="{variantsClasses[
+								i
+							]} bg-ctp-base relative cursor-pointer scroll-my-2 rounded-md py-2 pl-4 pr-4 text-ctp-text
                     {$isChecked(variant) ? 'bg-ctp-mauve/25 text-ctp-mauve' : ''}
                     hover:bg-ctp-mauve/25 hover:text-ctp-mauve"
-            >
-              {#if $isChecked(variant)}
-                <div class="check absolute left-2 top-1/2 z-10 text-ctp-mauve transform -translate-y-1/2">
-                  <Check class="square-4" />
-                </div>
-              {/if}
-              <div class="pl-4">
-                <p class="text-left capitalize font-medium">
-                  {variant}
-                </p>
-                <div class="flex w-full justify-between">
-                  <div class="square-2 rounded-full bg-ctp-rosewater"></div>
-                  <div class="square-2 rounded-full bg-ctp-flamingo"></div>
-                  <div class="square-2 rounded-full bg-ctp-pink"></div>
-                  <div class="square-2 rounded-full bg-ctp-mauve"></div>
-                  <div class="square-2 rounded-full bg-ctp-red"></div>
-                  <div class="square-2 rounded-full bg-ctp-maroon"></div>
-                  <div class="square-2 rounded-full bg-ctp-peach"></div>
-                  <div class="square-2 rounded-full bg-ctp-yellow"></div>
-                  <div class="square-2 rounded-full bg-ctp-green"></div>
-                  <div class="square-2 rounded-full bg-ctp-teal"></div>
-                  <div class="square-2 rounded-full bg-ctp-sky"></div>
-                  <div class="square-2 rounded-full bg-ctp-sapphire"></div>
-                  <div class="square-2 rounded-full bg-ctp-blue"></div>
-                  <div class="square-2 rounded-full bg-ctp-lavender"></div>
-                  <!-- 
+						>
+							{#if $isChecked(variant)}
+								<div
+									class="check absolute left-2 top-1/2 z-10 text-ctp-mauve transform -translate-y-1/2"
+								>
+									<Check class="square-4" />
+								</div>
+							{/if}
+							<div class="pl-4">
+								<p class="text-left capitalize font-medium">
+									{variant}
+								</p>
+								<div class="flex w-full justify-between">
+									<div class="square-2 rounded-full bg-ctp-rosewater" />
+									<div class="square-2 rounded-full bg-ctp-flamingo" />
+									<div class="square-2 rounded-full bg-ctp-pink" />
+									<div class="square-2 rounded-full bg-ctp-mauve" />
+									<div class="square-2 rounded-full bg-ctp-red" />
+									<div class="square-2 rounded-full bg-ctp-maroon" />
+									<div class="square-2 rounded-full bg-ctp-peach" />
+									<div class="square-2 rounded-full bg-ctp-yellow" />
+									<div class="square-2 rounded-full bg-ctp-green" />
+									<div class="square-2 rounded-full bg-ctp-teal" />
+									<div class="square-2 rounded-full bg-ctp-sky" />
+									<div class="square-2 rounded-full bg-ctp-sapphire" />
+									<div class="square-2 rounded-full bg-ctp-blue" />
+									<div class="square-2 rounded-full bg-ctp-lavender" />
+									<!-- 
                   <div class="square-3 bg-ctp-text"></div>
                   <div class="square-3 bg-ctp-subtext1"></div>
                   <div class="square-3 bg-ctp-subtext0"></div>
@@ -125,27 +129,34 @@
                   <div class="square-3 bg-ctp-mantle"></div>
                   <div class="square-3 bg-ctp-crust"></div>
                   -->
-                </div>
-              </div>
-            </button>
-          </div>
-        {/each}
-        <input name="line-height" use:melt={$hiddenInput} />
-      </div>
+								</div>
+							</div>
+						</button>
+					</div>
+				{/each}
+				<input name="line-height" use:melt={$hiddenInput} />
+			</div>
 
-      <small class="text-center">
-        <img src={$theme === "latte" ? "/img/catppuccin-light.png" : "/img/catppuccin-dark.png"} alt="Catppuccin logo" class="inline-block rounded-full square-4 mr-1" />
-        Powered by <a class="text-ctp-blue" href="https://github.com/catppuccin/catppuccin" target="_blank">Catppuccin</a>
-      </small>
-    </div>
-    <button
-      use:melt={$close}
-      aria-label="close"
-      class="absolute right-4 top-4 inline-flex h-6 w-6 appearance-none
+			<small class="text-center">
+				<img
+					src={$theme === 'latte' ? '/img/catppuccin-light.png' : '/img/catppuccin-dark.png'}
+					alt="Catppuccin logo"
+					class="inline-block rounded-full square-4 mr-1"
+				/>
+				Powered by
+				<a class="text-ctp-blue" href="https://github.com/catppuccin/catppuccin" target="_blank"
+					>Catppuccin</a
+				>
+			</small>
+		</div>
+		<button
+			use:melt={$close}
+			aria-label="close"
+			class="absolute right-4 top-4 inline-flex h-6 w-6 appearance-none
                 items-center justify-center rounded-full p-1 text-base
                 hover:bg-ctp-mauve hover:text-ctp-base transition-colors"
-    >
-      <X class="square-4" />
-    </button>
-  </div>
+		>
+			<X class="square-4" />
+		</button>
+	</div>
 {/if}

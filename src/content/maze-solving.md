@@ -16,6 +16,7 @@ published: true
 <Maze/>
 
 ## Core concepts of search algorithms
+
 Searching problems are a very common type of problem in computer science.
 They are used in many applications, such as route planning, scheduling, and games.
 
@@ -44,14 +45,14 @@ class Node():
 
 ```js
 class Node {
-  constructor(state, parent, action, g, h) {
-    this.state = state; // for example, an object {x, y} representing the position in a maze
-    this.parent = parent;
-    this.action = action;
-    this.g = g; // cost to reach this node
-    this.h = h; // heuristic value of this node
-    this.f = g + h; // priority of this node
-  }
+	constructor(state, parent, action, g, h) {
+		this.state = state; // for example, an object {x, y} representing the position in a maze
+		this.parent = parent;
+		this.action = action;
+		this.g = g; // cost to reach this node
+		this.h = h; // heuristic value of this node
+		this.f = g + h; // priority of this node
+	}
 }
 ```
 
@@ -135,6 +136,7 @@ Loop indefinitely:
 </CodeBlock>
 
 ## Depth-first search
+
 Depth-first search (<strong>DFS</strong>) is a search algorithm that explores the graph by going as far as
 possible along each path before backtracking. It uses a stack frontier, which means
 that the last node added to the frontier will be the first one explored.
@@ -163,10 +165,10 @@ class StackFontier():
 
   def contains_state(self, state):
     return any(node.state == state for node in self.frontier)
-  
+
   def is_empty(self):
     return len(self.frontier) == 0
-  
+
   def remove(self):
     if self.is_empty():
       raise Exception("Empty Frontier")
@@ -178,29 +180,29 @@ class StackFontier():
 
 ```js
 class StackFrontier {
-  constructor() {
-    this.frontier = [];
-  }
+	constructor() {
+		this.frontier = [];
+	}
 
-  add(node) {
-    this.frontier.push(node);
-  }
+	add(node) {
+		this.frontier.push(node);
+	}
 
-  containsState(state) {
-    return this.frontier.some((node) => node.state === state);
-  }
+	containsState(state) {
+		return this.frontier.some((node) => node.state === state);
+	}
 
-  isEmpty() {
-    return this.frontier.length === 0;
-  }
+	isEmpty() {
+		return this.frontier.length === 0;
+	}
 
-  remove() {
-    if (this.isEmpty()) {
-      throw new Error("Empty Frontier");
-    } else {
-      return this.frontier.pop();
-    }
-  }
+	remove() {
+		if (this.isEmpty()) {
+			throw new Error('Empty Frontier');
+		} else {
+			return this.frontier.pop();
+		}
+	}
 }
 ```
 
@@ -215,7 +217,7 @@ impl StackFrontier {
       frontier: Vec::new(),
     }
   }
-  
+
   pub fn add(&mut self, node: Node) {
     self.frontier.push(node);
   }
@@ -242,7 +244,7 @@ impl StackFrontier {
 #include <vector>
 #include <algorithm>
 #include <stdexcept>
-          
+
 class StackFrontier {
 private:
   std::vector<Node> frontier;
@@ -292,9 +294,9 @@ at each depth before moving to the next one. This means that it will explore a l
 
 ```py
 class QueueFontier():
-  
+
   """ ... """
-  
+
   def remove(self):
     if self.is_empty():
       raise Exception("Empty Frontier")
@@ -306,16 +308,15 @@ class QueueFontier():
 
 ```js
 class QueueFrontier {
-  
-  /* ... */
+	/* ... */
 
-  remove() {
-    if (this.isEmpty()) {
-      throw new Error("Empty Frontier");
-    } else {
-      return this.frontier.shift();
-    }
-  }
+	remove() {
+		if (this.isEmpty()) {
+			throw new Error('Empty Frontier');
+		} else {
+			return this.frontier.shift();
+		}
+	}
 }
 ```
 
@@ -390,9 +391,9 @@ This algorithm is very efficient and will always find the shortest path to the e
 
 ```py
 class PriorityQueueFontier():
-  
+
   """ ... """
-  
+
   def add(self, node):
     self.frontier.append(node)
     self.frontier = sorted(self.frontier, key=lambda node: node.h) # or node.f for A\* search
@@ -408,21 +409,20 @@ class PriorityQueueFontier():
 
 ```js
 class PriorityQueueFontier {
-  
-  /* ... */
+	/* ... */
 
-  add(node) {
-    this.frontier.push(node);
-    this.frontier.sort((a, b) => a.h - b.h); // or a.f - b.f for A\* search
-  }
+	add(node) {
+		this.frontier.push(node);
+		this.frontier.sort((a, b) => a.h - b.h); // or a.f - b.f for A\* search
+	}
 
-  remove() {
-    if (this.isEmpty()) {
-      throw new Error("Empty Frontier");
-    } else {
-      return this.frontier.shift();
-    }
-  }
+	remove() {
+		if (this.isEmpty()) {
+			throw new Error('Empty Frontier');
+		} else {
+			return this.frontier.shift();
+		}
+	}
 }
 ```
 

@@ -1,3 +1,14 @@
+<script lang="ts" context="module">
+	const {
+		elements,
+		helpers: { addToast },
+		states: { toasts },
+		actions: { portal }
+	} = createToaster<ToastData>();
+
+	export { addToast };
+</script>
+
 <script lang="ts">
 	import '../app.postcss';
 	import { createToaster } from '@melt-ui/svelte';
@@ -9,17 +20,6 @@
 	import Footer from './Footer.svelte';
 
 	export let data;
-</script>
-
-<script lang="ts" context="module">
-  const {
-		elements,
-		helpers: { addToast },
-		states: { toasts },
-		actions: { portal }
-	} = createToaster<ToastData>();
-
-  export { addToast };
 </script>
 
 <svelte:head>

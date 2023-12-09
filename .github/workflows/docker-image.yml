@@ -2,9 +2,9 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "master", "latest" ]
+    branches: ['master', 'latest']
   pull_request:
-    branches: [ "master", "latest" ]
+    branches: ['master', 'latest']
 
 env:
   REGISTRY: ghcr.io
@@ -17,7 +17,7 @@ jobs:
     permissions:
       contents: read
       packages: write
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

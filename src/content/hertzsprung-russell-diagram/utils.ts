@@ -1,10 +1,10 @@
-import type { ObjectId } from "mongodb";
+import type { ObjectId } from 'mongodb';
 
 interface StarHR {
-  HIP: number;
-  Amag: number;
-  BV: number;
-};
+	HIP: number;
+	Amag: number;
+	BV: number;
+}
 
 /*
 0. Catalog ( Catalog_Name ) - Catalogue (H=Hipparcos) 
@@ -88,107 +88,121 @@ interface StarHR {
 */
 
 interface Star {
-  "_id": ObjectId,
-  "Catalog": string,
-  "HIP": number,
-  "Proxy": string,
-  "RAhms": string,
-  "DEdms": string,
-  "Vmag": number,
-  "VarFlag": string,
-  "r_Vmag": string,
-  "RAdeg": number,
-  "DEdeg": number
-  "AstroRef": string,
-  "Plx": number,
-  "pmRA": number,
-  "pmDE": number,
-  "e_RAdeg": number,
-  "e_DEdeg": number,
-  "e_Plx": number,
-  "e_pmRA": number,
-  "e_pmDE": number,
-  "DE:RA": number,
-  "Plx:RA": number,
-  "Plx:DE": number,
-  "pmRA:RA": number,
-  "pmRA:DE": number,
-  "pmRA:Plx": number,
-  "pmDE:RA": number,
-  "pmDE:DE": number,
-  "pmDE:Plx": number,
-  "pmDE:pmRA": number,
-  "F1": number,
-  "F2": number,
-  "---": number,
-  "BTmag": number,
-  "e_BTmag": number,
-  "VTmag": number,
-  "e_VTmag": number,
-  "m_BTmag": string,
-  "B-V": number,
-  "e_B-V": number,
-  "r_B-V": string,
-  "V-I": number,
-  "e_V-I": number,
-  "r_V-I": string,
-  "CombMag": string,
-  "Hpmag": number,
-  "e_Hpmag": number,
-  "Hpscat": number,
-  "o_Hpmag": number,
-  "m_Hpmag": string,
-  "Hpmax": number,
-  "HPmin": number,
-  "Period": number | null,
-  "HvarType": string,
-  "moreVar": string | null,
-  "morePhoto": string | null,
-  "CCDM": string,
-  "n_CCDM": string,
-  "Nsys": number | null,
-  "Ncomp": number | null,
-  "MultFlag": string,
-  "Source": string,
-  "Qual": string,
-  "m_HIP": string,
-  "theta": number | null,
-  "rho": number | null,
-  "e_rho": number | null,
-  "dHp": number | null,
-  "e_dHp": number | null,
-  "Survey": string,
-  "Chart": string,
-  "Notes": string,
-  "HD": number | null,
-  "BD": string,
-  "CoD": string,
-  "CPD": string,
-  "(V-I)red": number | null,
-  "SpType": string,
-  "r_SpType": string
-};
+	_id: ObjectId;
+	Catalog: string;
+	HIP: number;
+	Proxy: string;
+	RAhms: string;
+	DEdms: string;
+	Vmag: number;
+	VarFlag: string;
+	r_Vmag: string;
+	RAdeg: number;
+	DEdeg: number;
+	AstroRef: string;
+	Plx: number;
+	pmRA: number;
+	pmDE: number;
+	e_RAdeg: number;
+	e_DEdeg: number;
+	e_Plx: number;
+	e_pmRA: number;
+	e_pmDE: number;
+	'DE:RA': number;
+	'Plx:RA': number;
+	'Plx:DE': number;
+	'pmRA:RA': number;
+	'pmRA:DE': number;
+	'pmRA:Plx': number;
+	'pmDE:RA': number;
+	'pmDE:DE': number;
+	'pmDE:Plx': number;
+	'pmDE:pmRA': number;
+	F1: number;
+	F2: number;
+	'---': number;
+	BTmag: number;
+	e_BTmag: number;
+	VTmag: number;
+	e_VTmag: number;
+	m_BTmag: string;
+	'B-V': number;
+	'e_B-V': number;
+	'r_B-V': string;
+	'V-I': number;
+	'e_V-I': number;
+	'r_V-I': string;
+	CombMag: string;
+	Hpmag: number;
+	e_Hpmag: number;
+	Hpscat: number;
+	o_Hpmag: number;
+	m_Hpmag: string;
+	Hpmax: number;
+	HPmin: number;
+	Period: number | null;
+	HvarType: string;
+	moreVar: string | null;
+	morePhoto: string | null;
+	CCDM: string;
+	n_CCDM: string;
+	Nsys: number | null;
+	Ncomp: number | null;
+	MultFlag: string;
+	Source: string;
+	Qual: string;
+	m_HIP: string;
+	theta: number | null;
+	rho: number | null;
+	e_rho: number | null;
+	dHp: number | null;
+	e_dHp: number | null;
+	Survey: string;
+	Chart: string;
+	Notes: string;
+	HD: number | null;
+	BD: string;
+	CoD: string;
+	CPD: string;
+	'(V-I)red': number | null;
+	SpType: string;
+	r_SpType: string;
+}
 
 const bv2rgb = (bv: number): string => {
-  bv = Math.max(-0.4, Math.min(2, bv));
-  let t;
-  return `#${[
-    bv < 0 ? (t = (bv + 0.4) / 0.4, 0.61 + (0.11 * t) + (0.1 * t * t))
-      : bv < 0.4 ? (t = bv / 0.4, 0.83 + (0.17 * t))
-      : 1,
-    bv < 0 ? (t = (bv + 0.4) / 0.4, 0.70 + (0.07 * t) + (0.1 * t * t))
-      : bv < 0.4 ? (t = bv / 0.4, 0.87 + (0.11 * t))
-      : bv < 1.6 ? (t = (bv - 0.4) / 1.20, 0.98 - (0.16 * t))
-      : (t = (bv - 1.6) / 0.4, 0.82 - (0.5 * t * t)), 
-    bv < 0.4 ? 1
-      : bv < 1.5 ? (t = (bv - 0.4) / 1.1, 1 - (0.47 * t) + (0.1 * t * t))
-      : bv < 1.94 ? (t = (bv - 1.5) / 0.44, 0.63 - (0.6 * t * t))
-      : 0
-  ].map(t => Math.round(t * 255).toString(16).padStart(2, "0")).join("")}`;
-}
+	bv = Math.max(-0.4, Math.min(2, bv));
+	let t;
+	return `#${[
+		bv < 0
+			? ((t = (bv + 0.4) / 0.4), 0.61 + 0.11 * t + 0.1 * t * t)
+			: bv < 0.4
+			? ((t = bv / 0.4), 0.83 + 0.17 * t)
+			: 1,
+		bv < 0
+			? ((t = (bv + 0.4) / 0.4), 0.7 + 0.07 * t + 0.1 * t * t)
+			: bv < 0.4
+			? ((t = bv / 0.4), 0.87 + 0.11 * t)
+			: bv < 1.6
+			? ((t = (bv - 0.4) / 1.2), 0.98 - 0.16 * t)
+			: ((t = (bv - 1.6) / 0.4), 0.82 - 0.5 * t * t),
+		bv < 0.4
+			? 1
+			: bv < 1.5
+			? ((t = (bv - 0.4) / 1.1), 1 - 0.47 * t + 0.1 * t * t)
+			: bv < 1.94
+			? ((t = (bv - 1.5) / 0.44), 0.63 - 0.6 * t * t)
+			: 0
+	]
+		.map((t) =>
+			Math.round(t * 255)
+				.toString(16)
+				.padStart(2, '0')
+		)
+		.join('')}`;
+};
 
 const temperature = (color: number): number => {
-  return 4600 * (1 / (0.92 * color + 1.7) + 1 / (0.92 * color + 0.62));
-}
+	return 4600 * (1 / (0.92 * color + 1.7) + 1 / (0.92 * color + 0.62));
+};
 
 export { type StarHR, type Star, bv2rgb, temperature };

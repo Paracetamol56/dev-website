@@ -40,9 +40,13 @@
 
 		const predictions = ($model.predict(testData) as tf.Tensor).argMax(1);
 		const labels = testLabels.argMax(1);
-		
+
 		// Compute confusion matrix
-		const confusionMatrix = tf.math.confusionMatrix(labels as tf.Tensor1D, predictions as tf.Tensor1D, 10);
+		const confusionMatrix = tf.math.confusionMatrix(
+			labels as tf.Tensor1D,
+			predictions as tf.Tensor1D,
+			10
+		);
 		classAccuracyMap = new Map();
 		confusionMap = new Map();
 		for (let i = 0; i < 10; i++) {
@@ -54,8 +58,10 @@
 			classAccuracyMap.set(classNames[i], row[i] / Array.from(row).reduce((a, b) => a + b));
 			confusionMap.set(classNames[i], rowMap);
 		}
-		classAccuracyMap = new Map([...classAccuracyMap.entries()].sort((a, b) => a[0].localeCompare(b[0])));	
-		confusionMap = new Map([...confusionMap.entries()].sort((a, b) => a[0].localeCompare(b[0])));	
+		classAccuracyMap = new Map(
+			[...classAccuracyMap.entries()].sort((a, b) => a[0].localeCompare(b[0]))
+		);
+		confusionMap = new Map([...confusionMap.entries()].sort((a, b) => a[0].localeCompare(b[0])));
 
 		// Load prediction example
 		[exampleTestData, exampleTestLabels] = $data.getTestData(32);
@@ -65,11 +71,14 @@
 
 <div>
 	<h3>Evaluate Model</h3>
-  <Button on:click={evaluateModel} disabled={$data.isDownloaded === false || $model.layers.length === 0}>
+	<Button
+		on:click={evaluateModel}
+		disabled={$data.isDownloaded === false || $model.layers.length === 0}
+	>
 		<span>Evaluate Model</span>
 		<FlaskConical size="18" stroke-width="3" />
 	</Button>
-	
+
 	<div class="w-full flex flex-col md:flex-row gap-4">
 		<div class="w-full h-72">
 			<h4>Class Accuracy</h4>
@@ -80,9 +89,13 @@
 			<ConfusionMatrix data={confusionMap} />
 		</div>
 	</div>
-	
+
 	{#if examplePredictions !== undefined}
 		<h4>Prediction Example</h4>
-		<MnistPreview data={exampleTestData} label={exampleTestLabels} prediction={examplePredictions} />
+		<MnistPreview
+			data={exampleTestData}
+			label={exampleTestLabels}
+			prediction={examplePredictions}
+		/>
 	{/if}
 </div>

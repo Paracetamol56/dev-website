@@ -64,7 +64,7 @@
 					},
 					onEpochEnd: async (epoch, logs) => {
 						currentEpoch = epoch;
-					},
+					}
 				}
 			});
 		} catch (e) {
@@ -119,15 +119,20 @@
 					</p>
 				</fieldset>
 			</div>
-			<Button on:click={trainModel} disabled={$data.isDownloaded === false || $model.layers.length === 0}>
+			<Button
+				on:click={trainModel}
+				disabled={$data.isDownloaded === false || $model.layers.length === 0}
+			>
 				<span>Train Model</span>
 				<BrainCircuit size="18" stroke-width="3" />
 			</Button>
 			{#if training}
-    		<p class="mt-2 text-ctp-peach font-semibold">Training...</p>
+				<p class="mt-2 text-ctp-peach font-semibold">Training...</p>
 				<p class="text-sm">
-					<strong>Epoch:</strong> {currentEpoch + 1} / {maxEpoch}<br />
-					<strong>Batch:</strong> {currentBatch + 1} / {Math.ceil($data.trainSize / batchSize)}
+					<strong>Epoch:</strong>
+					{currentEpoch + 1} / {maxEpoch}<br />
+					<strong>Batch:</strong>
+					{currentBatch + 1} / {Math.ceil($data.trainSize / batchSize)}
 				</p>
 			{/if}
 		</div>
@@ -139,10 +144,12 @@
 					<LineChart data={lossLogs} />
 				</div>
 				<div class="w-full">
-					<h4>Accuracy{accLogs.length > 0 ? ` - ${accLogs[accLogs.length - 1].toFixed(4)}` : ''}</h4>
+					<h4>
+						Accuracy{accLogs.length > 0 ? ` - ${accLogs[accLogs.length - 1].toFixed(4)}` : ''}
+					</h4>
 					<LineChart data={accLogs} />
 				</div>
-      </div>
+			</div>
 		</div>
 	</div>
 </div>

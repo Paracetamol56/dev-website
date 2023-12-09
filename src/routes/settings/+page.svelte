@@ -59,7 +59,7 @@
 
 <section class="container mx-auto">
 	<div {...root}>
-		{#each items as { id, title, component}, i}
+		{#each items as { id, title, component }, i}
 			<div
 				use:melt={$item(id)}
 				class="overflow-hidden transition-colors first:rounded-t-xl last:rounded-b-xl shadow-md shadow-ctp-crust"
@@ -72,8 +72,8 @@
             transition-colors hover:bg-ctp-crust focus:!ring-0
             focus-visible:text-magnum-800"
 					>
-            {title}
-          </button>
+						{title}
+					</button>
 				</h2>
 
 				{#if $isSelected(id)}

@@ -3,8 +3,8 @@
 	import Plot from './Plot.svelte';
 
 	let containerWidth: number;
-  $: containerWidth;
-  $: plotWidth = Math.min(500, containerWidth);
+	$: containerWidth;
+	$: plotWidth = Math.min(500, containerWidth);
 
 	$: relu = (x: number) => Math.max(0, x);
 </script>
@@ -20,6 +20,6 @@
 
 	<div class="flex-1" bind:clientWidth={containerWidth}>
 		<h3 class="mt-8 mb-4 text-lg font-semibold text-ctp-lavender">Result</h3>
-		<Plot fx={relu} width={plotWidth} height={plotWidth * 2 / 3} />
+		<Plot fx={relu} width={plotWidth} height={(plotWidth * 2) / 3} />
 	</div>
 </section>

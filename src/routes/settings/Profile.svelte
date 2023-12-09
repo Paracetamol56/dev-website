@@ -6,61 +6,61 @@
 	import { addToast } from '../+layout.svelte';
 	import Button from '$lib/components/Button.svelte';
 
-  let name: string;
-  let nameError: string = "";
-  let email: string;
-  let emailError: string = "";
+	let name: string;
+	let nameError: string = '';
+	let email: string;
+	let emailError: string = '';
 
-  onMount(() => {
-    name = $user?.name || '';
-    email = $user?.email || '';
-  });
+	onMount(() => {
+		name = $user?.name || '';
+		email = $user?.email || '';
+	});
 
-  const validateName = () => {
-    if (name.length === 0) {
-      nameError = "Name is required";
-      return false;
-    }
-    if (name.length < 3) {
-      nameError = "Name must be at least 3 characters long";
-      return false;
-    }
-    if (name.length > 100) {
-      nameError = "Name must be less than 100 characters long";
-      return false;
-    }
-    nameError = "";
-    return true;
-  };
-  const validateEmail = () => {
-    if (email.length === 0) {
-      emailError = "Email is required";
-      return false;
-    }
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      emailError = "Email address is invalid";
-      return false;
-    }
-    emailError = "";
-    return true;
-  };
- 
+	const validateName = () => {
+		if (name.length === 0) {
+			nameError = 'Name is required';
+			return false;
+		}
+		if (name.length < 3) {
+			nameError = 'Name must be at least 3 characters long';
+			return false;
+		}
+		if (name.length > 100) {
+			nameError = 'Name must be less than 100 characters long';
+			return false;
+		}
+		nameError = '';
+		return true;
+	};
+	const validateEmail = () => {
+		if (email.length === 0) {
+			emailError = 'Email is required';
+			return false;
+		}
+		if (!/\S+@\S+\.\S+/.test(email)) {
+			emailError = 'Email address is invalid';
+			return false;
+		}
+		emailError = '';
+		return true;
+	};
+
 	const handleSave = async () => {
-    if (!validateName() || !validateEmail()) {
-      addToast({
-        data: {
-          title: 'Invalid form',
-          description: 'Please check your inputs',
-          color: 'bg-ctp-red'
-        }
-      });
-      return;
-    }
+		if (!validateName() || !validateEmail()) {
+			addToast({
+				data: {
+					title: 'Invalid form',
+					description: 'Please check your inputs',
+					color: 'bg-ctp-red'
+				}
+			});
+			return;
+		}
 
 		axios
 			.patch(`/api/user/${$user?.id}`, {
-        name,
-      })
+				name
+			})
 			.then((res) => {
 				$user!.name = name;
 			})
@@ -72,7 +72,9 @@
 
 <form class="grid gap-x-8 gap-y-6" on:submit={handleSave}>
 	<fieldset class="max-w-[15rem]">
-		<label for="name" class="flex items-center gap-1 mb-2 text-sm font-semibold"><User size="16"/><span>Name</span></label>
+		<label for="name" class="flex items-center gap-1 mb-2 text-sm font-semibold"
+			><User size="16" /><span>Name</span></label
+		>
 		<input
 			type="text"
 			id="name"
@@ -80,12 +82,14 @@
 			name="name"
 			placeholder="Name"
 			bind:value={name}
-      on:blur={() => validateName()}
+			on:blur={() => validateName()}
 		/>
-    <span class="text-left text-sm font-semibold text-ctp-red">{nameError}</span>
+		<span class="text-left text-sm font-semibold text-ctp-red">{nameError}</span>
 	</fieldset>
 	<fieldset class="max-w-[15rem]">
-		<label for="email" class="flex items-center gap-1 mb-2 text-sm font-semibold"><AtSign size="16"/><span>Email</span></label>
+		<label for="email" class="flex items-center gap-1 mb-2 text-sm font-semibold"
+			><AtSign size="16" /><span>Email</span></label
+		>
 		<input
 			type="email"
 			disabled
@@ -94,15 +98,13 @@
 			name="email"
 			placeholder="Email"
 			bind:value={email}
-      on:blur={() => validateEmail()}
+			on:blur={() => validateEmail()}
 		/>
-    <span class="text-left text-sm font-semibold text-ctp-red">{emailError}</span>
+		<span class="text-left text-sm font-semibold text-ctp-red">{emailError}</span>
 	</fieldset>
 	<div class="flex justify-start">
-		<Button
-			type="submit"
-    >
-      <span>Save</span>
+		<Button type="submit">
+			<span>Save</span>
 			<Save size="16" />
 		</Button>
 	</div>

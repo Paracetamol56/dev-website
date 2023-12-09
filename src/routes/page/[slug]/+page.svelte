@@ -1,5 +1,5 @@
 <script lang="ts">
-	export let data
+	export let data;
 </script>
 
 <svelte:head>
@@ -9,23 +9,23 @@
 </svelte:head>
 
 <article>
-  <section class="container mx-auto mb-32">
-    <hgroup>
-      <h1 class="mb-8 text-6xl font-bold text-center">
-        <span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender">
-          {data.meta.title}
-        </span>
-      </h1>
-    </hgroup>
+	<section class="container mx-auto mb-32">
+		<hgroup>
+			<h1 class="mb-8 text-6xl font-bold text-center">
+				<span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender">
+					{data.meta.title}
+				</span>
+			</h1>
+		</hgroup>
 
-    <div class="flex gap-2 justify-center">
-      {#each data.meta.categories as category}
-        <span class="font-semibold text-ctp-lavender">
-          &num;{category}
-        </span>
-      {/each}
-    </div>
-  </section>
+		<div class="flex gap-2 justify-center">
+			{#each data.meta.categories as category}
+				<span class="font-semibold text-ctp-lavender">
+					&num;{category}
+				</span>
+			{/each}
+		</div>
+	</section>
 
 	<div class="container mx-auto content">
 		<svelte:component this={data.content} />

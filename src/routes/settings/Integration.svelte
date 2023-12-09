@@ -12,30 +12,32 @@
 	let githubUser: any = null;
 	onMount(() => {
 		axios
-      .get(`/api/user/${$user!.id}`)
-      .then((res) => {
-        if (res.data.github) {
-          githubUser = res.data.github;
-        }
-        loading = false;
-      })
-      .catch((err) => {
-        console.error(err);
-        addToast({
-          data: {
-            title: 'Error',
-            description: 'Failed load user data',
-            color: 'bg-ctp-red'
-          }
-        });
-      });
+			.get(`/api/user/${$user!.id}`)
+			.then((res) => {
+				if (res.data.github) {
+					githubUser = res.data.github;
+				}
+				loading = false;
+			})
+			.catch((err) => {
+				console.error(err);
+				addToast({
+					data: {
+						title: 'Error',
+						description: 'Failed load user data',
+						color: 'bg-ctp-red'
+					}
+				});
+			});
 	});
 </script>
 
-<h4 class="flex items-center gap-1 text-base font-semibold mb-2"><Github size="18" /> GitHub integration</h4>
+<h4 class="flex items-center gap-1 text-base font-semibold mb-2">
+	<Github size="18" /> GitHub integration
+</h4>
 <p>
-	Connect your GitHub account to enable features such as activity feed and
-	repositories informations.
+	Connect your GitHub account to enable features such as activity feed and repositories
+	informations.
 </p>
 {#if !loading}
 	{#if githubUser}
@@ -43,10 +45,10 @@
 			<Check size="16" class="text-ctp-green" />
 			<strong>
 				Connected to GitHub as <a
-				class="text-ctp-blue"
-				href="https://github.com/{githubUser.login}"
-				target="_blank">{githubUser.login}</a
-			>.
+					class="text-ctp-blue"
+					href="https://github.com/{githubUser.login}"
+					target="_blank">{githubUser.login}</a
+				>.
 			</strong>
 		</p>
 	{:else}

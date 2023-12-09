@@ -41,6 +41,7 @@ And the resistor is used to limit the current flowing into the base of the trans
 Here is the wiring diagram:
 ![Wiring diagram](/img/raspberry-pi-fan-controller/wiring-diagram.png)
 ![Schematic](/img/raspberry-pi-fan-controller/schematic.png)
+
 ## Software
 
 ### Temperature sensor
@@ -92,6 +93,7 @@ def getCpuTemperature():
 
 Now that we have a way to get the CPU temperature, we need to implement a regulation algorithm to control the fan speed.
 The algorithm is quite simple and can be summarized in 3 steps:
+
 - Turn off the fan if temperature is below a constant value (`MIN_TEMP`)
 - Set fan speed to maximum if the temperature is above a constant value (`MAX_TEMP`)
 - Interpolate the fan speed between `FAN_LOW` and `FAN_HIGH` if the temperature is between `MIN_TEMP` and `MAX_TEMP`
