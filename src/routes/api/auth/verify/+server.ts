@@ -36,7 +36,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			throw error(500, 'Failed to update user');
 		}
 
-		const user = await db.collection('users').findOne({ _id: userId });
+		const user = await db.collection('users').findOne({ _id: userId, deletedAt: { $exists: false } });
 
 		// Sign a new token
 		const newToken = jwt.sign(

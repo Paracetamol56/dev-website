@@ -42,7 +42,7 @@ export const GET = async ({ url }) => {
 			throw error(500, 'Failed to get GitHub user');
 		});
 
-	const dbUser = await db.collection('users').findOne({ email: user.email });
+	const dbUser = await db.collection('users').findOne({ email: user.email, deletedAt: { $exists: false } });
 
 	if (dbUser) {
 		await db.collection('users').updateOne(

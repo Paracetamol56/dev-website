@@ -35,7 +35,7 @@
 <h4 class="flex items-center gap-1 text-base font-semibold mb-2">
 	<Github size="18" /> GitHub integration
 </h4>
-<p>
+<p class="mb-2">
 	Connect your GitHub account to enable features such as activity feed and repositories
 	informations.
 </p>

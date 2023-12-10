@@ -58,9 +58,7 @@
 			</div>
 		</div>
 	</div>
-{/if}
-
-{#if !$open}
+{:else}
 	<LoadDataset {data} />
 	<InitModel {model} />
 	<TrainModel {data} {model} />

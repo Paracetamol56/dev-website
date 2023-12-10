@@ -1,22 +1,14 @@
 import db from '$lib/db';
-import jwt from 'jsonwebtoken';
 import { error, json, type RequestHandler } from '@sveltejs/kit';
 import { ObjectId } from 'mongodb';
-import { env } from '$env/dynamic/private';
-import type TokenPayload from '$lib/token';
 import { variants } from '@catppuccin/palette';
+import { readToken } from '$lib/token';
 
 export const GET: RequestHandler = async ({ params, cookies }) => {
-	const { token } = JSON.parse(cookies.get('user')!);
-	if (token === undefined) {
-		throw error(401, 'No token provided');
-	}
-	const decoded = jwt.verify(token, env.JWT_SECRET) as TokenPayload;
-	console.log(decoded);
-
+	const decoded = readToken(cookies);
 	const { id } = params;
 
-	const user = await db.collection('users').findOne({ _id: new ObjectId(id) });
+	const user = await db.collection('users').findOne({ _id: new ObjectId(id), deletedAt: { $exists: false } });
 	if (user === null) {
 		throw error(404, 'User not found');
 	}
@@ -33,20 +25,10 @@ export const GET: RequestHandler = async ({ params, cookies }) => {
 };
 
 export const PATCH: RequestHandler = async ({ params, request, cookies }) => {
-	const { token } = JSON.parse(cookies.get('user')!);
-	if (token === undefined) {
-		throw error(401, 'No token provided');
-	}
-
-	let decoded: TokenPayload;
-	try {
-		decoded = jwt.verify(token, env.JWT_SECRET) as TokenPayload;
-	} catch (e) {
-		throw error(401, 'Invalid token');
-	}
+	const decoded = readToken(cookies);
 	const { id } = params;
 
-	const user = await db.collection('users').findOne({ _id: new ObjectId(id) });
+	const user = await db.collection('users').findOne({ _id: new ObjectId(id), deletedAt: { $exists: false } });
 	if (user === null) {
 		throw error(404, 'User not found');
 	}
@@ -109,6 +91,35 @@ export const PATCH: RequestHandler = async ({ params, request, cookies }) => {
 
 	if (result.acknowledged !== true) {
 		throw error(500, 'Failed to update user');
+	}
+
+	return new Response(null, { status: 204 });
+};
+
+export const DELETE: RequestHandler = async ({ params, cookies }) => {
+	const decoded = readToken(cookies);
+	const { id } = params;
+
+	const user = await db.collection('users').findOne({ _id: new ObjectId(id), deletedAt: { $exists: false } });
+	if (user === null) {
+		throw error(404, 'User not found');
+	}
+
+	if (!user._id.equals(decoded.userId)) {
+		throw error(403, 'Forbidden');
+	}
+
+	const result = await db.collection('users').updateOne(
+		{ _id: new ObjectId(id) },
+		{
+			$set: {
+				deletedAt: new Date(),
+			}
+		}
+	);
+
+	if (result.acknowledged !== true) {
+		throw error(500, 'Failed to delete user');
 	}
 
 	return new Response(null, { status: 204 });

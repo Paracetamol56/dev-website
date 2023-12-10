@@ -8,6 +8,7 @@
 	import Integration from './Integration.svelte';
 	import Appearance from './Appearance.svelte';
 	import Profile from './Profile.svelte';
+	import Account from './Account.svelte';
 
 	onMount(() => {
 		if (!$user) {
@@ -28,6 +29,11 @@
 			id: 'profile',
 			title: 'Profile',
 			component: Profile
+		},
+		{
+			id: 'account',
+			title: 'Account',
+			component: Account
 		},
 		{
 			id: 'appearance',
