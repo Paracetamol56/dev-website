@@ -169,7 +169,7 @@
 				<span class="font-semibold">Are you sure you want to continue?</span>
 			</p>
 
-		<form on:submit={handleDelete}>
+			<form on:submit={handleDelete}>
 				<fieldset class="">
 					<label class="block mb-2 text-ctp-text" for="confirmation"
 						>Type <span class="font-semibold pointer-events-none">DELETE</span> to confirm</label

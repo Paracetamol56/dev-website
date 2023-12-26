@@ -8,7 +8,9 @@ import type { Document, WithId } from 'mongodb';
 export const POST: RequestHandler = async ({ request }) => {
 	const { email } = await request.json();
 
-	let user: WithId<Document> | null = await db.collection('users').findOne({ email: email, deletedAt: { $exists: false } });
+	let user: WithId<Document> | null = await db
+		.collection('users')
+		.findOne({ email: email, deletedAt: { $exists: false } });
 	if (user === null) {
 		// Insert the user into the database
 		const result = await db.collection('users').insertOne({

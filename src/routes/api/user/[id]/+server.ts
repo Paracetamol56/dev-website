@@ -8,7 +8,9 @@ export const GET: RequestHandler = async ({ params, cookies }) => {
 	const decoded = readToken(cookies);
 	const { id } = params;
 
-	const user = await db.collection('users').findOne({ _id: new ObjectId(id), deletedAt: { $exists: false } });
+	const user = await db
+		.collection('users')
+		.findOne({ _id: new ObjectId(id), deletedAt: { $exists: false } });
 	if (user === null) {
 		throw error(404, 'User not found');
 	}
@@ -28,7 +30,9 @@ export const PATCH: RequestHandler = async ({ params, request, cookies }) => {
 	const decoded = readToken(cookies);
 	const { id } = params;
 
-	const user = await db.collection('users').findOne({ _id: new ObjectId(id), deletedAt: { $exists: false } });
+	const user = await db
+		.collection('users')
+		.findOne({ _id: new ObjectId(id), deletedAt: { $exists: false } });
 	if (user === null) {
 		throw error(404, 'User not found');
 	}
@@ -100,7 +104,9 @@ export const DELETE: RequestHandler = async ({ params, cookies }) => {
 	const decoded = readToken(cookies);
 	const { id } = params;
 
-	const user = await db.collection('users').findOne({ _id: new ObjectId(id), deletedAt: { $exists: false } });
+	const user = await db
+		.collection('users')
+		.findOne({ _id: new ObjectId(id), deletedAt: { $exists: false } });
 	if (user === null) {
 		throw error(404, 'User not found');
 	}
@@ -113,7 +119,7 @@ export const DELETE: RequestHandler = async ({ params, cookies }) => {
 		{ _id: new ObjectId(id) },
 		{
 			$set: {
-				deletedAt: new Date(),
+				deletedAt: new Date()
 			}
 		}
 	);

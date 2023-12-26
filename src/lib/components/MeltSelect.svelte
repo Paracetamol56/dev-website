@@ -32,7 +32,6 @@
 		class="flex min-w-[220px] items-center justify-between rounded-md bg-ctp-surface0 px-3 py-1
         shadow-md shadow-ctp-crust transition-opacity hover:opacity-90"
 		use:melt={$trigger}
-		aria-label="Food"
 	>
 		{$selectedLabel || 'Select an option'}
 		<ChevronDown class="square-5" />
