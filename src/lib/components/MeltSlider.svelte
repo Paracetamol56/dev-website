@@ -25,8 +25,8 @@
 </script>
 
 <div>
-  <p>{name}</p>
-  <span use:melt={$root} class="relative flex h-[20px] w-[200px] items-center {disabled && 'opacity-50'}">
+  <span class="block text-ctp-text font-semibold text-sm">{name}</span>
+  <span use:melt={$root} class="relative flex h-[20px] w-[200px] items-center -mb-1 {disabled && 'opacity-50'}">
     <span class="block h-1 w-full rounded bg-ctp-mauve/20">
       <span use:melt={$range} class="h-1 rounded bg-ctp-mauve" />
     </span>

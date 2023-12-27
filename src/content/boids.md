@@ -20,7 +20,7 @@ This simulation is used in many video games and movies to create realistic-looki
 
 ### Emergent behavior
 
-Crowd intelligence, artificial intelligence, protein folding, or life on earth are examples of emergent behavior. Emergence is a philosophical concept that describes how complex systems and patterns arise out of a multiplicity of relatively simple interactions. The whole is greater than the sum of its parts.
+Crowd intelligence, artificial neural network, protein folding, or life on earth are examples of emergent behavior. Emergence is a philosophical concept that describes how complex systems and patterns arise out of a multiplicity of relatively simple interactions. **The whole is greater than the sum of its parts.**
 
 <Boids/>
 
