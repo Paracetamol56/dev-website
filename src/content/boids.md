@@ -40,13 +40,36 @@ The first rule is cohesion. A boid will try to move towards the center of mass o
 
 <MultiLangCodeBlock>
 
+```cpp
+std::array<float, 2> cohesionRule(Boid &boid, std::vector<Boid*> &otherBoids) {
+	std::array<float, 2> centerOfMass = {0, 0};
+	int numNeighbors = 0;
+
+	for (int i = 0; i < otherBoids.size(); i++) {
+		if (rayDistance(boid, *otherBoids[i]) < COHESION_RADIUS) {
+			centerOfMass[0] += otherBoids[i]->x;
+			centerOfMass[1] += otherBoids[i]->y;
+			numNeighbors++;
+		}
+	}
+
+	if (numNeighbors == 0) {
+		return {0, 0};
+	}
+	centerOfMass[0] /= numNeighbors;
+	centerOfMass[1] /= numNeighbors;
+
+	return {centerOfMass[0] - boid.x, centerOfMass[1] - boid.y};
+}
+```
+
 ```ts
 function cohesionRule(boid: Boid, otherBoids: Boid[]): number[] {
 	const centerOfMass: number[] = [0, 0];
 	let numNeighbors: number = 0;
 
 	for (let i = 0; i < otherBoids.length; i++) {
-		if (rayDistance(boid, otherBoids[i]) < VISION) {
+		if (rayDistance(boid, otherBoids[i]) < COHESION_RADIUS) {
 			centerOfMass[0] += otherBoids[i].x;
 			centerOfMass[1] += otherBoids[i].y;
 			numNeighbors++;
@@ -65,12 +88,81 @@ function cohesionRule(boid: Boid, otherBoids: Boid[]): number[] {
 
 </MultiLangCodeBlock>
 
-### Separation
+### Alignment
 
-Then there is separation. A boid will try to avoid colliding with its neighbors. This is the force that keeps the flock from clumping together.
-Its influence is inversely proportional to the distance between the boid and its neighbors and is capped at a certain distance in order to not be in conflict with the cohesion rule.
+Then there is alignment. A boid will try to match the average direction of its neighbors. This is the force that keeps the flock moving in the same direction.
 
 <MultiLangCodeBlock>
+
+```cpp
+std::array<float, 2> alignmentRule(Boid &boid, std::vector<Boid*> &otherBoids) {
+	std::array<float, 2> avgDir = {0, 0};
+	int numNeighbors = 0;
+
+	for (int i = 0; i < otherBoids.size(); i++) {
+		if (rayDistance(boid, *otherBoids[i]) < ALIGNMENT_RADIUS) {
+			avgDir[0] += otherBoids[i]->vx;
+			avgDir[1] += otherBoids[i]->vy;
+			numNeighbors++;
+		}
+	}
+
+	if (numNeighbors == 0) {
+		return {0, 0};
+	}
+	avgDir[0] /= numNeighbors;
+	avgDir[1] /= numNeighbors;
+	return {avgDir[0] - boid.vx, avgDir[1] - boid.vy};
+}
+```
+
+```ts
+function alignmentRule(boid: Boid, otherBoids: Boid[]): number[] {
+	const avgDir: number[] = [0, 0];
+	let numNeighbors: number = 0;
+
+	for (let i = 0; i < otherBoids.length; i++) {
+		if (rayDistance(boid, otherBoids[i]) < ALIGNMENT_RADIUS) {
+			avgDir[0] += otherBoids[i].vx;
+			avgDir[1] += otherBoids[i].vy;
+			numNeighbors++;
+		}
+	}
+
+	if (numNeighbors === 0) {
+		return [0, 0];
+	}
+	avgDir[0] /= numNeighbors;
+	avgDir[1] /= numNeighbors;
+	return [avgDir[0] - boid.vx, avgDir[1] - boid.vy];
+}
+```
+
+</MultiLangCodeBlock>
+
+### Separation
+
+And lastly, separation. A boid will try to avoid colliding with its neighbors. This is the force that keeps the flock from clumping together.
+Its influence is inversely proportional to the distance between the boid and its neighbors and is capped at a certain radius to avoid conflicts with the two other rules.
+
+<MultiLangCodeBlock>
+
+```cpp
+std::array<float, 2> separationRule(Boid &boid, std::vector<Boid*> &otherBoids) {
+	std::array<float, 2> v = {0, 0};
+	for (int i = 0; i < otherBoids.size(); i++) {
+		float distance = rayDistance(boid, *otherBoids[i]);
+		if (distance == 0) {
+			continue;
+		}
+		if (distance < SEPARATION_VISION) {
+			v[0] += (boid.x - otherBoids[i]->x) / distance;
+			v[1] += (boid.y - otherBoids[i]->y) / distance;
+		}
+	}
+	return v;
+}
+```
 
 ```ts
 function separationRule(boid: Boid, otherBoids: Boid[]): number[] {
@@ -91,36 +183,6 @@ function separationRule(boid: Boid, otherBoids: Boid[]): number[] {
 
 </MultiLangCodeBlock>
 
-### Alignment
-
-Lastly, there is alignment. A boid will try to match the average direction of its neighbors. This is the force that keeps the flock moving in the same direction.
-
-<MultiLangCodeBlock>
-
-```ts
-function alignmentRule(boid: Boid, otherBoids: Boid[]): number[] {
-	const avgV: number[] = [0, 0];
-	let numNeighbors: number = 0;
-
-	for (let i = 0; i < otherBoids.length; i++) {
-		if (rayDistance(boid, otherBoids[i]) < VISION) {
-			avgV[0] += otherBoids[i].vx;
-			avgV[1] += otherBoids[i].vy;
-			numNeighbors++;
-		}
-	}
-
-	if (numNeighbors === 0) {
-		return [0, 0];
-	}
-	avgV[0] /= numNeighbors;
-	avgV[1] /= numNeighbors;
-	return [avgV[0] - boid.vx, avgV[1] - boid.vy];
-}
-```
-
-</MultiLangCodeBlock>
-
 ## Connecting the dots
 
 The 3 functions above return a vector that represents the force that acts on the boid. The boid's velocity is then updated by adding this vector to it. The boid's position is then updated by adding its velocity to it.
@@ -129,25 +191,36 @@ I also added 3 constants to tweak the simulation: `COHESION_WEIGHT`, `SEPARATION
 
 <MultiLangCodeBlock>
 
-```ts
-const COHESION_WEIGHT: number = 0.01;
-const SEPARATION_WEIGHT: number = 0.1;
-const ALIGNMENT_WEIGHT: number = 0.1;
-const SPEED: number = 5;
+```cpp
+void update(boid &boid, std::vector<boid*> &otherBoids) {
+	std::array<float, 2> cohesion = cohesionRule(boid, otherBoids);
+	std::array<float, 2> separation = separationRule(boid, otherBoids);
+	std::array<float, 2> alignment = alignmentRule(boid, otherBoids);
 
-function updateBoid(boid: Boid, otherBoids: Boid[]): void {
+	boid.vx += cohesion[0] + alignment[0]; separation[0] +
+	boid.vy += cohesion[1] + separation[1] + alignment[1];
+
+	boid.x += boid.vx;
+	boid.y += boid.vy;
+
+	// Normalize velocity
+	float norm = sqrt(boid.vx * boid.vx + boid.vy * boid.vy);
+	boid.vx = (boid.vx / norm) * SPEED;
+	boid.vy = (boid.vy / norm) * SPEED;
+
+	// Draw the boid
+	// [...]
+}
+```
+
+```ts
+function update(boid: Boid, otherBoids: Boid[]): void {
 	const cohesion: number[] = cohesionRule(boid, otherBoids);
 	const separation: number[] = separationRule(boid, otherBoids);
 	const alignment: number[] = alignmentRule(boid, otherBoids);
 
-	boid.vx +=
-		COHESION_WEIGHT * cohesion[0] +
-		SEPARATION_WEIGHT * separation[0] +
-		ALIGNMENT_WEIGHT * alignment[0];
-	boid.vy +=
-		COHESION_WEIGHT * cohesion[1] +
-		SEPARATION_WEIGHT * separation[1] +
-		ALIGNMENT_WEIGHT * alignment[1];
+	boid.vx += cohesion[0] + alignment[0] + separation[0];
+	boid.vy += cohesion[1] + alignment[1] + separation[1];
 
 	boid.x += boid.vx;
 	boid.y += boid.vy;
