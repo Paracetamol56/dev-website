@@ -12,8 +12,10 @@
 	import axios from 'axios';
 	import { addToast } from './+layout.svelte';
 
+	type Theme = keyof typeof variants;
+
 	const onThemeChange: CreateRadioGroupProps['onValueChange'] = ({ curr, next }) => {
-		$theme = next;
+		$theme = next as Theme;
 		// API call to persist the theme on the user's profile if logged in
 		if ($user) {
 			axios

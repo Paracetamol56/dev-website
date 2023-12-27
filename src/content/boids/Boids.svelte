@@ -2,7 +2,7 @@
 	import Button from '$lib/components/Button.svelte';
 	import MeltSlider from '$lib/components/MeltSlider.svelte';
 	import { theme } from '$lib/stores';
-  import palette from '@catppuccin/palette';
+	import palette from '@catppuccin/palette';
 	import { Plus, RotateCcw } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
@@ -25,7 +25,7 @@
 	let speed: Writable<number[]> = writable([2.5]);
 	let cohesion: Writable<number[]> = writable([0.75]);
 	let separation: Writable<number[]> = writable([0.75]);
-	let alignment: Writable<number[]> = writable([0.50]);
+	let alignment: Writable<number[]> = writable([0.5]);
 	let vision: Writable<number[]> = writable([100]);
 	const margin: number = 50;
 
@@ -35,7 +35,7 @@
 		speed.set([2.5]);
 		cohesion.set([0.75]);
 		separation.set([0.75]);
-		alignment.set([0.50]);
+		alignment.set([0.5]);
 		vision.set([100]);
 		boids.splice(0, boids.length);
 		initBoids();
@@ -120,7 +120,7 @@
 		ctx.lineTo(boid.x - 10, boid.y + 5);
 		ctx.lineTo(boid.x - 10, boid.y - 5);
 		ctx.lineTo(boid.x, boid.y);
-		ctx.fillStyle = palette.variants[$theme].mauve.hex
+		ctx.fillStyle = palette.variants[$theme].mauve.hex;
 		ctx.fill();
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
 	}
@@ -186,7 +186,9 @@
 </script>
 
 <section>
-  <div class="bg-ctp-mantle shadow-md shadow-ctp-crust rounded-md p-4 flex flex-col lg:flex-row gap-2 md:gap-4 justify-center items-center my-8">
+	<div
+		class="bg-ctp-mantle shadow-md shadow-ctp-crust rounded-md p-4 flex flex-col lg:flex-row gap-2 md:gap-4 justify-center items-center my-8"
+	>
 		<div class="flex flex-col sm:flex-row justify-center items-start gap-2 lg:4">
 			<div class="flex flex-col justify-center items-start gap-2">
 				<MeltSlider name="Cohesion" min={0} max={1} value={cohesion} step={0.01} />
@@ -199,9 +201,9 @@
 			</div>
 		</div>
 		<div>
-			<BoidPreview speed={speed} cohesion={cohesion} separation={separation} alignment={alignment} vision={vision} />
+			<BoidPreview {cohesion} {separation} {alignment} {vision} />
 		</div>
-  </div>
+	</div>
 	<div
 		class="bg-ctp-mantle shadow-md shadow-ctp-crust rounded-md aspect-video mb-8"
 		bind:clientWidth={width}
@@ -217,7 +219,7 @@
 					on:click={handleReset}
 					type="button"
 				>
-					<RotateCcw size="18"/>
+					<RotateCcw size="18" />
 				</button>
 			</MeltPopover>
 			<MeltPopover text="Add 100 boids">
@@ -229,7 +231,7 @@
 					on:click={handleAdd100}
 					type="button"
 				>
-					<Plus size="18"/>
+					<Plus size="18" />
 				</button>
 			</MeltPopover>
 		</div>

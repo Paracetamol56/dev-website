@@ -5,7 +5,6 @@
 	import { Archive, Download, Trash2, UserX, X } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import { addToast } from '../+layout.svelte';
-	import { create } from 'd3';
 	import { createDialog, melt } from '@melt-ui/svelte';
 	import { fade, fly } from 'svelte/transition';
 	import { goto } from '$app/navigation';

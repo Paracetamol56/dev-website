@@ -3,16 +3,13 @@
 	import { theme, user } from '$lib/stores';
 	import { variants } from '@catppuccin/palette';
 	import {
-		createSelect,
 		melt,
-		type CreateSelectProps,
 		createRadioGroup,
 		type CreateRadioGroupProps
 	} from '@melt-ui/svelte';
 	import axios from 'axios';
-	import { Check, ChevronDown, Palette, Save } from 'lucide-svelte';
+	import { Check, Palette, Save } from 'lucide-svelte';
 	import { onMount } from 'svelte';
-	import { fade } from 'svelte/transition';
 
 	let flavour: keyof typeof variants;
 

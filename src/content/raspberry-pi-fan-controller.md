@@ -99,7 +99,7 @@ The algorithm is quite simple and can be summarized in 3 steps:
 - Interpolate the fan speed between `FAN_LOW` and `FAN_HIGH` if the temperature is between `MIN_TEMP` and `MAX_TEMP`
 
 [Linear interpolation](https://en.wikipedia.org/wiki/Linear_interpolation) is a basic mathematical technique that can be used to compute a value between two known values.
-![Linear interpolation](/img/raspberry-pi-fan-controller/LinearInterpolation.svg)
+![Linear interpolation](/img/raspberry-pi-fan-controller/linear-interpolation.svg)
 
 $$\frac{y-y_{0}}{x-x_{0}}=\frac{y_{1}-y_{0}}{x_{1}-x_{0}}$$
 $$\Leftrightarrow y=y_{0}+\frac{y_{1}-y_{0}}{x_{1}-x_{0}}(x-x_{0})$$
