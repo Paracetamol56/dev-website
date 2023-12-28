@@ -1,8 +1,4 @@
 <script lang="ts">
-	import Pagination from '$lib/components/Pagination.svelte';
-	import axios from 'axios';
-	import { writable, type Writable } from 'svelte/store';
-
 	let loading: boolean = true;
 	let data: {
 		pages: {
@@ -26,18 +22,6 @@
 			}
 		]
 	};
-	let pageNumber: Writable<number> = writable(1);
-
-	axios
-		.get('/api/content')
-		.then((res) => {
-			data.pages = res.data;
-			loading = false;
-		})
-		.catch((err) => {
-			console.error(err);
-			loading = false;
-		});
 
 	let scrollY: number;
 	let section0: HTMLElement;
