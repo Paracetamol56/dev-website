@@ -1,17 +1,15 @@
-package backend
+package server
 
 import (
 	"context"
 	"flag"
 	"log"
-	"main/backend/api"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
-	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,26 +19,10 @@ func Run() {
 	docker := flag.Bool("docker", false, "whether to run in docker mode")
 	flag.Parse()
 
-	if err := api.InitDatabase(); err != nil {
-		log.Fatalln(err)
-	}
-
 	gin.SetMode(gin.ReleaseMode)
-	r := gin.Default()
 
-	apiGroup := r.Group("/api")
-	{
-		apiGroup.GET("/healthcheck", func(c *gin.Context) {
-			c.JSON(200, gin.H{"status": "ok"})
-		})
-		apiGroup.POST("/contact", api.PostContact)
-	}
-
-	// Static files
-	r.Use(static.Serve("/", static.LocalFile("./build", true)))
-	r.NoRoute(func(c *gin.Context) {
-		c.File("./build/index.html")
-	})
+	// API
+	r := InitRouter()
 
 	var serverPath string
 	if *docker {

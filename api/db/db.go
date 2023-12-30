@@ -1,4 +1,4 @@
-package api
+package db
 
 import (
 	"context"
@@ -9,9 +9,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var mongoClient *mongo.Client
+var db *mongo.Database
 
-func InitDatabase() error {
+func Init() error {
 	clientOptions := options.Client().ApplyURI(os.Getenv("DB_URI"))
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
@@ -23,6 +23,10 @@ func InitDatabase() error {
 		log.Fatalln(err)
 	}
 
-	mongoClient = client
+	db = client.Database("dev")
 	return err
+}
+
+func GetDB() *mongo.Database {
+	return db
 }
