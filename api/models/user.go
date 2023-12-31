@@ -59,6 +59,13 @@ type FullUser struct {
 	Github         GitHubUser `json:"github" bson:"github"`
 }
 
+func CreateUser(c *gin.Context, user *FullUser) (*mongo.InsertOneResult, error) {
+	db := db.GetDB()
+	collection := db.Collection("users")
+	result, err := collection.InsertOne(c, user)
+	return result, err
+}
+
 func GetUserById(c *gin.Context, id primitive.ObjectID) (*User, error) {
 	db := db.GetDB()
 	collection := db.Collection("users")
@@ -79,10 +86,10 @@ func GetFullUserById(c *gin.Context, id primitive.ObjectID) (*FullUser, error) {
 	return &user, nil
 }
 
-func GetUserByEmail(c *gin.Context, email string) (*User, error) {
+func GetFullUserByEmail(c *gin.Context, email string) (*FullUser, error) {
 	db := db.GetDB()
 	collection := db.Collection("users")
-	var user User
+	var user FullUser
 	if err := collection.FindOne(c, bson.M{"email": email, "deletedAt": bson.M{"$exists": false}}).Decode(&user); err != nil {
 		return nil, err
 	}

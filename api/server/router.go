@@ -13,7 +13,7 @@ func InitRouter() *gin.Engine {
 	r.Use(gin.Recovery())
 
 	// Init controllers
-	// auth := new(controllers.AuthController)
+	auth := new(controllers.AuthController)
 	contact := new(controllers.ContactController)
 	heatlh := new(controllers.HealthController)
 	user := new(controllers.UserController)
@@ -22,6 +22,11 @@ func InitRouter() *gin.Engine {
 	{
 		apiGroup.GET("/health", heatlh.GetHealth)
 		apiGroup.POST("/contact", contact.PostContact)
+		authGroup := apiGroup.Group("/auth")
+		{
+			authGroup.POST("/login", auth.PostLogin)
+			authGroup.GET("/verify", auth.GetVerify)
+		}
 		userGroup := apiGroup.Group("/user")
 		{
 			userGroup.Use(middlewares.JwtAuthMiddleware())
