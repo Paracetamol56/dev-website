@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { user } from '$lib/stores';
+	import { user } from '$lib/store';
 	import axios from 'axios';
 	import { Check, Github } from 'lucide-svelte';
 	import { onMount } from 'svelte';
@@ -12,7 +12,11 @@
 	let githubUser: any = null;
 	onMount(() => {
 		axios
-			.get(`/api/user/${$user!.id}`)
+			.get(`/api/user/${$user!.id}`, {
+				headers: {
+					Authorization: `Bearer ${$user!.accessToken}`
+				}
+			})
 			.then((res) => {
 				if (res.data.github) {
 					githubUser = res.data.github;

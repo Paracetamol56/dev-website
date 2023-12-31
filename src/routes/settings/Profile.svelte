@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { user } from '$lib/stores';
+	import { user } from '$lib/store';
 	import axios from 'axios';
 	import { AtSign, Save, User } from 'lucide-svelte';
 	import { onMount } from 'svelte';
@@ -12,8 +12,8 @@
 	let emailError: string = '';
 
 	onMount(() => {
-		name = $user?.name || '';
-		email = $user?.email || '';
+		name = ""
+		email = $user.email || '';
 	});
 
 	const validateName = () => {
@@ -21,8 +21,8 @@
 			nameError = 'Name is required';
 			return false;
 		}
-		if (name.length < 3) {
-			nameError = 'Name must be at least 3 characters long';
+		if (name.length < 2) {
+			nameError = 'Name must be at least 2 characters long';
 			return false;
 		}
 		if (name.length > 100) {
@@ -60,9 +60,13 @@
 		axios
 			.patch(`/api/user/${$user?.id}`, {
 				name
+			}, {
+				headers: {
+					Authorization: `Bearer ${$user?.accessToken}`
+				}
 			})
 			.then((res) => {
-				$user!.name = name;
+				$user.name = name;
 			})
 			.catch((err) => {
 				console.error(err);

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Button from '$lib/components/Button.svelte';
-	import { user } from '$lib/stores';
+	import { user } from '$lib/store';
 	import axios from 'axios';
 	import { Archive, Download, Trash2, UserX, X } from 'lucide-svelte';
 	import { onMount } from 'svelte';
@@ -14,7 +14,12 @@
 	let lastLogin: Date;
 	onMount(() => {
 		axios
-			.get(`/api/user/${$user?.id}`)
+			.get(`/api/user/${$user?.id}`,
+				{
+					headers: {
+						Authorization: `Bearer ${$user?.accessToken}`
+					}
+				})
 			.then((res) => {
 				createdAt = new Date(res.data.createdAt);
 				lastLogin = new Date(res.data.lastLogin);
@@ -32,7 +37,11 @@
 	});
 
 	const handleExport = () => {
-		axios.get('/api/export').then((response) => {
+		axios.get('/api/export', {
+			headers: {
+				Authorization: `Bearer ${$user?.accessToken}`
+			}
+		}).then((response) => {
 			const element = document.createElement('a');
 			const file = new Blob([JSON.stringify(response.data)], { type: 'text/plain' });
 			element.href = URL.createObjectURL(file);

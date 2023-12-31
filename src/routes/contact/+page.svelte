@@ -3,7 +3,7 @@
 	import axios from 'axios';
 	import { Send } from 'lucide-svelte';
 	import { addToast } from '../+layout.svelte';
-	import { user } from '$lib/stores';
+	import { user } from '$lib/store';
 	import Button from '$lib/components/Button.svelte';
 
 	let email: string = '';

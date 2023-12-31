@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { user } from '$lib/stores';
+	import { user } from '$lib/store';
 	import { Send } from 'lucide-svelte';
 	import LoginDialog from '../../LoginDialog.svelte';
 	import { addToast } from '../../+layout.svelte';
@@ -121,7 +121,7 @@
                 px-3 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
 					bind:value={name}
 					on:blur={() => validateName(name)}
-					disabled={$user === null}
+					disabled={$user.id === null}
 				/>
 				<p class="text-left text-sm font-semibold text-ctp-red">{nameError}</p>
 			</fieldset>
@@ -134,7 +134,7 @@
                 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
 					bind:value={description}
 					on:blur={() => validateDescription(description)}
-					disabled={$user === null}
+					disabled={$user.id === null}
 				/>
 				<p class="text-left text-sm font-semibold text-ctp-red">{descriptionError}</p>
 			</fieldset>

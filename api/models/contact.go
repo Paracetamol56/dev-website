@@ -3,6 +3,7 @@ package models
 import (
 	"github.com/Paracetamol56/dev-website/api/db"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -19,10 +20,17 @@ type Contact struct {
 func CreateContact(c *gin.Context, contact Contact) (*primitive.ObjectID, error) {
 	db := db.GetDB()
 	collection := db.Collection("contacts")
-	result, err := collection.InsertOne(c, contact)
+	result, err := collection.InsertOne(c, bson.M{
+		"userId":    contact.UserId,
+		"name":      contact.Name,
+		"email":     contact.Email,
+		"message":   contact.Message,
+		"mailId":    contact.MailId,
+		"createdAt": contact.CreatedAt,
+	})
 	if err != nil {
 		return nil, err
 	}
-	insertedId := result.InsertedID.(primitive.ObjectID)
-	return &insertedId, nil
+	insertedID := result.InsertedID.(primitive.ObjectID)
+	return &insertedID, nil
 }

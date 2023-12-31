@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { user } from '$lib/stores';
+	import { user } from '$lib/store';
 	import { goto } from '$app/navigation';
 	import { addToast } from '../+layout.svelte';
 	import { createAccordion, melt } from '@melt-ui/svelte';
@@ -11,7 +11,7 @@
 	import Account from './Account.svelte';
 
 	onMount(() => {
-		if (!$user) {
+		if ($user.id === null) {
 			addToast({
 				data: {
 					title: 'You are not logged in',
@@ -22,6 +22,8 @@
 
 			goto('/');
 		}
+
+
 	});
 
 	const items = [

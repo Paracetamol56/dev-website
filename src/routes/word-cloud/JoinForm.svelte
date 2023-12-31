@@ -5,7 +5,7 @@
 	import { ArrowRightToLine } from 'lucide-svelte';
 	import { addToast } from '../+layout.svelte';
 	import type { WordCloudSession } from './utils';
-	import { user } from '$lib/stores';
+	import { user } from '$lib/store';
 
 	export let joinSession: (session: WordCloudSession) => void;
 	let codeError: string = '';
@@ -104,7 +104,7 @@
 	<a class="font-semibold hover:text-ctp-blue transition-colors" href="/word-cloud/new"
 		>Create a new session</a
 	>
-	{#if $user !== null}
+	{#if $user.id !== null}
 		<a class="font-semibold hover:text-ctp-blue transition-colors" href="/word-cloud/all"
 			>View your sessions</a
 		>

@@ -2,7 +2,7 @@
 	import { createToolbar, melt } from '@melt-ui/svelte';
 	import ThemePopover from './ThemePopover.svelte';
 	import LoginDialog from './LoginDialog.svelte';
-	import { user } from '$lib/stores';
+	import { user } from '$lib/store';
 	import ProfilePopover from './ProfilePopover.svelte';
 	import { ExternalLink } from 'lucide-svelte';
 
@@ -74,7 +74,7 @@
 		</div>
 		<div class="ml-auto flex items-center gap-2">
 			<ThemePopover />
-			{#if $user !== null}
+			{#if $user.id !== null}
 				<ProfilePopover />
 			{:else}
 				<LoginDialog />

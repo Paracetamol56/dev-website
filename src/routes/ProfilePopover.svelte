@@ -2,11 +2,17 @@
 	import { createPopover, melt } from '@melt-ui/svelte';
 	import { fade } from 'svelte/transition';
 	import { Cog, LogOut, User, X } from 'lucide-svelte';
-	import { user } from '$lib/stores';
+	import { user } from '$lib/store';
 	import { addToast } from './+layout.svelte';
 
 	const logOut = () => {
-		$user = null;
+		$user = {
+			accessToken: null,
+			refreshToken: null,
+			id: null,
+			email: null,
+			flavour: $user.flavour
+		}
 		addToast({
 			data: {
 				title: 'Logged out',

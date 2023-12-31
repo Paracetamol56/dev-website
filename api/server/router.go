@@ -15,6 +15,7 @@ func InitRouter() *gin.Engine {
 	// Init controllers
 	auth := new(controllers.AuthController)
 	contact := new(controllers.ContactController)
+	export := new(controllers.ExportController)
 	heatlh := new(controllers.HealthController)
 	user := new(controllers.UserController)
 
@@ -22,10 +23,16 @@ func InitRouter() *gin.Engine {
 	{
 		apiGroup.GET("/health", heatlh.GetHealth)
 		apiGroup.POST("/contact", contact.PostContact)
+		exportGroup := apiGroup.Group("/export")
+		{
+			exportGroup.Use(middlewares.JwtAuthMiddleware())
+			exportGroup.GET("", export.GetExport)
+		}
 		authGroup := apiGroup.Group("/auth")
 		{
 			authGroup.POST("/login", auth.PostLogin)
-			authGroup.GET("/verify", auth.GetVerify)
+			authGroup.POST("/verify", auth.PostVerify)
+			authGroup.POST("/refresh", auth.PostRefresh)
 		}
 		userGroup := apiGroup.Group("/user")
 		{

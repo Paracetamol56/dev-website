@@ -50,19 +50,22 @@ type User struct {
 }
 
 type FullUser struct {
-	Id             string     `json:"id" bson:"_id"`
+	Id             string     `json:"id" bson:"_id,omitempty"`
 	Name           string     `json:"name" bson:"name"`
 	Email          string     `json:"email" bson:"email"`
 	Flavour        string     `json:"flavour" bson:"flavour"`
-	ProfilePicture string     `json:"profilePicture" bson:"profilePicture"`
-	Admin          bool       `json:"admin" bson:"admin"`
-	Github         GitHubUser `json:"github" bson:"github"`
+	ProfilePicture string     `json:"profilePicture,omitempty" bson:"profilePicture,omitempty"`
+	Github         GitHubUser `json:"github,omitempty" bson:"github,omitempty"`
 }
 
 func CreateUser(c *gin.Context, user *FullUser) (*mongo.InsertOneResult, error) {
 	db := db.GetDB()
 	collection := db.Collection("users")
-	result, err := collection.InsertOne(c, user)
+	result, err := collection.InsertOne(c, bson.M{
+		"name":    user.Name,
+		"email":   user.Email,
+		"flavour": user.Flavour,
+	})
 	return result, err
 }
 
@@ -94,6 +97,27 @@ func GetFullUserByEmail(c *gin.Context, email string) (*FullUser, error) {
 		return nil, err
 	}
 	return &user, nil
+}
+
+func UpdateUser(c *gin.Context, id primitive.ObjectID, user *FullUser) (*mongo.UpdateResult, error) {
+	db := db.GetDB()
+	collection := db.Collection("users")
+	result, err := collection.UpdateOne(c, bson.M{"_id": id}, bson.M{"$set": bson.M{
+		"name":           user.Name,
+		"email":          user.Email,
+		"flavour":        user.Flavour,
+		"profilePicture": user.ProfilePicture,
+	}})
+	return result, err
+}
+
+func UpdateGithubUser(c *gin.Context, id primitive.ObjectID, githubUser *GitHubUser) (*mongo.UpdateResult, error) {
+	db := db.GetDB()
+	collection := db.Collection("users")
+	result, err := collection.UpdateOne(c, bson.M{"_id": id}, bson.M{"$set": bson.M{
+		"github": githubUser,
+	}})
+	return result, err
 }
 
 func DeleteUser(c *gin.Context, id primitive.ObjectID) (*mongo.UpdateResult, error) {

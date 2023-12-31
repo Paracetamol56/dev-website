@@ -8,18 +8,34 @@
 	import { fade } from 'svelte/transition';
 	import { Check, Palette, X } from 'lucide-svelte';
 	import { variants } from '@catppuccin/palette';
-	import { user, theme } from '$lib/stores';
+	import { user } from '$lib/store';
 	import axios from 'axios';
 	import { addToast } from './+layout.svelte';
 
 	const onThemeChange: CreateRadioGroupProps['onValueChange'] = ({ curr, next }) => {
-		$theme = next;
+		if (curr === next) return curr;
+		if (!(next in variants)) return curr;
+		$user.flavour = next as keyof typeof variants;
 		// API call to persist the theme on the user's profile if logged in
-		if ($user) {
+		if ($user.accessToken) {
 			axios
-				.patch(`/api/user/${$user?.id}`, { flavour: next })
+				.patch(`/api/user/${$user.id}`, { flavour: next }, {
+					headers: {
+						Authorization: `Bearer ${$user?.accessToken}`
+					}
+				})
 				.then((res) => {
-					$user!.flavour = next;
+					if (res.status === 200) {
+						return next;
+					}
+					addToast({
+						data: {
+							title: 'Internal Error',
+							description: 'Could not persist theme preference',
+							color: 'bg-ctp-red'
+						}
+					});
+					return curr;
 				})
 				.catch((err) => {
 					addToast({
@@ -29,6 +45,7 @@
 							color: 'bg-ctp-red'
 						}
 					});
+					return curr;
 				});
 		}
 		return next;
@@ -45,7 +62,7 @@
 		elements: { root, item, hiddenInput },
 		helpers: { isChecked }
 	} = createRadioGroup({
-		value: theme,
+		defaultValue: $user.flavour,
 		onValueChange: onThemeChange
 	});
 
@@ -139,7 +156,7 @@
 
 			<small class="text-center">
 				<img
-					src={$theme === 'latte' ? '/img/catppuccin-light.png' : '/img/catppuccin-dark.png'}
+					src={$user.flavour === 'latte' ? '/img/catppuccin-light.png' : '/img/catppuccin-dark.png'}
 					alt="Catppuccin logo"
 					class="inline-block rounded-full square-4 mr-1"
 				/>
