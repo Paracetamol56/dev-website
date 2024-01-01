@@ -1,6 +1,8 @@
 package models
 
 import (
+	"time"
+
 	"github.com/Paracetamol56/dev-website/api/db"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
@@ -50,21 +52,24 @@ type User struct {
 }
 
 type FullUser struct {
-	Id             string     `json:"id" bson:"_id,omitempty"`
-	Name           string     `json:"name" bson:"name"`
-	Email          string     `json:"email" bson:"email"`
-	Flavour        string     `json:"flavour" bson:"flavour"`
-	ProfilePicture string     `json:"profilePicture,omitempty" bson:"profilePicture,omitempty"`
-	Github         GitHubUser `json:"github,omitempty" bson:"github,omitempty"`
+	Id             string      `json:"id" bson:"_id,omitempty"`
+	Name           string      `json:"name" bson:"name"`
+	Email          string      `json:"email" bson:"email"`
+	CreatedAt      time.Time   `json:"createdAt" bson:"createdAt,omitempty"`
+	LastLogin      time.Time   `json:"lastLogin" bson:"lastLogin,omitempty"`
+	Flavour        string      `json:"flavour" bson:"flavour"`
+	ProfilePicture string      `json:"profilePicture,omitempty" bson:"profilePicture,omitempty"`
+	Github         *GitHubUser `json:"github,omitempty" bson:"github,omitempty"`
 }
 
 func CreateUser(c *gin.Context, user *FullUser) (*mongo.InsertOneResult, error) {
 	db := db.GetDB()
 	collection := db.Collection("users")
 	result, err := collection.InsertOne(c, bson.M{
-		"name":    user.Name,
-		"email":   user.Email,
-		"flavour": user.Flavour,
+		"name":      user.Name,
+		"email":     user.Email,
+		"flavour":   user.Flavour,
+		"createdAt": time.Now(),
 	})
 	return result, err
 }
@@ -107,6 +112,7 @@ func UpdateUser(c *gin.Context, id primitive.ObjectID, user *FullUser) (*mongo.U
 		"email":          user.Email,
 		"flavour":        user.Flavour,
 		"profilePicture": user.ProfilePicture,
+		"lastLogin":      user.LastLogin,
 	}})
 	return result, err
 }

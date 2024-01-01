@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/Paracetamol56/dev-website/api/models"
 	"github.com/gin-gonic/gin"
@@ -108,6 +109,12 @@ func (controller *AuthController) PostVerify(c *gin.Context) {
 	}
 	accesstoken, err := models.SignAccessToken(&user.Id, 1)
 	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	user.LastLogin = time.Now()
+	if _, err = models.UpdateUser(c, userId, user); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

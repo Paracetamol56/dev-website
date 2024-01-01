@@ -5,15 +5,21 @@
 	import { onMount } from 'svelte';
 	import { addToast } from '../+layout.svelte';
 	import Button from '$lib/components/Button.svelte';
+	import type { Writable } from 'svelte/store';
+	import type { UserSettings } from './userSettings';
+	import api from '$lib/api';
 
+	export let userSettings: Writable<UserSettings | null>;
 	let name: string;
 	let nameError: string = '';
 	let email: string;
 	let emailError: string = '';
 
 	onMount(() => {
-		name = ""
-		email = $user.email || '';
+		if ($userSettings !== null) {
+			name = $userSettings.name;
+			email = $userSettings.email;
+		}
 	});
 
 	const validateName = () => {
@@ -57,17 +63,10 @@
 			return;
 		}
 
-		axios
-			.patch(`/api/user/${$user?.id}`, {
-				name
-			}, {
-				headers: {
-					Authorization: `Bearer ${$user?.accessToken}`
-				}
-			})
-			.then((res) => {
-				$user.name = name;
-			})
+		api.callWithAuth('patch', `/users/${$user.id}`, {
+			name
+		})
+			.then((res) => {})
 			.catch((err) => {
 				console.error(err);
 			});

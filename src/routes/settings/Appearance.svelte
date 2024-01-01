@@ -12,7 +12,12 @@
 	import axios from 'axios';
 	import { Check, Palette, Save } from 'lucide-svelte';
 	import { onMount } from 'svelte';
+	import type { Writable } from 'svelte/store';
+	import type { UserSettings } from './userSettings';
+	import api from '$lib/api';
+	import { addToast } from '../+layout.svelte';
 
+	export let userSettings: Writable<UserSettings | null>;
 	let flavour: keyof typeof variants;
 
 	onMount(() => {
@@ -20,19 +25,21 @@
 	});
 
 	const handleSave = async () => {
-		axios
-			.patch(`/api/user/${$user?.id}`, {
-				flavour: flavour || $user?.flavour
-			}, {
-				headers: {
-					Authorization: `Bearer ${$user?.accessToken}`
-				}
-			})
+		api.callWithAuth('patch', `/users/${$user.id}`, { flavour })
 			.then((res) => {
-				$user.flavour = flavour;
+				if (res.status === 200) {
+					$user.flavour = flavour;
+				}
 			})
 			.catch((err) => {
 				console.error(err);
+				addToast({
+					data: {
+						title: 'Internal Error',
+						description: 'Could not save the theme preference',
+						color: 'bg-ctp-red'
+					}
+				});
 			});
 	};
 
@@ -46,7 +53,7 @@
 	};
 
 	const {
-		elements: { root, item, hiddenInput },
+		elements: { root, item },
 		helpers: { isChecked }
 	} = createRadioGroup({
 		onValueChange: onFlavourChange,

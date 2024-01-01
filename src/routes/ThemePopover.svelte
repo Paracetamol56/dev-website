@@ -9,8 +9,8 @@
 	import { Check, Palette, X } from 'lucide-svelte';
 	import { variants } from '@catppuccin/palette';
 	import { user } from '$lib/store';
-	import axios from 'axios';
 	import { addToast } from './+layout.svelte';
+	import api from '$lib/api';
 
 	const onThemeChange: CreateRadioGroupProps['onValueChange'] = ({ curr, next }) => {
 		if (curr === next) return curr;
@@ -18,12 +18,7 @@
 		$user.flavour = next as keyof typeof variants;
 		// API call to persist the theme on the user's profile if logged in
 		if ($user.accessToken) {
-			axios
-				.patch(`/api/user/${$user.id}`, { flavour: next }, {
-					headers: {
-						Authorization: `Bearer ${$user?.accessToken}`
-					}
-				})
+			api.callWithAuth('patch', `/users/${$user.id}`, { flavour: next })
 				.then((res) => {
 					if (res.status === 200) {
 						return next;

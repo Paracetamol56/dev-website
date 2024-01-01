@@ -51,7 +51,7 @@ user.set = (value) => {
 function writeUserToCookie(user: UserStore) {
 	if (browser) {
 		// Delete existing cookie
-		document.cookie = 'user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+		document.cookie = 'user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Strict;';
 		// Set new cookie
 		document.cookie = `user=${JSON.stringify(user)}; path=/; SameSite=Strict;`;
 	}

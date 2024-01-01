@@ -3,10 +3,13 @@ import { user } from "./store";
 import { get } from "svelte/store";
 import { addToast } from "../routes/+layout.svelte";
 import { goto } from "$app/navigation";
-// import { isExpired } from "$lib/token";
+import { browser } from "$app/environment";
+import { isExpired } from "$lib/token";
+
+const API_URL = "http://localhost:8080";
 
 async function login(email: string) {
-  await axios.post(`/api/auth/login`, { email })
+  await axios.post(`${API_URL}/api/auth/login`, { email })
     .then((response) => {
       if (response.status != 200) {
         console.error(response);
@@ -40,7 +43,7 @@ async function login(email: string) {
 }
 
 async function verify(token: string, redirect: string) {
-  await axios.post(`/api/auth/verify`, { token })
+  await axios.post(`${API_URL}/api/auth/verify`, { token })
     .then((reponse) => {
       if (reponse.status !== 200) {
         console.error(reponse);
@@ -92,6 +95,9 @@ function logout() {
     accessToken: null,
     refreshToken: null
   });
+  if (browser) {
+    window.location.reload();
+  }
 }
 
 async function refreshAccessToken() {
@@ -104,10 +110,9 @@ async function refreshAccessToken() {
         color: 'bg-ctp-red'
       }
     });
-    logout();
-    return;
+    throw new Error('No refresh token');
   }
-  await axios.post(`/api/auth/refresh`, { refreshToken })
+  await axios.post(`${API_URL}/api/auth/refresh`, { token: refreshToken })
     .then(res => {
       if (res.status === 200) {
         // Update the user store
@@ -118,21 +123,28 @@ async function refreshAccessToken() {
       }
     })
     .catch(err => {
-      console.log(err);
-      logout();
+      console.error(err);
+      addToast({
+        data: {
+          title: 'Failed to refresh token',
+          description: 'An error occured while refreshing your access token',
+          color: 'bg-ctp-red'
+        }
+      });
+      throw new Error('Failed to refresh token');
     });
 }
 
-async function callWithAuth(method: string, path: string, json: any) {
+async function callWithAuth(method: string, path: string, json?: any) {
   const accessToken = get(user).accessToken;
   if (!accessToken) {
     await refreshAccessToken();
   } else {
-    // isExpired(accessToken) && await refreshAccessToken();
+    isExpired(accessToken) && await refreshAccessToken();
   }
-  return await axios({
+  return axios({
     method,
-    url: `/api${path}`,
+    url: `${API_URL}/api${path}`,
     headers: {
       Authorization: `Bearer ${accessToken}`
     },
@@ -141,9 +153,9 @@ async function callWithAuth(method: string, path: string, json: any) {
 }
 
 async function call(method: string, path: string, json: any) {
-  return await axios({
+  return axios({
     method,
-    url: `/api${path}`,
+    url: `${API_URL}/api${path}`,
     data: json
   });
 }

@@ -1,4 +1,4 @@
-import jwt from "jsonwebtoken";
+import { jwtDecode } from "jwt-decode";
 
 type JwtClaims = {
   userId: string;
@@ -13,7 +13,7 @@ type JwtRefreshClaims = {
 function isExpired(token: string): boolean {
   let decoded: JwtClaims | JwtRefreshClaims;
   try {
-    decoded = jwt.decode(token) as JwtClaims | JwtRefreshClaims;
+    decoded = jwtDecode(token) as JwtClaims | JwtRefreshClaims;
   } catch (err) {
     return true;
   }

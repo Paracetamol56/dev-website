@@ -9,8 +9,13 @@
 	import Appearance from './Appearance.svelte';
 	import Profile from './Profile.svelte';
 	import Account from './Account.svelte';
+	import { writable, type Writable } from 'svelte/store';
+	import api from '$lib/api';
+	import type { UserSettings } from './userSettings';
 
-	onMount(() => {
+	const userSettings: Writable<UserSettings | null> = writable(null);
+	
+	onMount(async () => {
 		if ($user.id === null) {
 			addToast({
 				data: {
@@ -21,9 +26,25 @@
 			});
 
 			goto('/');
+			return;
 		}
 
-
+		api.callWithAuth('get', `/users/${$user.id}`)
+			.then(res => {
+				$userSettings = res.data;
+				console.log($userSettings);
+			})
+			.catch((err) => {
+				console.error(err);
+				addToast({
+					data: {
+						title: 'Failed to fetch user settings',
+						description: 'Please try again later',
+						color: 'bg-ctp-red'
+					}
+				});
+				goto('/');
+			});
 	});
 
 	const items = [
@@ -66,34 +87,36 @@
 </hgroup>
 
 <section class="container mx-auto">
-	<div {...root}>
-		{#each items as { id, title, component }, i}
-			<div
-				use:melt={$item(id)}
-				class="overflow-hidden transition-colors first:rounded-t-xl last:rounded-b-xl shadow-md shadow-ctp-crust"
-			>
-				<h2 class="flex">
-					<button
-						use:melt={$trigger(id)}
-						class="flex flex-1 cursor-pointer items-center justify-between
-            bg-ctp-mantle px-5 py-5 text-lg font-semibold leading-none
-            transition-colors hover:bg-ctp-crust focus:!ring-0
-            focus-visible:text-magnum-800"
-					>
-						{title}
-					</button>
-				</h2>
+	{#if $userSettings !== null}
+		<div {...root}>
+			{#each items as { id, title, component }, i}
+				<div
+					use:melt={$item(id)}
+					class="overflow-hidden transition-colors first:rounded-t-xl last:rounded-b-xl shadow-md shadow-ctp-crust"
+				>
+					<h2 class="flex">
+						<button
+							use:melt={$trigger(id)}
+							class="flex flex-1 cursor-pointer items-center justify-between
+							bg-ctp-mantle px-5 py-5 text-lg font-semibold leading-none
+							transition-colors hover:bg-ctp-crust focus:!ring-0
+							focus-visible:text-magnum-800"
+						>
+							{title}
+						</button>
+					</h2>
 
-				{#if $isSelected(id)}
-					<div
-						class="overflow-hidden bg-ctp-base px-5 py-4"
-						use:melt={$content(id)}
-						transition:slide={{ duration: 200 }}
-					>
-						<svelte:component this={component} />
-					</div>
-				{/if}
-			</div>
-		{/each}
-	</div>
+					{#if $isSelected(id)}
+						<div
+							class="overflow-hidden bg-ctp-base px-5 py-4"
+							use:melt={$content(id)}
+							transition:slide={{ duration: 200 }}
+						>
+							<svelte:component this={component} {userSettings}/>
+						</div>
+					{/if}
+				</div>
+			{/each}
+		</div>
+	{/if}
 </section>

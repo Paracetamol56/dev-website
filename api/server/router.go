@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/Paracetamol56/dev-website/api/controllers"
 	"github.com/Paracetamol56/dev-website/api/middlewares"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 )
@@ -11,6 +12,11 @@ func InitRouter() *gin.Engine {
 	r := gin.New()
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
+	r.Use(cors.New(cors.Config{
+		AllowAllOrigins: true,
+		AllowMethods:    []string{"GET", "POST", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders:    []string{"Origin", "Content-Type", "Authorization"},
+	}))
 
 	// Init controllers
 	auth := new(controllers.AuthController)
@@ -23,7 +29,7 @@ func InitRouter() *gin.Engine {
 	{
 		apiGroup.GET("/health", heatlh.GetHealth)
 		apiGroup.POST("/contact", contact.PostContact)
-		exportGroup := apiGroup.Group("/export")
+		exportGroup := apiGroup.Group("/exports")
 		{
 			exportGroup.Use(middlewares.JwtAuthMiddleware())
 			exportGroup.GET("", export.GetExport)
@@ -34,7 +40,7 @@ func InitRouter() *gin.Engine {
 			authGroup.POST("/verify", auth.PostVerify)
 			authGroup.POST("/refresh", auth.PostRefresh)
 		}
-		userGroup := apiGroup.Group("/user")
+		userGroup := apiGroup.Group("/users")
 		{
 			userGroup.Use(middlewares.JwtAuthMiddleware())
 			userGroup.GET("/:id", user.GetUser)
