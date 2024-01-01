@@ -152,7 +152,7 @@ async function callWithAuth(method: string, path: string, json?: any) {
   });
 }
 
-async function call(method: string, path: string, json: any) {
+async function call(method: string, path: string, json?: any) {
   return axios({
     method,
     url: `${API_URL}/api${path}`,

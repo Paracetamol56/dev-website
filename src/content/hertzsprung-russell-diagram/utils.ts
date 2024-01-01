@@ -1,7 +1,5 @@
-import type { ObjectId } from 'mongodb';
-
 interface StarHR {
-	HIP: number;
+	hip: number;
 	Amag: number;
 	BV: number;
 }
@@ -88,7 +86,7 @@ interface StarHR {
 */
 
 interface Star {
-	_id: ObjectId;
+	_id: string;
 	Catalog: string;
 	HIP: number;
 	Proxy: string;

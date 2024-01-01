@@ -10,6 +10,7 @@
 	import { onMount } from 'svelte';
 	import { addToast } from '../../routes/+layout.svelte';
 	import { browser } from '$app/environment';
+	import api from '$lib/api';
 
 	let data: StarHR[] = [];
 	let search: string = $page.url.searchParams.get('q') ?? '';
@@ -18,8 +19,7 @@
 	let selectedStar: StarHR | null = null;
 
 	const getData = () => {
-		axios
-			.get('/api/hipparcos')
+		api.call('get', '/hipparcos')
 			.then((response) => {
 				data = response.data;
 			})
@@ -38,8 +38,7 @@
 	};
 
 	const updateSelectedStar = () => {
-		axios
-			.get(`/api/hipparcos/${search}`)
+		api.call('get', `/hipparcos/${search}`)
 			.then((response) => {
 				if (response.data) {
 					searchError = '';
@@ -130,6 +129,11 @@
               flex h-8 items-center justify-between rounded-md bg-ctp-surface0
               px-3 pr-12 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
 					bind:value={search}
+					on:keydown={(event) => {
+						if (event.key === 'Enter') {
+							handleSearch(event);
+						}
+					}}
 				/>
 				<button
 					class="inline-flex square-8 items-center justify-center rounded-md
