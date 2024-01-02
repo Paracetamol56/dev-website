@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Button from '$lib/components/Button.svelte';
 	import MeltSlider from '$lib/components/MeltSlider.svelte';
-	import { theme } from '$lib/stores';
+	import { user } from '$lib/store';
 	import palette from '@catppuccin/palette';
 	import { Plus, RotateCcw } from 'lucide-svelte';
 	import { onMount } from 'svelte';
@@ -120,7 +120,7 @@
 		ctx.lineTo(boid.x - 10, boid.y + 5);
 		ctx.lineTo(boid.x - 10, boid.y - 5);
 		ctx.lineTo(boid.x, boid.y);
-		ctx.fillStyle = palette.variants[$theme].mauve.hex;
+		ctx.fillStyle = palette.variants[$user.flavour].mauve.hex;
 		ctx.fill();
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
 	}
