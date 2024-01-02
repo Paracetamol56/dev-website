@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Paracetamol56/dev-website/api/models"
+	"github.com/Paracetamol56/dev-website/api/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,14 +15,14 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 		t := strings.Split(authHeader, " ")
 		if len(t) == 2 {
 			authToken := t[1]
-			authorized, err := models.IsAuthorized(authToken, os.Getenv("ACCESS_TOKEN_SECRET"))
+			authorized, err := utils.IsAuthorized(authToken, os.Getenv("ACCESS_TOKEN_SECRET"))
 			if err != nil {
 				c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 				c.Abort()
 				return
 			}
 			if authorized {
-				userID, err := models.ExtractID(authToken, os.Getenv("ACCESS_TOKEN_SECRET"))
+				userID, err := utils.ExtractID(authToken, os.Getenv("ACCESS_TOKEN_SECRET"))
 				if err != nil {
 					c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 					c.Abort()

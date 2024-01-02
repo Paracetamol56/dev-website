@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Paracetamol56/dev-website/api/models"
+	"github.com/Paracetamol56/dev-website/api/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
@@ -46,7 +47,7 @@ func (controller *AuthController) PostLogin(c *gin.Context) {
 		}
 	}
 
-	verificationToken, err := models.SignRefreshToken(&user.Id, 1)
+	verificationToken, err := utils.SignRefreshToken(user.Id.Hex(), 1)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -84,7 +85,7 @@ func (controller *AuthController) PostVerify(c *gin.Context) {
 		return
 	}
 
-	userId, err := models.ExtractID(verify.Token, os.Getenv("REFRESH_TOKEN_SECRET"))
+	userId, err := utils.ExtractID(verify.Token, os.Getenv("REFRESH_TOKEN_SECRET"))
 	log.Println("userId", userId)
 	if err != nil {
 		log.Println("err", err)
@@ -102,12 +103,12 @@ func (controller *AuthController) PostVerify(c *gin.Context) {
 		return
 	}
 
-	refreshtoken, err := models.SignRefreshToken(&user.Id, 168)
+	refreshtoken, err := utils.SignRefreshToken(user.Id.Hex(), 168)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	accesstoken, err := models.SignAccessToken(&user.Id, 1)
+	accesstoken, err := utils.SignAccessToken(user.Id.Hex(), 1)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -133,7 +134,7 @@ func (controller *AuthController) PostRefresh(c *gin.Context) {
 		return
 	}
 
-	authorized, err := models.IsAuthorized(verrify.Token, os.Getenv("REFRESH_TOKEN_SECRET"))
+	authorized, err := utils.IsAuthorized(verrify.Token, os.Getenv("REFRESH_TOKEN_SECRET"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -143,14 +144,14 @@ func (controller *AuthController) PostRefresh(c *gin.Context) {
 		return
 	}
 
-	userId, err := models.ExtractID(verrify.Token, os.Getenv("REFRESH_TOKEN_SECRET"))
+	userId, err := utils.ExtractID(verrify.Token, os.Getenv("REFRESH_TOKEN_SECRET"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	userIdString := userId.Hex()
-	accesstoken, err := models.SignAccessToken(&userIdString, 1)
+	accesstoken, err := utils.SignAccessToken(userIdString, 1)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -159,4 +160,69 @@ func (controller *AuthController) PostRefresh(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"accessToken": accesstoken,
 	})
+}
+
+func (controller *AuthController) GetGithubLogin(c *gin.Context) {
+	code := c.Query("code")
+	if code == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Code not found"})
+		return
+	}
+	path := c.Query("path")
+	if path == "" {
+		path = "/"
+	}
+
+	// Get access token
+	accessToken, err := utils.GetGithubAccessToken(code)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Fetch the GitHub user
+	githubUser, err := utils.GetGithubUser(accessToken)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Check if the user exists in the database
+	user, err := models.GetFullUserByEmail(c, githubUser.Email)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	if user == nil {
+		// If not, create it
+		result, err := models.CreateUser(c, &models.FullUser{
+			Email:          githubUser.Email,
+			Name:           githubUser.Name,
+			Flavour:        "mocha",
+			ProfilePicture: githubUser.AvatarUrl,
+			Github:         githubUser,
+		})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		userId, _ := primitive.ObjectIDFromHex(result.InsertedID.(primitive.ObjectID).Hex())
+		user, err = models.GetFullUserById(c, userId)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+	} else if user.Github == nil {
+		// If it exists but doesn't have a github account, update it
+		user.Github = githubUser
+	}
+
+	user.LastLogin = time.Now()
+	if _, err := models.UpdateUser(c, user.Id, user); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.Redirect(http.StatusFound, path)
 }
