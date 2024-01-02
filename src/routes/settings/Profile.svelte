@@ -1,19 +1,25 @@
 <script lang="ts">
-	import { user } from '$lib/stores';
+	import { user } from '$lib/store';
 	import axios from 'axios';
 	import { AtSign, Save, User } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import { addToast } from '../+layout.svelte';
 	import Button from '$lib/components/Button.svelte';
+	import type { Writable } from 'svelte/store';
+	import type { UserSettings } from './userSettings';
+	import api from '$lib/api';
 
+	export let userSettings: Writable<UserSettings | null>;
 	let name: string;
 	let nameError: string = '';
 	let email: string;
 	let emailError: string = '';
 
 	onMount(() => {
-		name = $user?.name || '';
-		email = $user?.email || '';
+		if ($userSettings !== null) {
+			name = $userSettings.name;
+			email = $userSettings.email;
+		}
 	});
 
 	const validateName = () => {
@@ -21,8 +27,8 @@
 			nameError = 'Name is required';
 			return false;
 		}
-		if (name.length < 3) {
-			nameError = 'Name must be at least 3 characters long';
+		if (name.length < 2) {
+			nameError = 'Name must be at least 2 characters long';
 			return false;
 		}
 		if (name.length > 100) {
@@ -57,13 +63,10 @@
 			return;
 		}
 
-		axios
-			.patch(`/api/user/${$user?.id}`, {
-				name
-			})
-			.then((res) => {
-				$user!.name = name;
-			})
+		api.callWithAuth('patch', `/users/${$user.id}`, {
+			name
+		})
+			.then((res) => {})
 			.catch((err) => {
 				console.error(err);
 			});

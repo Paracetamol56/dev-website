@@ -1,4 +1,4 @@
-import adapter from '@sveltejs/adapter-node';
+import adapter from '@sveltejs/adapter-static';
 import sequence from 'svelte-sequential-preprocessor';
 import { vitePreprocess } from '@sveltejs/kit/vite';
 import { escapeSvelte, mdsvex } from 'mdsvex';
@@ -34,7 +34,12 @@ const config = {
 	extensions: ['.svelte', '.md'],
 	preprocess: sequence([vitePreprocess({}), mdsvex(mdsvexOptions), preprocessMeltUI()]),
 	kit: {
-		adapter: adapter()
+		adapter: adapter({
+			pages: 'build',
+			assets: 'build',
+			fallback: 'index.html',
+			strict: false
+		}),
 	}
 };
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Button from '$lib/components/Button.svelte';
-	import { user } from '$lib/stores';
+	import { user } from '$lib/store';
 	import axios from 'axios';
 	import { Archive, Download, Trash2, UserX, X } from 'lucide-svelte';
 	import { onMount } from 'svelte';
@@ -8,30 +8,25 @@
 	import { createDialog, melt } from '@melt-ui/svelte';
 	import { fade, fly } from 'svelte/transition';
 	import { goto } from '$app/navigation';
+	import type { Writable } from 'svelte/store';
+	import type { UserSettings } from './userSettings';
+	import api from '$lib/api';
+
+	export let userSettings: Writable<UserSettings | null>;
 
 	let createdAt: Date;
 	let lastLogin: Date;
-	onMount(() => {
-		axios
-			.get(`/api/user/${$user?.id}`)
-			.then((res) => {
-				createdAt = new Date(res.data.createdAt);
-				lastLogin = new Date(res.data.lastLogin);
-			})
-			.catch((err) => {
-				console.error(err);
-				addToast({
-					data: {
-						title: 'Error',
-						description: 'Failed load user data',
-						color: 'bg-ctp-red'
-					}
-				});
-			});
-	});
+
+	$: {
+		if ($userSettings) {
+			createdAt = new Date($userSettings.createdAt);
+			lastLogin = new Date($userSettings.lastLogin);
+		}
+	}
 
 	const handleExport = () => {
-		axios.get('/api/export').then((response) => {
+		api.callWithAuth('get', `/users/${$user.id}/export`)
+		.then((response) => {
 			const element = document.createElement('a');
 			const file = new Blob([JSON.stringify(response.data)], { type: 'text/plain' });
 			element.href = URL.createObjectURL(file);
@@ -64,10 +59,9 @@
 			return;
 		}
 
-		axios
-			.delete(`/api/user/${$user?.id}`)
-			.then((res) => {
-				user!.set(null);
+		api.callWithAuth('delete', `/users/${$user.id}`)
+			.then(res => {
+				api.logout();
 				addToast({
 					data: {
 						title: 'Success',
@@ -82,10 +76,11 @@
 				addToast({
 					data: {
 						title: 'Error',
-						description: 'An error occured, please try again later',
+						description: 'Failed load user data',
 						color: 'bg-ctp-red'
 					}
 				});
+				goto('/');
 			});
 	};
 
@@ -101,7 +96,7 @@
 	<div>
 		<p>
 			Account created on <span class="font-semibold"
-				>{createdAt?.toLocaleDateString('en-US', {
+				>{createdAt.toLocaleDateString('en-US', {
 					year: 'numeric',
 					month: 'long',
 					day: 'numeric'
@@ -110,7 +105,7 @@
 		</p>
 		<p>
 			Last login on <span class="font-semibold"
-				>{lastLogin?.toLocaleDateString('en-US', {
+				>{lastLogin.toLocaleDateString('en-US', {
 					year: 'numeric',
 					month: 'long',
 					day: 'numeric'

@@ -4,9 +4,9 @@
 	import { createDialog, melt } from '@melt-ui/svelte';
 	import { Send, X } from 'lucide-svelte';
 	import { addToast } from './+layout.svelte';
-	import axios from 'axios';
 	import { writable, type Writable } from 'svelte/store';
 	import { fade, fly } from 'svelte/transition';
+	import api from '$lib/api';
 
 	const dialogOpen: Writable<boolean> = writable(false);
 	const {
@@ -49,39 +49,7 @@
 
 		dialogOpen.set(false);
 
-		// Call the route /api/auth/login with the email as a parameter with axios
-		axios
-			.post('/api/auth/login', { email })
-			.then((response) => {
-				if (response.status != 200) {
-					console.error(response);
-					addToast({
-						data: {
-							title: 'Error',
-							description: 'An error occured, please try again later',
-							color: 'bg-ctp-red'
-						}
-					});
-					return;
-				}
-				addToast({
-					data: {
-						title: 'Magic link sent',
-						description: 'Please check your inbox',
-						color: 'bg-ctp-green'
-					}
-				});
-			})
-			.catch((error) => {
-				console.error(error);
-				addToast({
-					data: {
-						title: 'Error',
-						description: 'An error occured, please try again later',
-						color: 'bg-ctp-red'
-					}
-				});
-			});
+		api.login(email);
 	};
 </script>
 
