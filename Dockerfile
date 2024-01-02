@@ -17,4 +17,4 @@ WORKDIR /app
 COPY --from=www-builder /app/build /app/build
 COPY --from=api-builder /app/dev-website /app/api
 EXPOSE 8080
-CMD ./api
+CMD ./api -docker
