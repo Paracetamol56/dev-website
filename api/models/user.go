@@ -46,20 +46,20 @@ type GitHubUser struct {
 }
 
 type User struct {
-	Id             string `json:"id" bson:"_id"`
-	Name           string `json:"name" bson:"name"`
-	ProfilePicture string `json:"profilePicture" bson:"profilePicture"`
+	Id             primitive.ObjectID `json:"id" bson:"_id"`
+	Name           string             `json:"name" bson:"name"`
+	ProfilePicture string             `json:"profilePicture" bson:"profilePicture"`
 }
 
 type FullUser struct {
-	Id             string      `json:"id" bson:"_id,omitempty"`
-	Name           string      `json:"name" bson:"name"`
-	Email          string      `json:"email" bson:"email"`
-	CreatedAt      time.Time   `json:"createdAt" bson:"createdAt,omitempty"`
-	LastLogin      time.Time   `json:"lastLogin" bson:"lastLogin,omitempty"`
-	Flavour        string      `json:"flavour" bson:"flavour"`
-	ProfilePicture string      `json:"profilePicture,omitempty" bson:"profilePicture,omitempty"`
-	Github         *GitHubUser `json:"github,omitempty" bson:"github,omitempty"`
+	Id             primitive.ObjectID `json:"id" bson:"_id,omitempty"`
+	Name           string             `json:"name" bson:"name"`
+	Email          string             `json:"email" bson:"email"`
+	CreatedAt      time.Time          `json:"createdAt" bson:"createdAt,omitempty"`
+	LastLogin      time.Time          `json:"lastLogin" bson:"lastLogin,omitempty"`
+	Flavour        string             `json:"flavour" bson:"flavour"`
+	ProfilePicture string             `json:"profilePicture,omitempty" bson:"profilePicture,omitempty"`
+	Github         *GitHubUser        `json:"github,omitempty" bson:"github,omitempty"`
 }
 
 func CreateUser(c *gin.Context, user *FullUser) (*mongo.InsertOneResult, error) {
@@ -113,6 +113,7 @@ func UpdateUser(c *gin.Context, id primitive.ObjectID, user *FullUser) (*mongo.U
 		"flavour":        user.Flavour,
 		"profilePicture": user.ProfilePicture,
 		"lastLogin":      user.LastLogin,
+		"github":         user.Github,
 	}})
 	return result, err
 }

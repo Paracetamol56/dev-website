@@ -1,4 +1,4 @@
-package models
+package utils
 
 import (
 	"fmt"
@@ -19,10 +19,10 @@ type JwtRefreshClaims struct {
 	jwt.RegisteredClaims
 }
 
-func SignAccessToken(userId *string, expiry int64) (accessToken string, err error) {
+func SignAccessToken(userId string, expiry int64) (accessToken string, err error) {
 	exp := time.Now().Add(time.Hour * time.Duration(expiry))
 	claims := &JwtClaims{
-		UserId: *userId,
+		UserId: userId,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(exp),
 		},
@@ -35,10 +35,10 @@ func SignAccessToken(userId *string, expiry int64) (accessToken string, err erro
 	return t, err
 }
 
-func SignRefreshToken(userId *string, expiry int64) (refreshToken string, err error) {
+func SignRefreshToken(userId string, expiry int64) (refreshToken string, err error) {
 	exp := time.Now().Add(time.Hour * time.Duration(expiry))
 	claimsRefresh := &JwtRefreshClaims{
-		UserId: *userId,
+		UserId: userId,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(exp),
 		},

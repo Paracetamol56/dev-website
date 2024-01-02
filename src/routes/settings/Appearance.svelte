@@ -20,14 +20,17 @@
 	export let userSettings: Writable<UserSettings | null>;
 	let flavour: keyof typeof variants;
 
-	onMount(() => {
-		flavour = $user.flavour as keyof typeof variants;
-	});
+	$: {
+		if ($userSettings !== null) {
+			flavour = $userSettings.flavour as keyof typeof variants;
+		}
+	}
 
 	const handleSave = async () => {
 		api.callWithAuth('patch', `/users/${$user.id}`, { flavour })
 			.then((res) => {
 				if (res.status === 200) {
+					if ($userSettings !== null) $userSettings.flavour = flavour;
 					$user.flavour = flavour;
 				}
 			})
