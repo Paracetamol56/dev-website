@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Button from '$lib/components/Button.svelte';
-	import { theme, user } from '$lib/stores';
+	import { user } from '$lib/store';
 	import { variants } from '@catppuccin/palette';
 	import {
 		createSelect,
@@ -10,45 +10,57 @@
 		type CreateRadioGroupProps
 	} from '@melt-ui/svelte';
 	import axios from 'axios';
-	import { Check, ChevronDown, Palette, Save } from 'lucide-svelte';
+	import { Check, Palette, Save } from 'lucide-svelte';
 	import { onMount } from 'svelte';
-	import { fade } from 'svelte/transition';
+	import type { Writable } from 'svelte/store';
+	import type { UserSettings } from './userSettings';
+	import api from '$lib/api';
+	import { addToast } from '../+layout.svelte';
 
+	export let userSettings: Writable<UserSettings | null>;
 	let flavour: keyof typeof variants;
 
-	onMount(() => {
-		flavour = $theme as keyof typeof variants;
-	});
+	$: {
+		if ($userSettings !== null) {
+			flavour = $userSettings.flavour as keyof typeof variants;
+		}
+	}
 
 	const handleSave = async () => {
-		axios
-			.patch(`/api/user/${$user?.id}`, {
-				flavour: flavour || $user?.flavour
-			})
+		api.callWithAuth('patch', `/users/${$user.id}`, { flavour })
 			.then((res) => {
-				$theme = flavour;
+				if (res.status === 200) {
+					if ($userSettings !== null) $userSettings.flavour = flavour;
+					$user.flavour = flavour;
+				}
 			})
 			.catch((err) => {
 				console.error(err);
+				addToast({
+					data: {
+						title: 'Internal Error',
+						description: 'Could not save the theme preference',
+						color: 'bg-ctp-red'
+					}
+				});
 			});
 	};
 
 	const variantsClasses = ['ctp-latte', 'ctp-frappe', 'ctp-macchiato', 'ctp-mocha'];
 
 	const onFlavourChange: CreateRadioGroupProps['onValueChange'] = ({ curr, next }) => {
-		if (!next) {
-			return curr;
-		}
+		if (curr === next) return curr;
+		if (!(next in variants)) return curr;
 		flavour = next as keyof typeof variants;
 		return next;
 	};
 
 	const {
-		elements: { root, item, hiddenInput },
+		elements: { root, item },
 		helpers: { isChecked }
 	} = createRadioGroup({
 		onValueChange: onFlavourChange,
-		defaultValue: $theme
+		defaultValue: $user.flavour
 	});
 </script>
 
@@ -106,7 +118,7 @@
 		</div>
 		<small class="text-center">
 			<img
-				src={$theme === 'latte' ? '/img/catppuccin-light.png' : '/img/catppuccin-dark.png'}
+				src={$user.flavour === 'latte' ? '/img/catppuccin-light.png' : '/img/catppuccin-dark.png'}
 				alt="Catppuccin logo"
 				class="inline-block rounded-full square-4 mr-1"
 			/>

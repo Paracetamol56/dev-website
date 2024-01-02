@@ -1,25 +1,25 @@
-import { env } from '$env/dynamic/private';
-import { error } from '@sveltejs/kit';
-import type { ObjectId } from 'mongodb';
-import jwt from 'jsonwebtoken';
+import { jwtDecode } from "jwt-decode";
 
-export default interface TokenPayload {
-	userId: ObjectId;
-	iat: number;
-	exp: number;
+type JwtClaims = {
+  userId: string;
+  exp: number;
+};
+
+type JwtRefreshClaims = {
+  userId: string;
+  exp: number;
+};
+
+function isExpired(token: string): boolean {
+  let decoded: JwtClaims | JwtRefreshClaims;
+  try {
+    decoded = jwtDecode(token) as JwtClaims | JwtRefreshClaims;
+  } catch (err) {
+    return true;
+  }
+  return Date.now() >= decoded.exp * 1000;
 }
 
-export const readToken = (cookies: any) => {
-	const { token } = JSON.parse(cookies.get('user')!);
-	if (token === undefined) {
-		throw error(401, 'No token provided');
-	}
-	let decoded: TokenPayload;
-	try {
-		decoded = jwt.verify(token, env.JWT_SECRET) as TokenPayload;
-	} catch (e) {
-		throw error(401, 'Invalid token');
-	}
+export { isExpired };
+export type { JwtClaims, JwtRefreshClaims };
 
-	return decoded;
-};
