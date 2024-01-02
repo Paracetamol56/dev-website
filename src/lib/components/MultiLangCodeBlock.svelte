@@ -33,6 +33,9 @@
 				case 'js':
 					language = 'JavaScript';
 					break;
+				case 'ts':
+					language = 'TypeScript';
+					break;
 				case 'rs':
 					language = 'Rust';
 					break;

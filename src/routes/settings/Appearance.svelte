@@ -3,9 +3,7 @@
 	import { user } from '$lib/store';
 	import { variants } from '@catppuccin/palette';
 	import {
-		createSelect,
 		melt,
-		type CreateSelectProps,
 		createRadioGroup,
 		type CreateRadioGroupProps
 	} from '@melt-ui/svelte';

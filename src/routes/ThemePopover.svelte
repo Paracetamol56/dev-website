@@ -12,6 +12,8 @@
 	import { addToast } from './+layout.svelte';
 	import api from '$lib/api';
 
+	type Theme = keyof typeof variants;
+
 	const onThemeChange: CreateRadioGroupProps['onValueChange'] = ({ curr, next }) => {
 		if (curr === next) return curr;
 		if (!(next in variants)) return curr;
