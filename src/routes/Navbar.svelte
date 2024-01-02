@@ -21,7 +21,7 @@
 
 <nav
 	class="min-w-max p-3 fixed top-0 left-0 right-0 transition-transform duration-200
-				transform {scrollYdelta > 0 && scrollY >= 250 ? '-translate-y-full' : ''} z-50"
+				transform {scrollYdelta > 0 && scrollY >= 250 ? '-translate-y-full' : ''} z-20"
 	use:melt={$root}
 >
 	<div

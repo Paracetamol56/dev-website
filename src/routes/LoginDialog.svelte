@@ -68,7 +68,7 @@
 	{#if $open}
 		<div
 			use:melt={$overlay}
-			class="fixed inset-0 z-10 bg-black/50"
+			class="fixed inset-0 z-30 bg-black/50"
 			transition:fade={{ duration: 200 }}
 		/>
 		<div
