@@ -26,11 +26,8 @@
 	}
 
 	const handleExport = () => {
-		axios.get('/api/exports', {
-			headers: {
-				Authorization: `Bearer ${$user?.accessToken}`
-			}
-		}).then((response) => {
+		api.callWithAuth('get', `/users/${$user.id}/export`)
+		.then((response) => {
 			const element = document.createElement('a');
 			const file = new Blob([JSON.stringify(response.data)], { type: 'text/plain' });
 			element.href = URL.createObjectURL(file);

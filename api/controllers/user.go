@@ -93,7 +93,7 @@ func (controller *UserController) DeleteUser(c *gin.Context) {
 	}
 
 	// Check if user is authorized
-	if userIdString != c.MustGet("x-user-id").(string) {
+	if userId != c.MustGet("x-user-id").(primitive.ObjectID) {
 		c.JSON(http.StatusForbidden, gin.H{"error": "Forbidden"})
 		return
 	}
@@ -109,4 +109,26 @@ func (controller *UserController) DeleteUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusNoContent, nil)
+}
+
+func (controller *UserController) GetExport(c *gin.Context) {
+	userIdString := c.Param("id")
+	userId, err := primitive.ObjectIDFromHex(userIdString)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid id"})
+		return
+	}
+
+	// Check if user is authorized
+	if userId != c.MustGet("x-user-id").(primitive.ObjectID) {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Forbidden"})
+		return
+	}
+
+	user, err := models.GetFullUserById(c, userId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, user)
 }

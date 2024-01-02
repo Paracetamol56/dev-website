@@ -32,7 +32,6 @@
 		api.callWithAuth('get', `/users/${$user.id}`)
 			.then(res => {
 				$userSettings = res.data;
-				console.log($userSettings);
 			})
 			.catch((err) => {
 				console.error(err);
