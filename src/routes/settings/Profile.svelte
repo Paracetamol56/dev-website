@@ -10,6 +10,8 @@
 	import api from '$lib/api';
 
 	export let userSettings: Writable<UserSettings | null>;
+	export let markSavedState: (saved: boolean | null) => void;
+
 	let name: string;
 	let nameError: string = '';
 	let email: string;
@@ -36,6 +38,7 @@
 			return false;
 		}
 		nameError = '';
+		markSavedState(false);
 		return true;
 	};
 	const validateEmail = () => {
@@ -48,6 +51,7 @@
 			return false;
 		}
 		emailError = '';
+		markSavedState(false);
 		return true;
 	};
 
@@ -66,7 +70,12 @@
 		api.callWithAuth('patch', `/users/${$user.id}`, {
 			name
 		})
-			.then((res) => {})
+			.then((res) => {
+				if (res.status === 200) {
+					if ($userSettings !== null) $userSettings.name = name;
+					markSavedState(true);
+				}
+			})
 			.catch((err) => {
 				console.error(err);
 			});

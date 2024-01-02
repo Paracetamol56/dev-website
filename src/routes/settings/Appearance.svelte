@@ -7,15 +7,14 @@
 		createRadioGroup,
 		type CreateRadioGroupProps
 	} from '@melt-ui/svelte';
-	import axios from 'axios';
 	import { Check, Palette, Save } from 'lucide-svelte';
-	import { onMount } from 'svelte';
 	import type { Writable } from 'svelte/store';
 	import type { UserSettings } from './userSettings';
 	import api from '$lib/api';
 	import { addToast } from '../+layout.svelte';
 
 	export let userSettings: Writable<UserSettings | null>;
+	export let markSavedState: (saved: boolean | null) => void;
 	let flavour: keyof typeof variants;
 
 	$: {
@@ -29,6 +28,7 @@
 			.then((res) => {
 				if (res.status === 200) {
 					if ($userSettings !== null) $userSettings.flavour = flavour;
+					markSavedState(true);
 					$user.flavour = flavour;
 				}
 			})
@@ -49,6 +49,8 @@
 	const onFlavourChange: CreateRadioGroupProps['onValueChange'] = ({ curr, next }) => {
 		if (curr === next) return curr;
 		if (!(next in variants)) return curr;
+		if ($userSettings?.flavour !== next) markSavedState(false);
+		else markSavedState(null);
 		flavour = next as keyof typeof variants;
 		return next;
 	};

@@ -3,15 +3,17 @@
 	import { goto } from '$app/navigation';
 	import { addToast } from '../+layout.svelte';
 	import { createAccordion, melt } from '@melt-ui/svelte';
-	import { onMount } from 'svelte';
+	import { SvelteComponent, onMount } from 'svelte';
 	import { slide } from 'svelte/transition';
 	import Integration from './Integration.svelte';
 	import Appearance from './Appearance.svelte';
 	import Profile from './Profile.svelte';
 	import Account from './Account.svelte';
-	import { writable, type Writable } from 'svelte/store';
+	import { get, writable, type Writable } from 'svelte/store';
 	import api from '$lib/api';
 	import type { UserSettings } from './userSettings';
+	import { CheckCircle, CircleDotDashed } from 'lucide-svelte';
+	import BarChart from '../../content/mnist-classification/BarChart.svelte';
 
 	const userSettings: Writable<UserSettings | null> = writable(null);
 	
@@ -46,7 +48,12 @@
 			});
 	});
 
-	const items = [
+	type Item = {
+		id: string;
+		title: string;
+		component: any;
+	};
+	const items: Item[] = [
 		{
 			id: 'profile',
 			title: 'Profile',
@@ -68,6 +75,10 @@
 			component: Integration
 		}
 	];
+	const savedStates: Writable<Record<string, boolean | null>> = writable(Object.assign(
+		{},
+		...items.map(({ id }) => ({ [id]: null }))
+	));
 
 	const {
 		elements: { content, item, trigger, root },
@@ -102,6 +113,17 @@
 							focus-visible:text-magnum-800"
 						>
 							{title}
+							{#if $savedStates[id] !== null}
+								{#if $savedStates[id]}
+									<span class="text-ctp-green">
+										<CheckCircle size="18"  />
+									</span>
+								{:else}
+									<span class="text-ctp-peach">
+										<CircleDotDashed size="18"  />
+									</span>
+								{/if}
+							{/if}
 						</button>
 					</h2>
 
@@ -111,7 +133,7 @@
 							use:melt={$content(id)}
 							transition:slide={{ duration: 200 }}
 						>
-							<svelte:component this={component} {userSettings}/>
+							<svelte:component this={component} {userSettings} markSavedState={saved => $savedStates[id] = saved} />
 						</div>
 					{/if}
 				</div>
