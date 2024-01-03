@@ -67,9 +67,10 @@
 			return;
 		}
 
-		api.callWithAuth('patch', `/users/${$user.id}`, {
-			name
-		})
+		api
+			.callWithAuth('patch', `/users/${$user.id}`, {
+				name
+			})
 			.then((res) => {
 				if (res.status === 200) {
 					if ($userSettings !== null) $userSettings.name = name;

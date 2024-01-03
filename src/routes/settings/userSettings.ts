@@ -1,11 +1,11 @@
-import type { variants } from "@catppuccin/palette";
+import type { variants } from '@catppuccin/palette';
 
 export interface UserSettings {
-  id: string;
+	id: string;
 	name: string;
 	email: string;
-  createdAt: Date;
-  lastLogin: Date;
+	createdAt: Date;
+	lastLogin: Date;
 	flavour: keyof typeof variants;
 	github: any;
 }

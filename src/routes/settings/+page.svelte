@@ -16,7 +16,7 @@
 	import BarChart from '../../content/mnist-classification/BarChart.svelte';
 
 	const userSettings: Writable<UserSettings | null> = writable(null);
-	
+
 	onMount(async () => {
 		if ($user.id === null) {
 			addToast({
@@ -31,8 +31,9 @@
 			return;
 		}
 
-		api.callWithAuth('get', `/users/${$user.id}`)
-			.then(res => {
+		api
+			.callWithAuth('get', `/users/${$user.id}`)
+			.then((res) => {
 				$userSettings = res.data;
 			})
 			.catch((err) => {
@@ -75,10 +76,9 @@
 			component: Integration
 		}
 	];
-	const savedStates: Writable<Record<string, boolean | null>> = writable(Object.assign(
-		{},
-		...items.map(({ id }) => ({ [id]: null }))
-	));
+	const savedStates: Writable<Record<string, boolean | null>> = writable(
+		Object.assign({}, ...items.map(({ id }) => ({ [id]: null })))
+	);
 
 	const {
 		elements: { content, item, trigger, root },
@@ -116,11 +116,11 @@
 							{#if $savedStates[id] !== null}
 								{#if $savedStates[id]}
 									<span class="text-ctp-green">
-										<CheckCircle size="18"  />
+										<CheckCircle size="18" />
 									</span>
 								{:else}
 									<span class="text-ctp-peach">
-										<CircleDotDashed size="18"  />
+										<CircleDotDashed size="18" />
 									</span>
 								{/if}
 							{/if}
@@ -133,7 +133,11 @@
 							use:melt={$content(id)}
 							transition:slide={{ duration: 200 }}
 						>
-							<svelte:component this={component} {userSettings} markSavedState={saved => $savedStates[id] = saved} />
+							<svelte:component
+								this={component}
+								{userSettings}
+								markSavedState={(saved) => ($savedStates[id] = saved)}
+							/>
 						</div>
 					{/if}
 				</div>

@@ -20,7 +20,8 @@
 		$user.flavour = next as keyof typeof variants;
 		// API call to persist the theme on the user's profile if logged in
 		if ($user.accessToken) {
-			api.callWithAuth('patch', `/users/${$user.id}`, { flavour: next })
+			api
+				.callWithAuth('patch', `/users/${$user.id}`, { flavour: next })
 				.then((res) => {
 					if (res.status === 200) {
 						return next;

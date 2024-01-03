@@ -12,7 +12,7 @@
 			id: null,
 			email: null,
 			flavour: $user.flavour
-		}
+		};
 		addToast({
 			data: {
 				title: 'Logged out',

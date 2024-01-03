@@ -52,6 +52,7 @@ In this example, you can add objects to the simulation by clicking on the canvas
 
 <Tree />
 
+
 ## Other use cases
 
 Since the space is partition in an esay to use data structure, we can use it for other things, like collision detection. or serching for objects by position. And basically any other problem where you want to avoid looping over all the objects and simplify computations by grouping objects that are far away.
@@ -61,4 +62,4 @@ Since the space is partition in an esay to use data structure, we can use it for
 - Original paper: [A Hierarchical O(N log N) Force Calculation Algorithm](https://ui.adsabs.harvard.edu/abs/1986Natur.324..446B/abstract)
 - [Wikipedia](https://en.wikipedia.org/wiki/Barnes%E2%80%93Hut_simulation)
 - Barnes hut in action: [The Barnes-Hut Approximation](https://jheer.github.io/barnes-hut) by Jeff Heer
-- 3D online simulation: [Barnes-Hut Simulation](https://jurasic.dev/2023/barnes-hut-simulation/) by Juraj Michálek
+- 3D online simulation: [Barnes-Hut Simulation](https://jurasic.dev/2023/barnes-hut-simulation/) by Jurasic Dev

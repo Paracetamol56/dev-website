@@ -2,11 +2,7 @@
 	import Button from '$lib/components/Button.svelte';
 	import { user } from '$lib/store';
 	import { variants } from '@catppuccin/palette';
-	import {
-		melt,
-		createRadioGroup,
-		type CreateRadioGroupProps
-	} from '@melt-ui/svelte';
+	import { melt, createRadioGroup, type CreateRadioGroupProps } from '@melt-ui/svelte';
 	import { Check, Palette, Save } from 'lucide-svelte';
 	import type { Writable } from 'svelte/store';
 	import type { UserSettings } from './userSettings';
@@ -24,7 +20,8 @@
 	}
 
 	const handleSave = async () => {
-		api.callWithAuth('patch', `/users/${$user.id}`, { flavour })
+		api
+			.callWithAuth('patch', `/users/${$user.id}`, { flavour })
 			.then((res) => {
 				if (res.status === 200) {
 					if ($userSettings !== null) $userSettings.flavour = flavour;

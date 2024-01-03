@@ -39,9 +39,7 @@
 	</div>
 	<div class="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
 		{#each data.pages as page}
-			<div
-				class="p-8 bg-ctp-crust/50 backdrop-blur-sm rounded-md shadow-md shadow-ctp-crust z-10"
-			>
+			<div class="p-8 bg-ctp-crust/50 backdrop-blur-sm rounded-md shadow-md shadow-ctp-crust z-10">
 				<div class="mb-2 flex justify-left flex-wrap gap-x-2 items-center">
 					{#each page.categories as category}
 						<a href="/">
@@ -62,6 +60,7 @@
 		<Pagination page={pageNumber} count={data.pages.length} perPage={6} />
 	</div>-->
 </section>
+
 <!--
 <section class="relative container mx-auto" bind:this={section2}>
 	<span
