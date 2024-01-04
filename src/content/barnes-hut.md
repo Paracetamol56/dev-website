@@ -52,10 +52,22 @@ In this example, you can add objects to the simulation by clicking on the canvas
 
 <Tree />
 
+## Barnes-Hut in action (and in 3D)
+
+This is a simulation of a galaxy with 1000 stars.
+This component is made in C++ and compiled to WebAssembly.
+
+**Your browser must support WebAssembly. Mobile devices are strongly discouraged.**
+
+In 3d, the core idea is the same but we use an octree (8 children per node) instead of a quadtree (4 children per node).
+
+<div style="overflow: auto;">
+  <iframe src="/files/barnes-hut/barnes-hut.html" style="width: 800px; height: 800px; border: none; margin: 0 auto;"></iframe>
+</div>
 
 ## Other use cases
 
-Since the space is partition in an esay to use data structure, we can use it for other things, like collision detection. or serching for objects by position. And basically any other problem where you want to avoid looping over all the objects and simplify computations by grouping objects that are far away.
+Since the space is partitioned in an esay to use data structure, we can use it for other things, like collision detection. or serching for objects by position. And basically any other problem where you want to avoid looping over all the objects and simplify computations by grouping objects that are far away.
 
 ## References
 
