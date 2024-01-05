@@ -6,7 +6,7 @@ import { writable, type Writable } from 'svelte/store';
 type UserStore = {
 	accessToken: string | null;
 	refreshToken: string | null;
-	id: string | null
+	id: string | null;
 	email: string | null;
 	flavour: keyof typeof variants;
 };
@@ -18,10 +18,10 @@ function initUserStore(): Writable<UserStore> {
 		accessToken: null,
 		refreshToken: null,
 		email: null,
-		flavour: "mocha"
+		flavour: 'mocha'
 	};
 	if (browser) {
-		const cookie = document.cookie.split('; ').find(row => row.startsWith('user='));
+		const cookie = document.cookie.split('; ').find((row) => row.startsWith('user='));
 		if (cookie) {
 			const { id, accessToken, refreshToken, email, flavour } = JSON.parse(cookie.split('=')[1]);
 			value = {
@@ -29,12 +29,12 @@ function initUserStore(): Writable<UserStore> {
 				accessToken: accessToken || null,
 				refreshToken: refreshToken || null,
 				email: email || null,
-				flavour: flavour || "mocha"
+				flavour: flavour || 'mocha'
 			};
-			applyUserTheme(flavour || "mocha");
+			applyUserTheme(flavour || 'mocha');
 		}
 	}
-	
+
 	writeUserToCookie(value);
 	return writable(value);
 }
@@ -45,7 +45,7 @@ user.set = (value) => {
 	applyUserTheme(value.flavour);
 	writeUserToCookie(value);
 	userSet(value);
-}
+};
 
 // Function to write the user store to the cookie
 function writeUserToCookie(user: UserStore) {

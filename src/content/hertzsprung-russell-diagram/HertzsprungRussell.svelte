@@ -19,7 +19,8 @@
 	let selectedStar: StarHR | null = null;
 
 	const getData = () => {
-		api.call('get', '/hipparcos')
+		api
+			.call('get', '/hipparcos')
 			.then((response) => {
 				data = response.data;
 			})
@@ -38,7 +39,8 @@
 	};
 
 	const updateSelectedStar = () => {
-		api.call('get', `/hipparcos/${search}`)
+		api
+			.call('get', `/hipparcos/${search}`)
 			.then((response) => {
 				if (response.data) {
 					searchError = '';

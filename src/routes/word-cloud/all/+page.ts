@@ -10,5 +10,5 @@ export const load: PageData = async () => {
 		.catch((err) => {
 			console.error(err);
 			return { sessions: [] };
-	});
+		});
 };

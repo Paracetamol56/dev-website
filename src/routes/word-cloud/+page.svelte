@@ -8,7 +8,7 @@
 	import { browser } from '$app/environment';
 	import { onMount } from 'svelte';
 	import type { WordCloudSession } from './utils';
-	
+
 	let session: WordCloudSession | null = null;
 
 	onMount(() => {

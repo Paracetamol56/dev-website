@@ -7,6 +7,6 @@
 		const token: string = $page.url.searchParams.get('token') ?? '';
 		const redirect: string = $page.url.searchParams.get('redirect') ?? '/';
 
-		api.verify(token, redirect)
+		api.verify(token, redirect);
 	});
 </script>

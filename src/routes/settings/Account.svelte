@@ -25,8 +25,7 @@
 	}
 
 	const handleExport = () => {
-		api.callWithAuth('get', `/users/${$user.id}/export`)
-		.then((response) => {
+		api.callWithAuth('get', `/users/${$user.id}/export`).then((response) => {
 			const element = document.createElement('a');
 			const file = new Blob([JSON.stringify(response.data)], { type: 'text/plain' });
 			element.href = URL.createObjectURL(file);
@@ -59,8 +58,9 @@
 			return;
 		}
 
-		api.callWithAuth('delete', `/users/${$user.id}`)
-			.then(res => {
+		api
+			.callWithAuth('delete', `/users/${$user.id}`)
+			.then((res) => {
 				api.logout();
 				addToast({
 					data: {
