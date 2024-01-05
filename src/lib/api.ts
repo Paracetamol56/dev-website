@@ -137,11 +137,13 @@ async function refreshAccessToken() {
 }
 
 async function callWithAuth(method: string, path: string, json?: any) {
-	const accessToken = get(user).accessToken;
+	let accessToken = get(user).accessToken;
 	if (!accessToken) {
 		await refreshAccessToken();
+		accessToken = get(user).accessToken;
 	} else {
 		isExpired(accessToken) && (await refreshAccessToken());
+		accessToken = get(user).accessToken;
 	}
 	return axios({
 		method,

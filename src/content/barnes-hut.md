@@ -4,6 +4,8 @@ description: Optimization algorithm for n-body simulations
 categories:
   - computer science
   - simulation
+  - astronomy
+  - physics
 published: true
 ---
 
@@ -54,7 +56,7 @@ In this example, you can add objects to the simulation by clicking on the canvas
 
 ## Barnes-Hut in action (and in 3D)
 
-This is a simulation of a galaxy with 1000 stars.
+This is a simulation of a galaxy with 1000 stars. Their positions and velocities are computed on the CPU, and the rendering is done on the GPU with WebGL.
 This component is made in C++ and compiled to WebAssembly.
 
 **Your browser must support WebAssembly. Mobile devices are strongly discouraged.**

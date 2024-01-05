@@ -52,7 +52,7 @@
 			<p class="mb-2 font-semibold text-ctp-text">Profile</p>
 			<ul>
 				<li class="mb-2 text-ctp-text hover:text-ctp-blue transition-colors">
-					<a href="settings" class="flex justify-start items-center gap-2">
+					<a href="/settings" class="flex justify-start items-center gap-2">
 						<Cog size="18" stroke-width="3" />
 						<span>Settings</span>
 					</a>

@@ -53,7 +53,7 @@ function writeUserToCookie(user: UserStore) {
 		// Delete existing cookie
 		document.cookie = 'user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Strict;';
 		// Set new cookie
-		document.cookie = `user=${JSON.stringify(user)}; path=/; SameSite=Strict;`;
+		document.cookie = `user=${JSON.stringify(user)}; path=/; SameSite=Strict; max-age=31536000;`;
 	}
 }
 
