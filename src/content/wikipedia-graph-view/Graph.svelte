@@ -73,6 +73,7 @@
 	let width: number;
 	let height: number;
 	let svg: SVGSVGElement;
+	let svgGroup: SVGGElement;
 
 	let hover: { title: string, x: number; y: number } | null = null;
   let summaries = new Map<string, any>();
@@ -126,7 +127,7 @@
 			.force('Y', d3.forceY());
 
 		const link = d3
-			.select(svg)
+			.select(svgGroup)
 			.append('g')
 			.attr('stroke', variants[$user.flavour].surface0.rgb)
 			.selectAll('line')
@@ -136,7 +137,7 @@
 			.attr('stroke-width', 1.5);
 
 		const node = d3
-			.select(svg)
+			.select(svgGroup)
 			.append('g')
 			.attr('stroke', 'none')
 			.attr('stroke-width', 1.5)
@@ -177,11 +178,21 @@
 
 	const destroySimulation = () => {
 		simulation.stop();
-		d3.select(svg).selectAll('*').remove();
+		d3.select(svgGroup).selectAll('*').remove();
 	};
 
 	onMount(() => {
 		startSimulation();
+
+		const zoom: d3.ZoomBehavior<Element, unknown> = d3
+			.zoom()
+			.scaleExtent([0.1, 10])
+			.on('zoom', (event: any) => {
+				d3.select(svgGroup).attr('transform', event.transform);
+			});
+		
+		d3.select(svg).call(zoom);
+
 	});
 </script>
 
@@ -226,7 +237,9 @@
 		{width}
 		{height}
 		viewBox={`${-width / 2} ${-height / 2} ${width} ${height}`}
-	/>
+	>
+		<g bind:this={svgGroup}/>
+	</svg>
 	{#if hover}
 		<a
       href="https://en.wikipedia.org/wiki/{hover.title}"
