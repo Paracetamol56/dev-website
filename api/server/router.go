@@ -6,6 +6,8 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func InitRouter() *gin.Engine {
@@ -28,6 +30,7 @@ func InitRouter() *gin.Engine {
 	apiGroup := r.Group("/api")
 	{
 		apiGroup.GET("/health", heatlh.GetHealth)
+		apiGroup.GET("/doc/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 		apiGroup.POST("/contact", contact.PostContact)
 		authGroup := apiGroup.Group("/auth")
 		{
@@ -53,6 +56,11 @@ func InitRouter() *gin.Engine {
 	}
 
 	// Static files
+	r.Use(func(c *gin.Context) {
+		c.Header("Cross-Origin-Opener-Policy", "same-origin")
+		c.Header("Cross-Origin-Embedder-Policy", "require-corp")
+		c.Next()
+	})
 	r.Use(static.Serve("/", static.LocalFile("./build", true)))
 	r.NoRoute(func(c *gin.Context) {
 		c.File("./build/index.html")
