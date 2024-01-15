@@ -56,7 +56,7 @@ In this example, you can add objects to the simulation by clicking on the canvas
 
 ## Barnes-Hut in action (and in 3D)
 
-This is a simulation of a galaxy with 1000 stars. Their positions and velocities are computed on the CPU, and the rendering is done on the GPU with WebGL.
+This is a simulation of a galaxy with 10000 stars. Their positions and velocities are computed on the CPU, and the rendering is done on the GPU with WebGL.
 This component is made in C++ and compiled to WebAssembly.
 
 **Your browser must support WebAssembly. Mobile devices are strongly discouraged.**
@@ -64,7 +64,7 @@ This component is made in C++ and compiled to WebAssembly.
 In 3d, the core idea is the same but we use an octree (8 children per node) instead of a quadtree (4 children per node).
 
 <div style="overflow: auto;">
-  <iframe src="/files/barnes-hut/barnes-hut.html" style="width: 800px; height: 800px; border: none; margin: 0 auto;"></iframe>
+  <iframe src="/files/barnes-hut/barnes-hut.html" title="Barnes-Hut WASM simulation" style="width: 800px; height: 800px; border: none; margin: 0 auto;"></iframe>
 </div>
 
 ## Other use cases

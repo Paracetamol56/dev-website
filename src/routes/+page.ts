@@ -24,3 +24,5 @@ export const load: PageLoad = () => {
 
 	return { pages };
 };
+
+export const prerender = true;

@@ -38,7 +38,6 @@
 			return false;
 		}
 		nameError = '';
-		markSavedState(false);
 		return true;
 	};
 	const validateEmail = () => {
@@ -96,6 +95,7 @@
 			placeholder="Name"
 			bind:value={name}
 			on:blur={() => validateName()}
+			on:change={() => markSavedState(false)}
 		/>
 		<span class="text-left text-sm font-semibold text-ctp-red">{nameError}</span>
 	</fieldset>
