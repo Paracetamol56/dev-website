@@ -15,10 +15,16 @@ func InitRouter() *gin.Engine {
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 	r.Use(cors.New(cors.Config{
-		AllowAllOrigins: true,
-		AllowMethods:    []string{"GET", "POST", "PATCH", "DELETE", "OPTIONS"},
-		AllowHeaders:    []string{"Origin", "Content-Type", "Authorization"},
+		AllowOrigins: []string{"http://localhost:8000", "http://localhost:5174", "https://dev.matheo-galuba.com", "https://dev-uat.matheo-galuba.com"},
+		AllowMethods: []string{"GET", "POST", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders: []string{"Origin", "Content-Type", "Authorization"},
 	}))
+	r.Use(func(c *gin.Context) {
+		c.Header("Cross-Origin-Resource-Policy", "cross-origin")
+		c.Header("Cross-Origin-Opener-Policy", "same-origin")
+		c.Header("Cross-Origin-Embedder-Policy", "require-corp")
+		c.Next()
+	})
 
 	// Init controllers
 	auth := new(controllers.AuthController)
@@ -56,11 +62,6 @@ func InitRouter() *gin.Engine {
 	}
 
 	// Static files
-	r.Use(func(c *gin.Context) {
-		c.Header("Cross-Origin-Opener-Policy", "same-origin")
-		c.Header("Cross-Origin-Embedder-Policy", "require-corp")
-		c.Next()
-	})
 	r.Use(static.Serve("/", static.LocalFile("./build", true)))
 	r.NoRoute(func(c *gin.Context) {
 		c.File("./build/index.html")

@@ -119,7 +119,8 @@ async function refreshAccessToken() {
 				// Update the user store
 				user.set({
 					...get(user),
-					accessToken: res.data.accessToken
+					accessToken: res.data.accessToken,
+					refreshToken: res.data.refreshToken
 				});
 			}
 		})

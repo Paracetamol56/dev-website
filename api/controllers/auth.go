@@ -17,6 +17,33 @@ import (
 type AuthController struct {
 }
 
+func SendVerificationEmail(c *gin.Context, user *models.FullUser, url string) error {
+	from := mail.NewEmail("Matheo Galuba", os.Getenv("ADMIN_EMAIL"))
+	subject := "Verify your email address"
+	to := mail.NewEmail(user.Name, user.Email)
+	plainTextContent := "Please verify your email address by clicking the link below:\n" + url
+
+	mail := mail.NewSingleEmail(from, subject, to, plainTextContent, "")
+	client := sendgrid.NewSendClient(os.Getenv("SENDGRID_API_KEY"))
+	response, err := client.Send(mail)
+	if err != nil || response.StatusCode != http.StatusAccepted {
+		return err
+	}
+	return nil
+}
+
+func SignTokenPair(c *gin.Context, userId string) (string, string, error) {
+	refreshtoken, err := utils.SignRefreshToken(userId, 168)
+	if err != nil {
+		return "", "", err
+	}
+	accesstoken, err := utils.SignAccessToken(userId, 1)
+	if err != nil {
+		return "", "", err
+	}
+	return refreshtoken, accesstoken, nil
+}
+
 type LoginBody struct {
 	Email string `json:"email" binding:"required,email"`
 }
@@ -59,21 +86,6 @@ func (controller *AuthController) PostLogin(c *gin.Context) {
 	}
 }
 
-func SendVerificationEmail(c *gin.Context, user *models.FullUser, url string) error {
-	from := mail.NewEmail("Matheo Galuba", os.Getenv("ADMIN_EMAIL"))
-	subject := "Verify your email address"
-	to := mail.NewEmail(user.Name, user.Email)
-	plainTextContent := "Please verify your email address by clicking the link below:\n" + url
-
-	mail := mail.NewSingleEmail(from, subject, to, plainTextContent, "")
-	client := sendgrid.NewSendClient(os.Getenv("SENDGRID_API_KEY"))
-	response, err := client.Send(mail)
-	if err != nil || response.StatusCode != http.StatusAccepted {
-		return err
-	}
-	return nil
-}
-
 type VerifyBody struct {
 	Token string `json:"token" binding:"required"`
 }
@@ -103,18 +115,14 @@ func (controller *AuthController) PostVerify(c *gin.Context) {
 		return
 	}
 
-	refreshtoken, err := utils.SignRefreshToken(user.Id.Hex(), 168)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	accesstoken, err := utils.SignAccessToken(user.Id.Hex(), 1)
+	refreshtoken, accesstoken, err := SignTokenPair(c, userId.Hex())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	user.LastLogin = time.Now()
+	user.LastRefresh = time.Now()
 	if _, err = models.UpdateUser(c, userId, user); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -157,8 +165,15 @@ func (controller *AuthController) PostRefresh(c *gin.Context) {
 		return
 	}
 
+	refreshtoken, err := utils.SignRefreshToken(userIdString, 168)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"accessToken": accesstoken,
+		"accessToken":  accesstoken,
+		"refreshToken": refreshtoken,
 	})
 }
 
