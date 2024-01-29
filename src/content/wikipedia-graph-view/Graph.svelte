@@ -333,7 +333,7 @@
 </div>
 <div
 	id="graph"
-	class="relative bg-ctp-mantle rounded-md shadow-md shadow-ctp-crust w-full aspect-video"
+	class="relative mb-8 bg-ctp-mantle rounded-md shadow-md shadow-ctp-crust w-full aspect-[3/4] md:aspect-[16/9]"
 	bind:clientWidth={width}
 	bind:clientHeight={height}
 >
