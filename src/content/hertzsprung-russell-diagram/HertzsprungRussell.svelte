@@ -1,5 +1,4 @@
 <script lang="ts">
-	import axios from 'axios';
 	import Diagram from './Diagram.svelte';
 	import type { StarHR } from './utils';
 	import { AlertTriangle, Search } from 'lucide-svelte';

@@ -236,6 +236,7 @@ func (controller *AuthController) PostGithubLogin(c *gin.Context) {
 	}
 
 	user.LastLogin = time.Now()
+	user.LastRefresh = time.Now()
 	if _, err := models.UpdateUser(c, user.Id, user); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

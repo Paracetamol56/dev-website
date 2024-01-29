@@ -83,7 +83,7 @@
 			<h2 use:melt={$title} class="m-0 text-lg font-medium text-ctp-text">Login</h2>
 			
 			<div class="mt-6 flex justify-center gap-4">
-				<Button link={`https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${window.location.origin}/verify/github?path=/&scope=user:email`}>
+				<Button link={`https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${window.location.origin}/verify/github?path=${window.location.pathname}&scope=user:email`}>
 					<span>Continue with GitHub</span>
 					<Github size="16" />
 				</Button>

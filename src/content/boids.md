@@ -27,7 +27,7 @@ Crowd intelligence, artificial neural network, protein folding, or life on earth
 Very good video about boids by Mehdi Moussaid from [Fouloscopie](https://www.youtube.com/@Fouloscopie) in 5 levels of difficulty (in French):
 
 <div class="flex justify-center">
-  <iframe width="560" height="315" src="https://www.youtube.com/embed/Ch7VxxTBe1c?si=OUbHv3_f3D8n98Wa" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/Ch7VxxTBe1c?si=OUbHv3_f3D8n98Wa" credentialless title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 </div>
 
 ## The rules of boids

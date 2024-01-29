@@ -21,7 +21,7 @@
 		elements: { close, content, title, description },
 		states: { open }
 	} = createDialog({
-		forceVisible: true,
+		forceVisible: false,
 		closeOnOutsideClick: false,
 		defaultOpen: true,
 		preventScroll: false
