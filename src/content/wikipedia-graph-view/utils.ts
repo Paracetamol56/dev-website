@@ -1,15 +1,16 @@
 
-type Page = {
+type WikiNode = {
   title: string;
+  expanded?: boolean;
 };
 
-type Link = {
+type WikiLink = {
   source: string;
   target: string;
 };
 
-function extractLinks(html: string): Page[] {
-  const pages: Page[] = [];
+function extractLinks(html: string): WikiNode[] {
+  const pages: WikiNode[] = [];
   // Wikipedia link regex (eg. <a rel="mw:WikiLink" href="./Cookbook" title="Cookbook" id="mw_w">cook-book</a>)
   const linkRegex = /<a rel="mw:WikiLink" href="\.\/([^"]+)" title="([^"]+)"[^>]*>[^<]+<\/a>/g;
   let match: RegExpExecArray | null;
@@ -23,5 +24,5 @@ function extractLinks(html: string): Page[] {
   return pages;
 }
 
-export type { Page, Link };
+export type { WikiNode, WikiLink };
 export { extractLinks };
