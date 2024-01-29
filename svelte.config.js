@@ -39,7 +39,11 @@ const config = {
 			assets: 'build',
 			fallback: 'index.html',
 			strict: false
-		})
+		}),
+		prerender: {
+			crawl: true,
+			handleHttpError: 'warn',
+		}
 	}
 };
 
