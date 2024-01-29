@@ -2,7 +2,7 @@
 	import '../app.postcss';
 	import Button from '$lib/components/Button.svelte';
 	import { createDialog, melt } from '@melt-ui/svelte';
-	import { Send, X } from 'lucide-svelte';
+	import { Github, Send, X } from 'lucide-svelte';
 	import { addToast } from './+layout.svelte';
 	import { writable, type Writable } from 'svelte/store';
 	import { fade, fly } from 'svelte/transition';
@@ -19,6 +19,8 @@
 
 	let email = '';
 	let emailError = '';
+
+	const GITHUB_CLIENT_ID = '566de517d2c2d47ad218';
 
 	function validateEmail(): boolean {
 		if (email.length == 0) {
@@ -79,6 +81,19 @@
 			use:melt={$content}
 		>
 			<h2 use:melt={$title} class="m-0 text-lg font-medium text-ctp-text">Login</h2>
+			
+			<div class="mt-6 flex justify-center gap-4">
+				<Button link={`https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${window.location.origin}/verify/github?path=/&scope=user:email`}>
+					<span>Continue with GitHub</span>
+					<Github size="16" />
+				</Button>
+			</div>
+			<div class="my-4 flex justify-between items-center">
+				<span class="w-full h-px bg-ctp-text opacity-20" />
+				<strong class="mx-4">OR</strong>
+				<span class="w-full h-px bg-ctp-text opacity-20" />
+			</div>
+			
 			<p use:melt={$description} class="mb-5 mt-2 leading-normal text-ctp-text">
 				This is a passwordless authentication. We only need your email to send you a magic link.
 				<br />
@@ -100,13 +115,14 @@
 					/>
 				</fieldset>
 				<p class="mb-4 text-right text-sm text-ctp-red">{emailError}</p>
-				<div class="mt-6 flex justify-end gap-4">
+				<div class="mt-6 flex justify-center gap-4">
 					<Button type="submit">
 						<span>Send the magic link</span>
 						<Send size="16" />
 					</Button>
 				</div>
 			</form>
+
 			<button
 				use:melt={$close}
 				aria-label="close"

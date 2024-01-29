@@ -79,7 +79,7 @@ func (controller *AuthController) PostLogin(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	link := c.GetHeader("Origin") + "/verify?token=" + verificationToken + "&redirect=" + c.GetHeader("Referer")
+	link := c.GetHeader("Origin") + "/verify/email?token=" + verificationToken + "&redirect=" + c.GetHeader("Referer")
 	if err := SendVerificationEmail(c, user, link); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -177,19 +177,19 @@ func (controller *AuthController) PostRefresh(c *gin.Context) {
 	})
 }
 
-func (controller *AuthController) GetGithubLogin(c *gin.Context) {
-	code := c.Query("code")
-	if code == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Code not found"})
+type GithubLoginBody struct {
+	Code string `json:"code" binding:"required"`
+}
+
+func (controller *AuthController) PostGithubLogin(c *gin.Context) {
+	body := GithubLoginBody{}
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
 		return
-	}
-	path := c.Query("path")
-	if path == "" {
-		path = "/"
 	}
 
 	// Get access token
-	accessToken, err := utils.GetGithubAccessToken(code)
+	accessToken, err := utils.GetGithubAccessToken(body.Code)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -212,11 +212,12 @@ func (controller *AuthController) GetGithubLogin(c *gin.Context) {
 	if user == nil {
 		// If not, create it
 		result, err := models.CreateUser(c, &models.FullUser{
-			Email:          githubUser.Email,
-			Name:           githubUser.Name,
-			Flavour:        "mocha",
-			ProfilePicture: githubUser.AvatarUrl,
-			Github:         githubUser,
+			Email:             githubUser.Email,
+			Name:              githubUser.Name,
+			Flavour:           "mocha",
+			ProfilePicture:    githubUser.AvatarUrl,
+			GitHubAccessToken: accessToken,
+			Github:            githubUser,
 		})
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -230,6 +231,7 @@ func (controller *AuthController) GetGithubLogin(c *gin.Context) {
 		}
 	} else if user.Github == nil {
 		// If it exists but doesn't have a github account, update it
+		user.GitHubAccessToken = accessToken
 		user.Github = githubUser
 	}
 
@@ -239,5 +241,21 @@ func (controller *AuthController) GetGithubLogin(c *gin.Context) {
 		return
 	}
 
-	c.Redirect(http.StatusFound, path)
+	accesstoken, err := utils.SignAccessToken(user.Id.Hex(), 1)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	refreshtoken, err := utils.SignRefreshToken(user.Id.Hex(), 168)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"accessToken":  accesstoken,
+		"refreshToken": refreshtoken,
+		"user":         user,
+	})
 }

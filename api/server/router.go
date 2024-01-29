@@ -44,7 +44,7 @@ func InitRouter() *gin.Engine {
 			authGroup.POST("/verify", auth.PostVerify)
 			authGroup.POST("/refresh", auth.PostRefresh)
 			// Third party auth
-			authGroup.GET("/github", auth.GetGithubLogin)
+			authGroup.POST("/github", auth.PostGithubLogin)
 		}
 		hipparcosGroup := apiGroup.Group("/hipparcos")
 		{

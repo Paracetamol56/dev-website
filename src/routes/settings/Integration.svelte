@@ -4,7 +4,6 @@
 	import type { UserSettings } from './userSettings';
 
 	const GITHUB_CLIENT_ID = '566de517d2c2d47ad218';
-	const redirect_uri = window.location.origin + '/api/auth/github';
 
 	export let userSettings: Writable<UserSettings | null>;
 </script>
@@ -31,7 +30,7 @@
 	{:else}
 		<div class="flex justify-start">
 			<a
-				href={`https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${redirect_uri}?path=/settings&scope=user:email`}
+				href={`https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${window.location.origin}/verify/github?path=/settings&scope=user:email`}
 				class="flex items-center gap-1 rounded-md bg-ctp-mauve px-3 py-1
   font-semibold text-ctp-mantle
   shadow-md shadow-ctp-crust transition-opacity

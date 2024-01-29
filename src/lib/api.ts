@@ -57,22 +57,8 @@ async function verify(token: string, redirect: string) {
 				goto(redirect);
 				return;
 			}
-			// Write the user to the store
-			user.set({
-				accessToken: reponse.data.accessToken,
-				refreshToken: reponse.data.refreshToken,
-				id: reponse.data.user.id,
-				email: reponse.data.user.email,
-				flavour: reponse.data.user.flavour
-			});
-
-			addToast({
-				data: {
-					title: 'Successfully logged in',
-					description: 'You are now logged in',
-					color: 'bg-ctp-green'
-				}
-			});
+			
+			persistUser(reponse);
 			goto(redirect);
 		})
 		.catch(() => {
@@ -85,6 +71,24 @@ async function verify(token: string, redirect: string) {
 			});
 			goto(redirect);
 		});
+}
+
+function persistUser(apiResponse: any) {
+	user.set({
+		accessToken: apiResponse.data.accessToken,
+		refreshToken: apiResponse.data.refreshToken,
+		id: apiResponse.data.user.id,
+		email: apiResponse.data.user.email,
+		flavour: apiResponse.data.user.flavour
+	});
+
+	addToast({
+		data: {
+			title: 'Successfully logged in',
+			description: 'You are now logged in',
+			color: 'bg-ctp-green'
+		}
+	});
 }
 
 function logout() {
@@ -164,4 +168,4 @@ async function call(method: string, path: string, json?: any) {
 	});
 }
 
-export default { login, verify, logout, callWithAuth, call };
+export default { login, verify, persistUser, logout, callWithAuth, call };

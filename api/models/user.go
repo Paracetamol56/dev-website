@@ -52,26 +52,22 @@ type User struct {
 }
 
 type FullUser struct {
-	Id             primitive.ObjectID `json:"id" bson:"_id,omitempty"`
-	Name           string             `json:"name" bson:"name"`
-	Email          string             `json:"email" bson:"email"`
-	CreatedAt      time.Time          `json:"createdAt" bson:"createdAt,omitempty"`
-	LastLogin      time.Time          `json:"lastLogin" bson:"lastLogin,omitempty"`
-	LastRefresh    time.Time          `json:"lastRefresh" bson:"lastRefresh,omitempty"`
-	Flavour        string             `json:"flavour" bson:"flavour"`
-	ProfilePicture string             `json:"profilePicture,omitempty" bson:"profilePicture,omitempty"`
-	Github         *GitHubUser        `json:"github,omitempty" bson:"github,omitempty"`
+	Id                primitive.ObjectID `json:"id" bson:"_id,omitempty"`
+	Name              string             `json:"name" bson:"name"`
+	Email             string             `json:"email" bson:"email"`
+	CreatedAt         time.Time          `json:"createdAt" bson:"createdAt,omitempty"`
+	LastLogin         time.Time          `json:"lastLogin" bson:"lastLogin,omitempty"`
+	LastRefresh       time.Time          `json:"lastRefresh" bson:"lastRefresh,omitempty"`
+	Flavour           string             `json:"flavour" bson:"flavour"`
+	ProfilePicture    string             `json:"profilePicture,omitempty" bson:"profilePicture,omitempty"`
+	GitHubAccessToken string             `json:"githubAccessToken,omitempty" bson:"githubAccessToken,omitempty"`
+	Github            *GitHubUser        `json:"github,omitempty" bson:"github,omitempty"`
 }
 
 func CreateUser(c *gin.Context, user *FullUser) (*mongo.InsertOneResult, error) {
 	db := db.GetDB()
 	collection := db.Collection("users")
-	result, err := collection.InsertOne(c, bson.M{
-		"name":      user.Name,
-		"email":     user.Email,
-		"flavour":   user.Flavour,
-		"createdAt": time.Now(),
-	})
+	result, err := collection.InsertOne(c, user)
 	return result, err
 }
 
@@ -100,6 +96,9 @@ func GetFullUserByEmail(c *gin.Context, email string) (*FullUser, error) {
 	collection := db.Collection("users")
 	var user FullUser
 	if err := collection.FindOne(c, bson.M{"email": email, "deletedAt": bson.M{"$exists": false}}).Decode(&user); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, nil
+		}
 		return nil, err
 	}
 	return &user, nil
