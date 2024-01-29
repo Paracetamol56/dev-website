@@ -108,13 +108,14 @@ func UpdateUser(c *gin.Context, id primitive.ObjectID, user *FullUser) (*mongo.U
 	db := db.GetDB()
 	collection := db.Collection("users")
 	result, err := collection.UpdateOne(c, bson.M{"_id": id}, bson.M{"$set": bson.M{
-		"name":           user.Name,
-		"email":          user.Email,
-		"flavour":        user.Flavour,
-		"profilePicture": user.ProfilePicture,
-		"lastLogin":      user.LastLogin,
-		"lastRefresh":    user.LastRefresh,
-		"github":         user.Github,
+		"name":              user.Name,
+		"email":             user.Email,
+		"flavour":           user.Flavour,
+		"profilePicture":    user.ProfilePicture,
+		"lastLogin":         user.LastLogin,
+		"lastRefresh":       user.LastRefresh,
+		"githubAccessToken": user.GitHubAccessToken,
+		"github":            user.Github,
 	}})
 	return result, err
 }

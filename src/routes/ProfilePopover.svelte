@@ -20,6 +20,7 @@
 				color: 'bg-ctp-green'
 			}
 		});
+		location.reload();
 	};
 
 	const {
