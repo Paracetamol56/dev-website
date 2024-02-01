@@ -4,7 +4,7 @@ description: A simulation of flocking birds
 categories:
   - computer science
   - simulation
-published: true
+listed: true
 ---
 
 <script>

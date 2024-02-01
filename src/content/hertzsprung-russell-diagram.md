@@ -5,7 +5,7 @@ categories:
   - astronomy
   - computer-science
   - data-science
-published: true
+listed: true
 ---
 
 <script>

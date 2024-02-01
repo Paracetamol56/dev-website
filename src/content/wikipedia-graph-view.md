@@ -4,7 +4,7 @@ description: A graph view of Wikipedia pages and their links
 categories:
   - computer science
   - data visualization
-published: true
+listed: true
 ---
 
 <script>

@@ -5,7 +5,7 @@ type Page = {
 	slug: string;
 	description: string;
 	categories: Categories[];
-	published: boolean;
+	listed: boolean;
 };
 
 export type { Categories, Page };

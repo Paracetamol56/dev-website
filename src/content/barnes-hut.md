@@ -6,7 +6,7 @@ categories:
   - simulation
   - astronomy
   - physics
-published: true
+listed: true
 ---
 
 <script>

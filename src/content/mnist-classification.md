@@ -5,7 +5,7 @@ categories:
   - ai
   - computer-science
   - machine-learning
-published: true
+listed: true
 ---
 
 <script>

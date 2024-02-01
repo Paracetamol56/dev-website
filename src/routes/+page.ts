@@ -18,7 +18,7 @@ export const load: PageLoad = () => {
 		if (slug && typeof file === 'object' && 'metadata' in file) {
 			const metadata: Omit<Page, 'slug'> = file.metadata;
 			const page: Page = { ...metadata, slug } satisfies Page;
-			if (page.published) pages.push(page);
+			if (page.listed) pages.push(page);
 		}
 	}
 

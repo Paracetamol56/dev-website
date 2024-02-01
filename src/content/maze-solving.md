@@ -4,7 +4,7 @@ description: Different algorithms for solving mazes and more generally search pr
 categories:
   - ai
   - computer-science
-published: true
+listed: true
 ---
 
 <script>

@@ -95,12 +95,12 @@
 			</div>
 			
 			<p use:melt={$description} class="mb-5 mt-2 leading-normal text-ctp-text">
-				This is a passwordless authentication. We only need your email to send you a magic link.
+				This is a passwordless authentication. I only need your email to send you a magic link.
 				<br />
 				<strong> Don't forget to check your spam folder! </strong>
 			</p>
 
-			<form on:submit={handleSubmit}>
+			<form on:submit={handleSubmit} class="mb-5">
 				<fieldset class="flex items-center gap-5">
 					<label class="text-right text-ctp-text" for="name"> Email </label>
 					<input
@@ -122,6 +122,12 @@
 					</Button>
 				</div>
 			</form>
+
+			<p class="text-right">
+				<small>
+					Check the <a class="text-ctp-mauve" href="/page/privacy-policy">privacy policy</a>.
+				</small>
+			</p>
 
 			<button
 				use:melt={$close}
