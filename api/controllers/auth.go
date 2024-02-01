@@ -21,14 +21,61 @@ func SendVerificationEmail(c *gin.Context, user *models.FullUser, url string) er
 	from := mail.NewEmail("Matheo Galuba", os.Getenv("ADMIN_EMAIL"))
 	subject := "Verify your email address"
 	to := mail.NewEmail(user.Name, user.Email)
-	plainTextContent := "Please verify your email address by clicking the link below:\n" + url
+	htmlContent := `
+		<h1>Verify your email address</h1>
+		<p>
+			👋 Hi,<br>
+			Thanks for signing up to my website!<br>
+			Please verify your email address by clicking the link below.
+		</p>
 
-	mail := mail.NewSingleEmail(from, subject, to, plainTextContent, "")
+		<a href="` + url + `">Verify your email address</a>
+
+		<p>
+			Thanks,<br>
+			Mathéo
+		</p>
+
+		<br>
+
+		<h4>🌱 Why is this email ugly?</h4>
+		<p>
+			This email is voluntarily ugly because it's lightweight, so the environment impact is reduced..<br>
+			By the way, this email is single-use, so you can delete it to avoid keeping it on someone's else hard drive 😎.
+		</p>
+
+		<p><small>If you didn't sign up to my website, please ignore this email.</small></p>
+	`
+
+	mail := mail.NewSingleEmail(from, subject, to, "", htmlContent)
 	client := sendgrid.NewSendClient(os.Getenv("SENDGRID_API_KEY"))
 	response, err := client.Send(mail)
 	if err != nil || response.StatusCode != http.StatusAccepted {
 		return err
 	}
+	return nil
+}
+
+func AddContact(c *gin.Context, user *models.FullUser) error {
+	host := "https://api.sendgrid.com"
+	request := sendgrid.GetRequest(os.Getenv("SENDGRID_API_KEY"), "/v3/marketing/contacts", host)
+	request.Method = "PUT"
+	request.Body = []byte(`{
+		"list_ids": [
+			"` + os.Getenv("SENDGRID_CONTACT_LIST_ID") + `"
+		],
+		"contacts": [
+			{
+				"email": "` + user.Email + `"
+			}
+		]
+	}`)
+
+	response, err := sendgrid.API(request)
+	if err != nil || response.StatusCode != http.StatusAccepted {
+		return err
+	}
+
 	return nil
 }
 
@@ -51,7 +98,7 @@ type LoginBody struct {
 func (controller *AuthController) PostLogin(c *gin.Context) {
 	var login LoginBody
 	if err := c.ShouldBindJSON(&login); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -114,6 +161,8 @@ func (controller *AuthController) PostVerify(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "User not found"})
 		return
 	}
+
+	AddContact(c, user)
 
 	refreshtoken, accesstoken, err := SignTokenPair(c, userId.Hex())
 	if err != nil {

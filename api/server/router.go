@@ -15,7 +15,7 @@ func InitRouter() *gin.Engine {
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 	r.Use(cors.New(cors.Config{
-		AllowOrigins: []string{"http://localhost:8000", "http://localhost:5174", "https://dev.matheo-galuba.com", "https://dev-uat.matheo-galuba.com"},
+		AllowOrigins: []string{"http://localhost:8000", "http://localhost:5173", "https://dev.matheo-galuba.com", "https://dev-uat.matheo-galuba.com"},
 		AllowMethods: []string{"GET", "POST", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders: []string{"Origin", "Content-Type", "Authorization"},
 	}))
