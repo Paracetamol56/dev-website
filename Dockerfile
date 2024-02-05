@@ -8,6 +8,7 @@ RUN npm run build
 FROM golang:alpine AS api-builder
 WORKDIR /app
 COPY api /app/api
+COPY docs /app/docs
 COPY go.* /app/
 COPY *.go /app/
 RUN go build -buildmode=exe -buildvcs=false -mod=readonly -v
