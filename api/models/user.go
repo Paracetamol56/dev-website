@@ -1,6 +1,7 @@
 package models
 
 import (
+	"context"
 	"time"
 
 	"github.com/Paracetamol56/dev-website/api/db"
@@ -136,5 +137,12 @@ func DeleteUser(c *gin.Context, id primitive.ObjectID) (*mongo.UpdateResult, err
 		"deletedAt": bson.M{"$exists": true},
 	},
 	})
+	return result, err
+}
+
+func DeleteOldUsers(c context.Context) (*mongo.DeleteResult, error) {
+	db := db.GetDB()
+	collection := db.Collection("users")
+	result, err := collection.DeleteMany(c, bson.M{"deletedAt": bson.M{"$lt": time.Now().AddDate(0, 0, -30)}})
 	return result, err
 }
