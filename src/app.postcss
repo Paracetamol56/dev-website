@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import font Inter located in fonts/Inter/Inter-VariableFont_slnt,wght.ttf */
+@font-face {
+	font-family: 'Inter';
+	font-style: normal;
+	font-weight: 100 200 300 400 500 600 700 800 900;
+	src: url('$lib/fonts/Inter/Inter-VariableFont_slnt,wght.ttf') format('truetype-variations');
+}
+
+/* Import font Fira_Code located in /fonts/Fira_Code/FiraCode-VariableFont_wght.ttf */
+@font-face {
+	font-family: 'Fira Code';
+	font-style: monospace;
+	font-weight: 300 400 500 600 700;
+	src: url('$lib/fonts/Fira_Code/FiraCode-VariableFont_wght.ttf') format('truetype-variations');
+}
+
+body {
+	font-family: 'Inter', sans-serif;
+}
+
+article .content:not(.content-ignore) h1 {
+	@apply mt-12 mb-6 text-6xl font-bold text-ctp-lavender;
+}
+
+article .content:not(.content-ignore) h2 {
+	@apply mt-8 mb-4 text-4xl font-bold text-ctp-lavender;
+}
+
+article .content:not(.content-ignore) h3 {
+	@apply mt-6 mb-3 text-2xl font-bold text-ctp-lavender;
+}
+
+article .content:not(.content-ignore) h4 {
+	@apply mt-4 mb-2 text-xl font-bold text-ctp-lavender;
+}
+
+article .content:not(.content-ignore) h5 {
+	@apply mt-4 mb-2 text-lg font-bold text-ctp-lavender;
+}
+
+article .content:not(.content-ignore) h6 {
+	@apply mt-4 mb-2 text-base font-bold text-ctp-lavender;
+}
+
+article .content:not(.content-ignore) p {
+	@apply mb-2 text-base;
+}
+
+article .content:not(.content-ignore) a {
+	@apply text-ctp-blue;
+}
+
+article .content:not(.content-ignore) a:hover {
+	@apply text-ctp-blue underline;
+}
+
+article .content:not(.content-ignore) img {
+	@apply my-4 mx-auto;
+}
+
+article .content:not(.content-ignore) ul {
+	@apply list-disc list-inside;
+}
+
+article .content:not(.content-ignore) ol {
+	@apply list-decimal list-inside;
+}
+
+article .content:not(.content-ignore) blockquote {
+	@apply border-l-4 border-ctp-lavender text-ctp-lavender pl-4;
+}

@@ -1,59 +1,98 @@
-<script>
-	import Counter from './Counter.svelte';
-	import welcome from '$lib/images/svelte-welcome.webp';
-	import welcome_fallback from '$lib/images/svelte-welcome.png';
+<script lang="ts">
+	import type { PageData } from './$types';
+
+	export let data: PageData;
+
+	let scrollY: number;
+	let section0: HTMLElement;
+	let section1: HTMLElement;
 </script>
 
+<svelte:window bind:scrollY />
+
 <svelte:head>
-	<title>Home</title>
-	<meta name="description" content="Svelte demo app" />
+	<title>Home - Mathéo Galuba</title>
 </svelte:head>
 
-<section>
-	<h1>
-		<span class="welcome">
-			<picture>
-				<source srcset={welcome} type="image/webp" />
-				<img src={welcome_fallback} alt="Welcome" />
-			</picture>
-		</span>
-
-		to your new<br />SvelteKit app
-	</h1>
-
-	<h2>
-		try editing <strong>src/routes/+page.svelte</strong>
-	</h2>
-
-	<Counter />
+<section class="container mx-auto mb-32" bind:this={section0}>
+	<hgroup>
+		<h1 class="mb-8 text-6xl font-bold text-center">
+			<span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender"
+				>Welcome</span
+			> to my website
+		</h1>
+	</hgroup>
 </section>
 
-<style>
-	section {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		flex: 0.6;
-	}
+<section class="relative container mx-auto mb-32" bind:this={section1}>
+	<span
+		class="absolute top-0 left-1/2 transform -translate-x-1/2
+					text-9xl font-black text-transparent text-outline-2 opacity-20 z-0"
+		style="transform: translate(-50%, {(scrollY - section1?.offsetTop + 300) / 5}px);"
+	>
+		Pages
+	</span>
+	<div class=" flex flex-col items-center justify-center">
+		<h2 class="mb-2 text-4xl font-bold">Pages</h2>
+		<p class="text-ctp-subtext0">Pages with various content...</p>
+		<hr class="my-8 h-1 w-6 border-none rounded-full bg-ctp-mauve" />
+	</div>
+	<div class="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
+		{#each data.pages as page}
+			<div class="p-8 bg-ctp-crust/50 backdrop-blur-sm rounded-md shadow-md shadow-ctp-crust z-10">
+				<div class="mb-2 flex justify-left flex-wrap gap-x-2 items-center">
+					{#each page.categories as category}
+						<a href="/">
+							<span class="text-sm font-semibold text-ctp-lavender">#{category}</span>
+						</a>
+					{/each}
+				</div>
+				<a href="/page/{page.slug}">
+					<h4 class="mb-4 text-2xl font-bold hover:opacity-75 transition-opacity">
+						{page.title}
+					</h4>
+					<p class="text-ctp-subtext0">{page.description}</p>
+				</a>
+			</div>
+		{/each}
+	</div>
+	<!--<div class="my-4 flex justify-center">
+		<Pagination page={pageNumber} count={data.pages.length} perPage={6} />
+	</div>-->
+</section>
 
-	h1 {
-		width: 100%;
-	}
+<!--
+<section class="relative container mx-auto" bind:this={section2}>
+	<span
+		class="absolute top-0 left-1/2 transform -translate-x-1/2
+					text-9xl font-black text-transparent text-outline-2 opacity-20 z-0"
+		style="transform: translate(-50%, {(scrollY - section2?.offsetTop + 300) / 5}px);"
+	>
+		Tools
+	</span>
+	<div class=" flex flex-col items-center justify-center">
+		<h2 class="mb-2 text-4xl font-bold">Tools</h2>
+		<p class="text-ctp-subtext0">Tools to help you in your daily life...</p>
+		<hr class="my-8 h-1 w-6 border-none rounded-full bg-ctp-mauve" />
+	</div>
+	<div class="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
+		{#each data.tools as tool}
+			<div class="p-8 bg-ctp-crust/50 backdrop-blur-sm rounded-md shadow-md shadow-ctp-crust z-10">
+				<div class="mb-2 flex justify-left flex-wrap gap-x-2 items-center">
+				</div>
+				<a href={tool.path}>
+					<h4 class="mb-4 text-2xl font-bold hover:opacity-75 transition-opacity">{tool.title}</h4>
+					<p class="text-ctp-subtext0">{tool.description}</p>
+				</a>
+			</div>
+		{/each}
+	</div>
+</section>
+-->
 
-	.welcome {
-		display: block;
-		position: relative;
-		width: 100%;
-		height: 0;
-		padding: 0 0 calc(100% * 495 / 2048) 0;
-	}
-
-	.welcome img {
-		position: absolute;
-		width: 100%;
-		height: 100%;
-		top: 0;
-		display: block;
+<style lang="postcss">
+	.text-outline-2 {
+		-webkit-text-stroke-width: 2px;
+		-webkit-text-stroke-color: theme('colors.ctp-text.DEFAULT');
 	}
 </style>

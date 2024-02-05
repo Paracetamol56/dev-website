@@ -1,12 +1,21 @@
-FROM oven/bun:latest AS builder
-
+FROM node:lts-alpine AS www-builder
 WORKDIR /app
+COPY ./package*.json ./
+RUN npm install
 COPY . .
-RUN bun install
-RUN bun run build
+RUN npm run build
 
-FROM oven/bun:latest AS runner
-
+FROM golang:alpine AS api-builder
 WORKDIR /app
-COPY --from=builder /app/build .
-ENTRYPOINT ["bun", "./index.js"]
+COPY api /app/api
+COPY docs /app/docs
+COPY go.* /app/
+COPY *.go /app/
+RUN go build -buildmode=exe -buildvcs=false -mod=readonly -v
+
+FROM alpine:latest AS runner
+WORKDIR /app
+COPY --from=www-builder /app/build /app/build
+COPY --from=api-builder /app/dev-website /app/api
+EXPOSE 8080
+CMD ./api -docker
