@@ -17,6 +17,8 @@ import (
 type AuthController struct {
 }
 
+// SendVerificationEmail godoc
+// Sends a verification email to the user with the provided url
 func SendVerificationEmail(c *gin.Context, user *models.FullUser, url string) error {
 	from := mail.NewEmail("Matheo Galuba", os.Getenv("ADMIN_EMAIL"))
 	subject := "Verify your email address"
@@ -56,6 +58,8 @@ func SendVerificationEmail(c *gin.Context, user *models.FullUser, url string) er
 	return nil
 }
 
+// AddContact godoc
+// Adds the user to the SendGrid contact list
 func AddContact(c *gin.Context, user *models.FullUser) error {
 	host := "https://api.sendgrid.com"
 	request := sendgrid.GetRequest(os.Getenv("SENDGRID_API_KEY"), "/v3/marketing/contacts", host)
@@ -79,6 +83,8 @@ func AddContact(c *gin.Context, user *models.FullUser) error {
 	return nil
 }
 
+// SignTokenPair godoc
+// Signs a refresh token and an access token for the user with the provided id
 func SignTokenPair(c *gin.Context, userId string) (string, string, error) {
 	refreshtoken, err := utils.SignRefreshToken(userId, 168)
 	if err != nil {
@@ -95,6 +101,16 @@ type LoginBody struct {
 	Email string `json:"email" binding:"required,email"`
 }
 
+// PostLogin godoc
+//	@Summary		Login or register a user
+//	@Description	Login or register a user by email
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body		LoginBody	true	"Email"
+//	@Success		200		{object}	models.FullUser
+//	@Failure		400
+//	@Router			/auth/login [post]
 func (controller *AuthController) PostLogin(c *gin.Context) {
 	var login LoginBody
 	if err := c.ShouldBindJSON(&login); err != nil {
@@ -137,6 +153,16 @@ type VerifyBody struct {
 	Token string `json:"token" binding:"required"`
 }
 
+// PostVerify godoc
+//	@Summary		Verify a user's email
+//	@Description	Verify a user's email by token
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body		VerifyBody	true	"Token"
+//	@Success		200		{object}	models.FullUser
+//	@Failure		400
+//	@Router			/auth/verify [post]
 func (controller *AuthController) PostVerify(c *gin.Context) {
 	var verify VerifyBody
 	if err := c.ShouldBindJSON(&verify); err != nil {
@@ -184,6 +210,16 @@ func (controller *AuthController) PostVerify(c *gin.Context) {
 	})
 }
 
+// PostRefresh godoc
+//	@Summary		Refresh a user's access token
+//	@Description	Refresh a user's access token by refresh token
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body		VerifyBody	true	"Refresh token"
+//	@Success		200		{object}	map[string]string
+//	@Failure		400
+//	@Router			/auth/refresh [post]
 func (controller *AuthController) PostRefresh(c *gin.Context) {
 	verrify := VerifyBody{}
 	if err := c.ShouldBindJSON(&verrify); err != nil {
@@ -230,6 +266,16 @@ type GithubLoginBody struct {
 	Code string `json:"code" binding:"required"`
 }
 
+// PostGithubLogin godoc
+//	@Summary		Login or register a user with GitHub
+//	@Description	Login or register a user with GitHub by code
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body		GithubLoginBody	true	"Code"
+//	@Success		200		{object}	map[string]interface{}
+//	@Failure		400
+//	@Router			/auth/github/login [post]
 func (controller *AuthController) PostGithubLogin(c *gin.Context) {
 	body := GithubLoginBody{}
 	if err := c.ShouldBindJSON(&body); err != nil {

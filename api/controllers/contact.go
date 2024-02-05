@@ -22,6 +22,16 @@ type ContactBody struct {
 	Message string             `json:"message" binding:"required,min=10,max=1000"`
 }
 
+// PostContact godoc
+//	@Summary		Send a contact message
+//	@Description	Send a contact message
+//	@Tags			contact
+//	@Accept			json
+//	@Produce		json
+//	@Param			contact	body	ContactBody	true	"Contact message"
+//	@Success		201
+//	@Failure		400
+//	@Router			/contact [post]
 func (controller *ContactController) PostContact(c *gin.Context) {
 	var contact ContactBody
 	if err := c.ShouldBindJSON(&contact); err != nil {

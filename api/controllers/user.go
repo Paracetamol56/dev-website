@@ -11,6 +11,18 @@ import (
 type UserController struct {
 }
 
+// GetUsers godoc
+//	@Summary		Get one user
+//	@Description	Get one user by id
+//	@Note			Returns a full user if the user is the same as the one making the request
+//	@Tags			user
+//	@Produce		json
+//	@Param			id	path		string	true	"User ID"
+//	@Success		200	{object}	models.FullUser
+//	@Failure		400
+//	@Failure		404
+//	@Security		Bearer
+//	@Router			/user/{id} [get]
 func (controller *UserController) GetUser(c *gin.Context) {
 	userId, err := primitive.ObjectIDFromHex(c.Param("id"))
 	if err != nil {
@@ -41,6 +53,20 @@ type PatchUserBody struct {
 	ProfilePicture string `json:"profilePicture" binding:"omitempty,url"`
 }
 
+// PatchUser godoc
+//	@Summary		Update a user
+//	@Description	Update a user by id
+//	@Tags			user
+//	@Accept			json
+//	@Produce		json
+//	@Param			id			path		string			true	"User ID"
+//	@Param			patchUser	body		PatchUserBody	true	"User data"
+//	@Success		200			{object}	models.FullUser
+//	@Failure		400
+//	@Failure		403
+//	@Failure		404
+//	@Security		Bearer
+//	@Router			/user/{id} [patch]
 func (controller *UserController) PatchUser(c *gin.Context) {
 	userId, err := primitive.ObjectIDFromHex(c.Param("id"))
 	if err != nil {
@@ -84,6 +110,18 @@ func (controller *UserController) PatchUser(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
+// DeleteUser godoc
+//	@Summary		Delete a user
+//	@Description	Delete a user by id
+//	@Tags			user
+//	@Produce		json
+//	@Param			id	path	string	true	"User ID"
+//	@Success		204
+//	@Failure		400
+//	@Failure		403
+//	@Failure		404
+//	@Security		Bearer
+//	@Router			/user/{id} [delete]
 func (controller *UserController) DeleteUser(c *gin.Context) {
 	userIdString := c.Param("id")
 	userId, err := primitive.ObjectIDFromHex(userIdString)
@@ -111,6 +149,18 @@ func (controller *UserController) DeleteUser(c *gin.Context) {
 	c.JSON(http.StatusNoContent, nil)
 }
 
+// GetExport godoc
+//	@Summary		Get user export
+//	@Description	Get user export by id
+//	@Tags			user
+//	@Produce		json
+//	@Param			id	path		string	true	"User ID"
+//	@Success		200	{object}	models.FullUser
+//	@Failure		400
+//	@Failure		403
+//	@Failure		404
+//	@Security		Bearer
+//	@Router			/user/{id}/export [get]
 func (controller *UserController) GetExport(c *gin.Context) {
 	userIdString := c.Param("id")
 	userId, err := primitive.ObjectIDFromHex(userIdString)

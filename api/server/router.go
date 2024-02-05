@@ -6,6 +6,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
+
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -35,8 +36,8 @@ func InitRouter() *gin.Engine {
 
 	apiGroup := r.Group("/api")
 	{
-		apiGroup.GET("/health", heatlh.GetHealth)
 		apiGroup.GET("/doc/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+		apiGroup.GET("/health", heatlh.GetHealth)
 		apiGroup.POST("/contact", contact.PostContact)
 		authGroup := apiGroup.Group("/auth")
 		{
