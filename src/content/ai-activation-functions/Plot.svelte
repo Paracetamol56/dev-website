@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { user } from '$lib/store';
+	import { variants } from '@catppuccin/palette';
+	import * as Plot from '@observablehq/plot';
 	import * as d3 from 'd3';
 
 	export let fx: (x: number) => number;
@@ -6,24 +9,29 @@
 	export let yDomain: [number, number] = [0, 1];
 	export let width: number = 500;
 	export let height: number = 300;
-	let margin = { top: 20, right: 20, bottom: 30, left: 40 };
 
-	let gx: SVGGElement;
-	let gy: SVGGElement;
+	$: fxPts = d3.ticks(xDomain[0], xDomain[1], 200).map((x) => ({ x, ϕ: fx(x) }));
+	$: derivPts = d3.ticks(xDomain[0], xDomain[1], 200).map((n) => ({ n, O: (fx(n + 0.01) - fx(n - 0.01)) / 0.02 }));
 
-	$: x = d3.scaleLinear(xDomain, [margin.left, width - margin.right]);
-	$: y = d3.scaleLinear(yDomain, [height - margin.bottom, margin.top]);
-	$: line = d3
-		.line()
-		.x((d: [number, number]) => x(d[0]))
-		.y((d: [number, number]) => y(d[1]));
-	$: data = d3.range(-1, 1, 0.01).map((x) => [x, fx(x)] as [number, number]);
-	$: d3.select(gy).call(d3.axisLeft(y));
-	$: d3.select(gx).call(d3.axisBottom(x));
+	let div: HTMLDivElement;
+	$: {
+		div?.firstChild?.remove();
+		div?.append(
+      Plot
+      .plot({
+				width,
+				height,
+				x: { domain: xDomain },
+				y: { domain: yDomain },
+        grid: true,
+        marks: [
+          Plot.lineY(fxPts, { x: "x", y: "ϕ", stroke: variants[$user.flavour].blue.rgb, strokeWidth: 2 }),
+					Plot.lineY(derivPts, { x: "n", y: "O", stroke: variants[$user.flavour].red.rgb, strokeWidth: 1, strokeDasharray: "4 4" }),
+          Plot.crosshairX(fxPts, { x: "x", y: "ϕ", ruleStrokeOpacity: 1, textStroke: "none", textFill: variants[$user.flavour].blue.rgb }),
+        ],
+      })
+    );
+	}
 </script>
 
-<svg id="plot" {width} {height}>
-	<g bind:this={gx} transform="translate(0, {height - margin.bottom})" />
-	<g bind:this={gy} transform="translate({margin.left}, 0)" />
-	<path class="fill-none stroke-ctp-mauve stroke-2" d={line(data)} />
-</svg>
+<div bind:this={div} class="flex justify-start" role="img" />
