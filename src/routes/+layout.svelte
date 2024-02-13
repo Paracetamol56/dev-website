@@ -24,12 +24,9 @@
 
 <svelte:head>
 	<script
-		data-host="https://cdn.micrometrics.es"
-		data-dnt="false"
-		src="https://cdn.micrometrics.es/js/script.js"
-		id="ZwSg9rf6GA"
 		async
-		defer
+		src="https://analytics.matheo-galuba.com/script.js"
+		data-website-id="be7a2824-e938-4d1e-9897-2c3ca61ceef2"
 	></script>
 	<title>Dev - Mathéo Galuba</title>
 	<meta name="description" content="A showcase of my little dev projects" />
