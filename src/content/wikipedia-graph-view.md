@@ -1,9 +1,9 @@
 ---
 title: Wikipedia graph view
 description: A graph view of Wikipedia pages and their links
-categories:
-  - computer science
-  - data visualization
+tags:
+  - computer-science
+  - data-visualization
 listed: true
 ---
 

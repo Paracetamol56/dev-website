@@ -1,7 +1,7 @@
 ---
 title: Convolution
 description: Demonstration of common convolution operations used in computer vision.
-categories:
+tags:
   - ai
   - computer-science
   - computer-vision

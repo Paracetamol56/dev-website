@@ -1,7 +1,7 @@
 ---
 title: MNIST Classification
 description: A simple MNIST classification example using TensorFlow.js
-categories:
+tags:
   - ai
   - computer-science
   - machine-learning

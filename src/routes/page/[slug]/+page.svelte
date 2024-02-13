@@ -21,10 +21,10 @@
 		</hgroup>
 
 		<div class="flex gap-2 justify-center">
-			{#each data.meta.categories as category}
-				<span class="font-semibold text-ctp-lavender">
-					&num;{category}
-				</span>
+			{#each data.meta.tags as tag}
+				<a href="/page?tag={tag}" class="font-semibold text-ctp-lavender">
+					&num;{tag}
+				</a>
 			{/each}
 		</div>
 	</section>

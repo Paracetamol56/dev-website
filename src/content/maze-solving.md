@@ -1,7 +1,7 @@
 ---
 title: Maze solving
 description: Different algorithms for solving mazes and more generally search problems.
-categories:
+tags:
   - ai
   - computer-science
 listed: true

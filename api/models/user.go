@@ -134,7 +134,7 @@ func DeleteUser(c *gin.Context, id primitive.ObjectID) (*mongo.UpdateResult, err
 	db := db.GetDB()
 	collection := db.Collection("users")
 	result, err := collection.UpdateOne(c, bson.M{"_id": id}, bson.M{"$set": bson.M{
-		"deletedAt": bson.M{"$exists": true},
+		"deletedAt": time.Now(),
 	},
 	})
 	return result, err

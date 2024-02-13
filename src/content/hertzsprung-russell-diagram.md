@@ -1,7 +1,7 @@
 ---
 title: Hertzsprung-Russell diagram
 description: The Hertzsprung-Russell diagram from Hipparcos data.
-categories:
+tags:
   - astronomy
   - computer-science
   - data-science

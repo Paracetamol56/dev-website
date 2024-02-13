@@ -1,7 +1,11 @@
 <script lang="ts">
+	import Pagination from '$lib/components/Pagination.svelte';
+	import { writable, type Writable } from 'svelte/store';
 	import type { PageData } from './$types';
+	import PageDisplay from './PageDisplay.svelte';
 
 	export let data: PageData;
+	const pageNumber: Writable<number> = writable(1);
 
 	let scrollY: number;
 	let section0: HTMLElement;
@@ -38,27 +42,13 @@
 		<hr class="my-8 h-1 w-6 border-none rounded-full bg-ctp-mauve" />
 	</div>
 	<div class="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
-		{#each data.pages as page}
-			<div class="p-8 bg-ctp-crust/50 backdrop-blur-sm rounded-md shadow-md shadow-ctp-crust z-10">
-				<div class="mb-2 flex justify-left flex-wrap gap-x-2 items-center">
-					{#each page.categories as category}
-						<a href="/">
-							<span class="text-sm font-semibold text-ctp-lavender">#{category}</span>
-						</a>
-					{/each}
-				</div>
-				<a href="/page/{page.slug}">
-					<h4 class="mb-4 text-2xl font-bold hover:opacity-75 transition-opacity">
-						{page.title}
-					</h4>
-					<p class="text-ctp-subtext0">{page.description}</p>
-				</a>
-			</div>
+		{#each data.pages.slice(($pageNumber - 1) * 6, $pageNumber * 6) as page}
+			<PageDisplay {page} />
 		{/each}
 	</div>
-	<!--<div class="my-4 flex justify-center">
+	<div class="my-4 flex justify-center">
 		<Pagination page={pageNumber} count={data.pages.length} perPage={6} />
-	</div>-->
+	</div>
 </section>
 
 <!--

@@ -1,8 +1,8 @@
 ---
 title: Boids
 description: A simulation of flocking birds
-categories:
-  - computer science
+tags:
+  - computer-science
   - simulation
 listed: true
 ---

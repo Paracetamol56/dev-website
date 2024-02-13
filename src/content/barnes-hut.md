@@ -1,8 +1,8 @@
 ---
 title: Barnes-Hut
 description: Optimization algorithm for n-body simulations
-categories:
-  - computer science
+tags:
+  - computer-science
   - simulation
   - astronomy
   - physics

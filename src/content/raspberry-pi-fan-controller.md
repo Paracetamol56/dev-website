@@ -1,7 +1,7 @@
 ---
 title: Raspberry Pi fan controller with Python
 description: A simple python script to control a fan connected to a Raspberry Pi
-categories:
+tags:
   - raspberry-pi
   - self-hosting
 listed: true
