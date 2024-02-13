@@ -137,6 +137,11 @@
 				</svg>
 			</SocialButton>
 		</div>
-		<small> © 2024 Matheo Galuba. All rights reserved. <a class="text-ctp-blue" href="/page/privacy-policy">Privacy policy</a></small>
+		<small>
+			© 2024 Matheo Galuba. All rights reserved. <a
+				class="text-ctp-blue"
+				href="/page/privacy-policy">Privacy policy</a
+			></small
+		>
 	</div>
 </footer>

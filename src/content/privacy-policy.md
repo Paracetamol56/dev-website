@@ -23,6 +23,7 @@ We may collect additional information when you choose to link your GitHub accoun
 ### Usage information
 
 We collect information about your interactions with our website, including:
+
 - The pages you visit
 - The devices and software you use to access our website
 - Your IP address

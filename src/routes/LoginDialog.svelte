@@ -81,9 +81,11 @@
 			use:melt={$content}
 		>
 			<h2 use:melt={$title} class="m-0 text-lg font-medium text-ctp-text">Login</h2>
-			
+
 			<div class="mt-6 flex justify-center gap-4">
-				<Button link={`https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${window.location.origin}/verify/github?path=${window.location.pathname}&scope=user:email`}>
+				<Button
+					link={`https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${window.location.origin}/verify/github?path=${window.location.pathname}&scope=user:email`}
+				>
 					<span>Continue with GitHub</span>
 					<Github size="16" />
 				</Button>
@@ -93,7 +95,7 @@
 				<strong class="mx-4">OR</strong>
 				<span class="w-full h-px bg-ctp-text opacity-20" />
 			</div>
-			
+
 			<p use:melt={$description} class="mb-5 mt-2 leading-normal text-ctp-text">
 				This is a passwordless authentication. I only need your email to send you a magic link.
 				<br />

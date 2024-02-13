@@ -47,7 +47,7 @@
 			</div>
 		{:else if math}
 			<div class="px-4 py-1 text-ctp-mantle">
-				{@html tex(math, {overflowAuto: false})}
+				{@html tex(math, { overflowAuto: false })}
 			</div>
 		{:else if text}
 			<p class="px-4 py-1 text-ctp-mantle">{text}</p>
