@@ -1,11 +1,10 @@
-type Categories = 'sveltekit' | 'svelte';
 
 type Page = {
 	title: string;
 	slug: string;
 	description: string;
-	categories: Categories[];
+	tags: string[];
 	listed: boolean;
 };
 
-export type { Categories, Page };
+export type { Page };
