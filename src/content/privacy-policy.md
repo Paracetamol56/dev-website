@@ -1,7 +1,7 @@
 ---
 title: Privacy policy
 description: Privacy policy
-categories: []
+tags: []
 listed: false
 ---
 

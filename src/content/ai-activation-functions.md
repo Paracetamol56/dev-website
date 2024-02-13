@@ -1,7 +1,7 @@
 ---
 title: AI activation functions
 description: Comparison of activation functions used in neural networks. Activation functions are used to introduce non-linearity into neural networks.
-categories:
+tags:
   - ai
   - computer-science
   - machine-learning

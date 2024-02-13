@@ -160,6 +160,7 @@
 								class="fill-ctp-mauve hover:fill-ctp-red"
 								on:mouseenter={() => nodeEnter(node)}
 								on:mouseleave={() => nodeLeave(node)}
+								role="tooltip"
 							/>
 						{/each}
 					{/if}
