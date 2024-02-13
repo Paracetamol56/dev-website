@@ -38,7 +38,9 @@ const config = {
 			pages: 'build',
 			assets: 'build',
 			fallback: 'index.html',
-			strict: false
+			strict: false,
+			precompress: true,
+			enableSourcemap: true
 		}),
 		prerender: {
 			crawl: true,

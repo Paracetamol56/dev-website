@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { Eraser } from 'lucide-svelte';
+	import { Eraser } from 'lucide-svelte';
 	import PageDisplay from '../PageDisplay.svelte';
-  import type { PageData } from './$types';
+	import type { PageData } from './$types';
 
-  export let data: PageData;
+	export let data: PageData;
 </script>
 
 <svelte:head>
@@ -14,15 +14,17 @@
 	<hgroup>
 		<h1 class="mb-8 text-6xl font-bold text-center">
 			<span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender">
-        Pages
-      </span>
+				Pages
+			</span>
 		</h1>
-    {#if data.tag}
-      <div class="flex flex-col items-center">
-        <h2 class="mb-2 text-xl font-semibold text-ctp-lavender">#{data.tag}</h2>
-        <a href="/page" class="text-sm font-semibold text-ctp-lavender flex gap-2 items-center"><Eraser size="16" /><span>Clear filter</span></a>
-      </div>
-    {/if}
+		{#if data.tag}
+			<div class="flex flex-col items-center">
+				<h2 class="mb-2 text-xl font-semibold text-ctp-lavender">#{data.tag}</h2>
+				<a href="/page" class="text-sm font-semibold text-ctp-lavender flex gap-2 items-center"
+					><Eraser size="16" /><span>Clear filter</span></a
+				>
+			</div>
+		{/if}
 	</hgroup>
 </section>
 

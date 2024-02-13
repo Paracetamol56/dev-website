@@ -1,4 +1,3 @@
-
 type Page = {
 	title: string;
 	slug: string;
