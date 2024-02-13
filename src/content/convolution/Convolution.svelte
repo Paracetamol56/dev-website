@@ -3,7 +3,6 @@
 	import * as tf from '@tensorflow/tfjs';
 	import MeltTooltip from '$lib/components/MeltTooltip.svelte';
 	import { applyConvolution, loadImage } from './utils';
-	import { browser } from '$app/environment';
 	import { onMount } from 'svelte';
 
 	export let imgSrc: string;
@@ -12,7 +11,7 @@
 	let convolvedImage: HTMLCanvasElement;
 
 	let imageTensor: tf.Tensor4D;
-  let convolvedImageTensor: tf.Tensor4D;
+	let convolvedImageTensor: tf.Tensor4D;
 
 	let matrixMultiplier: number = 1;
 	let matrix: number[][] = [
@@ -20,19 +19,19 @@
 		[0, 1, 0],
 		[0, 0, 0]
 	];
-  
-  const convolve = async (): Promise<void> => {
-    if (!imageTensor) return;
-    convolvedImageTensor = await applyConvolution(
-      matrix.map((row) => row.map((value) => value * matrixMultiplier)),
-      imageTensor
-    );
-    tf.browser.toPixels(convolvedImageTensor.squeeze([0]) as tf.Tensor3D, convolvedImage);
-  };
+
+	const convolve = async (): Promise<void> => {
+		if (!imageTensor) return;
+		convolvedImageTensor = await applyConvolution(
+			matrix.map((row) => row.map((value) => value * matrixMultiplier)),
+			imageTensor
+		);
+		tf.browser.toPixels(convolvedImageTensor.squeeze([0]) as tf.Tensor3D, convolvedImage);
+	};
 
 	onMount(async () => {
 		imageTensor = await loadImage(imgSrc);
-    convolve();
+		convolve();
 	});
 </script>
 
@@ -47,8 +46,8 @@
 			max="100"
 			step="0.1"
 			bind:value={matrixMultiplier}
-      on:change={convolve}
-			class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none flex h-8 w-32 items-center justify-between rounded-md bg-ctp-surface0 px-3 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
+			on:change={convolve}
+			class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none flex h-8 w-32 items-center justify-between rounded-md bg-ctp-surface0 px-3 focus:outline-none focus:ring-2 focus:ring-ctp-mauve shadow-md shadow-ctp-crust"
 		/>
 	</div>
 	<div class="shrink-0">
@@ -60,8 +59,8 @@
 				max="100"
 				step="1"
 				bind:value={matrix[0][0]}
-        on:change={convolve}
-				class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none flex h-8 w-16 items-center justify-between rounded-md bg-ctp-surface0 px-3 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
+				on:change={convolve}
+				class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none flex h-8 w-16 items-center justify-between rounded-md bg-ctp-surface0 px-3 focus:outline-none focus:ring-2 focus:ring-ctp-mauve shadow-md shadow-ctp-crust"
 			/>
 			<input
 				type="number"
@@ -69,8 +68,8 @@
 				max="100"
 				step="1"
 				bind:value={matrix[0][1]}
-        on:change={convolve}
-				class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none flex h-8 w-16 items-center justify-between rounded-md bg-ctp-surface0 px-3 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
+				on:change={convolve}
+				class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none flex h-8 w-16 items-center justify-between rounded-md bg-ctp-surface0 px-3 focus:outline-none focus:ring-2 focus:ring-ctp-mauve shadow-md shadow-ctp-crust"
 			/>
 			<input
 				type="number"
@@ -78,8 +77,8 @@
 				max="100"
 				step="1"
 				bind:value={matrix[0][2]}
-        on:change={convolve}
-				class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none flex h-8 w-16 items-center justify-between rounded-md bg-ctp-surface0 px-3 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
+				on:change={convolve}
+				class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none flex h-8 w-16 items-center justify-between rounded-md bg-ctp-surface0 px-3 focus:outline-none focus:ring-2 focus:ring-ctp-mauve shadow-md shadow-ctp-crust"
 			/>
 			<input
 				type="number"
@@ -87,8 +86,8 @@
 				max="100"
 				step="1"
 				bind:value={matrix[1][0]}
-        on:change={convolve}
-				class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none flex h-8 w-16 items-center justify-between rounded-md bg-ctp-surface0 px-3 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
+				on:change={convolve}
+				class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none flex h-8 w-16 items-center justify-between rounded-md bg-ctp-surface0 px-3 focus:outline-none focus:ring-2 focus:ring-ctp-mauve shadow-md shadow-ctp-crust"
 			/>
 			<input
 				type="number"
@@ -96,8 +95,8 @@
 				max="100"
 				step="1"
 				bind:value={matrix[1][1]}
-        on:change={convolve}
-				class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none flex h-8 w-16 items-center justify-between rounded-md bg-ctp-surface0 px-3 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
+				on:change={convolve}
+				class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none flex h-8 w-16 items-center justify-between rounded-md bg-ctp-surface0 px-3 focus:outline-none focus:ring-2 focus:ring-ctp-mauve shadow-md shadow-ctp-crust"
 			/>
 			<input
 				type="number"
@@ -105,8 +104,8 @@
 				max="100"
 				step="1"
 				bind:value={matrix[1][2]}
-        on:change={convolve}
-				class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none flex h-8 w-16 items-center justify-between rounded-md bg-ctp-surface0 px-3 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
+				on:change={convolve}
+				class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none flex h-8 w-16 items-center justify-between rounded-md bg-ctp-surface0 px-3 focus:outline-none focus:ring-2 focus:ring-ctp-mauve shadow-md shadow-ctp-crust"
 			/>
 			<input
 				type="number"
@@ -114,8 +113,8 @@
 				max="100"
 				step="1"
 				bind:value={matrix[2][0]}
-        on:change={convolve}
-				class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none flex h-8 w-16 items-center justify-between rounded-md bg-ctp-surface0 px-3 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
+				on:change={convolve}
+				class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none flex h-8 w-16 items-center justify-between rounded-md bg-ctp-surface0 px-3 focus:outline-none focus:ring-2 focus:ring-ctp-mauve shadow-md shadow-ctp-crust"
 			/>
 			<input
 				type="number"
@@ -123,8 +122,8 @@
 				max="100"
 				step="1"
 				bind:value={matrix[2][1]}
-        on:change={convolve}
-				class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none flex h-8 w-16 items-center justify-between rounded-md bg-ctp-surface0 px-3 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
+				on:change={convolve}
+				class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none flex h-8 w-16 items-center justify-between rounded-md bg-ctp-surface0 px-3 focus:outline-none focus:ring-2 focus:ring-ctp-mauve shadow-md shadow-ctp-crust"
 			/>
 			<input
 				type="number"
@@ -132,8 +131,8 @@
 				max="100"
 				step="1"
 				bind:value={matrix[2][2]}
-        on:change={convolve}
-				class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none flex h-8 w-16 items-center justify-between rounded-md bg-ctp-surface0 px-3 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
+				on:change={convolve}
+				class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none flex h-8 w-16 items-center justify-between rounded-md bg-ctp-surface0 px-3 focus:outline-none focus:ring-2 focus:ring-ctp-mauve shadow-md shadow-ctp-crust"
 			/>
 		</div>
 	</div>
@@ -149,7 +148,7 @@
 							[0, 1, 0],
 							[0, 0, 0]
 						];
-            convolve();
+						convolve();
 					}}>Identity</Button
 				>
 			</MeltTooltip>
@@ -162,7 +161,7 @@
 							[-1, 4, -1],
 							[0, -1, 0]
 						];
-            convolve();
+						convolve();
 					}}>Edge Detection 1</Button
 				>
 			</MeltTooltip>
@@ -177,7 +176,7 @@
 							[-1, 8, -1],
 							[-1, -1, -1]
 						];
-            convolve();
+						convolve();
 					}}>Edge Detection 2</Button
 				>
 			</MeltTooltip>
@@ -190,7 +189,7 @@
 							[-1, 5, -1],
 							[0, -1, 0]
 						];
-            convolve();
+						convolve();
 					}}>Sharpen</Button
 				>
 			</MeltTooltip>
@@ -205,7 +204,7 @@
 							[1, 1, 1],
 							[1, 1, 1]
 						];
-            convolve();
+						convolve();
 					}}>Box Blur</Button
 				>
 			</MeltTooltip>
@@ -220,7 +219,7 @@
 							[2, 4, 2],
 							[1, 2, 1]
 						];
-            convolve();
+						convolve();
 					}}>Gaussian Blur</Button
 				>
 			</MeltTooltip>

@@ -27,7 +27,7 @@
 	});
 </script>
 
-<div class="my-4 flex gap-2 justify-between items-start">
+<div class="my-4 flex flex-col md:flex-row gap-4 justify-between items-center">
 	<div class="flex-1">
 		<div class="bg-ctp-mantle shadow-md shadow-ctp-crust rounded-md w-full overflow-hidden">
 			<img class="w-full h-auto content-ignore" src={imgSrc} alt="Original" />
@@ -45,7 +45,7 @@
 			step="1"
 			bind:value={poolSize}
 			on:change={pool}
-			class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none flex h-8 w-32 items-center justify-between rounded-md bg-ctp-surface0 px-3 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
+			class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none flex h-8 w-32 items-center justify-between rounded-md bg-ctp-surface0 px-3 focus:outline-none focus:ring-2 focus:ring-ctp-mauve shadow-md shadow-ctp-crust"
 		/>
 		<span class="block text-ctp-text font-semibold text-sm">Stride</span>
 		<input
@@ -55,7 +55,7 @@
 			step="1"
 			bind:value={stride}
 			on:change={pool}
-			class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none flex h-8 w-32 items-center justify-between rounded-md bg-ctp-surface0 px-3 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
+			class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none flex h-8 w-32 items-center justify-between rounded-md bg-ctp-surface0 px-3 focus:outline-none focus:ring-2 focus:ring-ctp-mauve shadow-md shadow-ctp-crust"
 		/>
 	</div>
 	<div class="flex-1">

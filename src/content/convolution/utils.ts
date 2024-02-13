@@ -60,7 +60,11 @@ async function applyConvolution(
 	return convolvedImageTensor;
 }
 
-async function applyMaxPooling(poolSize: number, stride: number, imageTensor: tf.Tensor4D): Promise<tf.Tensor4D> {
+async function applyMaxPooling(
+	poolSize: number,
+	stride: number,
+	imageTensor: tf.Tensor4D
+): Promise<tf.Tensor4D> {
 	if (!browser) {
 		throw new Error('This code must be run in a browser environment');
 	}
