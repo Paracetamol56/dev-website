@@ -57,7 +57,7 @@ async function verify(token: string, redirect: string) {
 				goto(redirect);
 				return;
 			}
-			
+
 			persistUser(reponse);
 			goto(redirect);
 		})

@@ -128,7 +128,7 @@
 					min="0"
 					class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none
               flex h-8 items-center justify-between rounded-md bg-ctp-surface0
-              px-3 pr-12 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
+              px-3 pr-12 focus:outline-none focus:ring-2 focus:ring-ctp-mauve shadow-md shadow-ctp-crust"
 					bind:value={search}
 					on:keydown={(event) => {
 						if (event.key === 'Enter') {
@@ -139,7 +139,8 @@
 				<button
 					class="inline-flex square-8 items-center justify-center rounded-md
                 bg-ctp-mauve font-medium leading-none text-ctp-mantle
-                outline-none hover:opacity-75 active:opacity-50 transition-opacity"
+                outline-none hover:opacity-75 active:opacity-50 transition-opacity
+shadow-md shadow-ctp-crust"
 					on:click={handleSearch}
 				>
 					<Search size="18" />

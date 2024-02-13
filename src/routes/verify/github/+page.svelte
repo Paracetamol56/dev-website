@@ -10,11 +10,12 @@
 		const path: string = $page.url.searchParams.get('path') ?? '/';
 
 		console.log(code, path);
-    axios.post('/api/auth/github', { code })
-      .then((res) => {
+		axios
+			.post('/api/auth/github', { code })
+			.then((res) => {
 				api.persistUser(res);
 				goto(path);
-      })
+			})
 			.catch((err) => {
 				console.error(err);
 				goto(path);
