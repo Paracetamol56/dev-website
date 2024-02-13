@@ -1,14 +1,7 @@
 <script lang="ts">
 	import * as d3 from 'd3';
 	import { onMount } from 'svelte';
-	import {
-		Cog,
-		Expand,
-		ExternalLink,
-		RotateCcw,
-		Search,
-		X
-	} from 'lucide-svelte';
+	import { Cog, Expand, ExternalLink, RotateCcw, Search, X } from 'lucide-svelte';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import axios from 'axios';
@@ -40,7 +33,7 @@
 					newPage = {
 						title: response.data.title,
 						expanded: false
-					}
+					};
 					if (!nodes.some((n) => n.title === newPage.title)) {
 						nodes.push(newPage);
 					}
@@ -52,7 +45,7 @@
 					goto($page.url.toString());
 					return;
 				});
-					
+
 			axios
 				.get(`https://en.wikipedia.org/api/rest_v1/page/html/${search}`)
 				.then((response) => {
@@ -107,11 +100,10 @@
 	let nodeSize: Writable<number[]> = writable([5]);
 	let linkOpacity: Writable<number[]> = writable([50]);
 	let linkWidth: Writable<number[]> = writable([1.5]);
-	
 
 	let hover: { title: string; x: number; y: number } | null = null;
 	let summaries = new Map<string, any>();
-	
+
 	const getSummary = async (title: string) => {
 		if (!summaries.has(title)) {
 			axios
@@ -179,7 +171,9 @@
 			.data(nodes)
 			.join('circle')
 			.attr('r', (d: any) => (d.expanded ? 2 * $nodeSize[0] : $nodeSize[0]))
-			.attr('fill', (d: any) => (d.expanded ? variants[$user.flavour].lavender.rgb : variants[$user.flavour].mauve.rgb))
+			.attr('fill', (d: any) =>
+				d.expanded ? variants[$user.flavour].lavender.rgb : variants[$user.flavour].mauve.rgb
+			)
 			.attr('fill-opacity', $nodeOpacity[0] / 100)
 			.on('mouseenter', (event: any, d: any) => {
 				// Apply the zoom behavior to the hover coordinates
@@ -237,13 +231,19 @@
 		simulation?.force('charge', d3.forceManyBody().strength(-$repelForce[0]));
 		simulation?.force('X', d3.forceX().strength($centerForce[0] / 100));
 		simulation?.force('Y', d3.forceY().strength($centerForce[0] / 100));
-		simulation?.force('link', d3.forceLink(links).id((d: any) => d.title).strength($linkForce[0] / 100));
-	
+		simulation?.force(
+			'link',
+			d3
+				.forceLink(links)
+				.id((d: any) => d.title)
+				.strength($linkForce[0] / 100)
+		);
+
 		d3.select(svgGroup)
 			.selectAll('circle')
 			.attr('r', (d: any) => (d.expanded ? 2 * $nodeSize[0] : $nodeSize[0]))
 			.attr('fill-opacity', $nodeOpacity[0] / 100);
-		
+
 		d3.select(svgGroup)
 			.selectAll('line')
 			.attr('stroke-opacity', $linkOpacity[0] / 100)
@@ -251,15 +251,18 @@
 
 		// Save settings to session storage
 		if (browser) {
-			sessionStorage.setItem('graphSettings', JSON.stringify({
-				centerForce: $centerForce[0],
-				repelForce: $repelForce[0],
-				linkForce: $linkForce[0],
-				nodeOpacity: $nodeOpacity[0],
-				nodeSize: $nodeSize[0],
-				linkOpacity: $linkOpacity[0],
-				linkWidth: $linkWidth[0]
-			}));
+			sessionStorage.setItem(
+				'graphSettings',
+				JSON.stringify({
+					centerForce: $centerForce[0],
+					repelForce: $repelForce[0],
+					linkForce: $linkForce[0],
+					nodeOpacity: $nodeOpacity[0],
+					nodeSize: $nodeSize[0],
+					linkOpacity: $linkOpacity[0],
+					linkWidth: $linkWidth[0]
+				})
+			);
 		}
 	}
 
@@ -307,10 +310,10 @@
 	<div>
 		<div class="flex gap-2">
 			<input
-			id="root"
-			type="text"
-			min="0"
-			class="flex h-8 items-center justify-between rounded-md bg-ctp-surface0
+				id="root"
+				type="text"
+				min="0"
+				class="flex h-8 items-center justify-between rounded-md bg-ctp-surface0
 			px-3 pr-12 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
 				bind:value={search}
 				on:keydown={(event) => {
@@ -449,14 +452,14 @@
 				<fieldset>
 					<MeltSlider min={0} max={100} step={0.1} value={linkForce} name="Link force" />
 				</fieldset>
-				<hr class="border-ctp-text opacity-20 my-2">
+				<hr class="border-ctp-text opacity-20 my-2" />
 				<fieldset>
 					<MeltSlider min={0} max={100} step={1} value={nodeOpacity} name="Node opacity" />
 				</fieldset>
 				<fieldset>
 					<MeltSlider min={1} max={20} step={1} value={nodeSize} name="Node size" />
 				</fieldset>
-				<hr class="border-ctp-text opacity-20 my-2">
+				<hr class="border-ctp-text opacity-20 my-2" />
 				<fieldset>
 					<MeltSlider min={0} max={100} step={1} value={linkOpacity} name="Link opacity" />
 				</fieldset>

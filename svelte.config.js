@@ -42,7 +42,7 @@ const config = {
 		}),
 		prerender: {
 			crawl: true,
-			handleHttpError: 'warn',
+			handleHttpError: 'warn'
 		}
 	}
 };
