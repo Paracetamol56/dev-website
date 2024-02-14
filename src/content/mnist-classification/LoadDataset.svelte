@@ -23,7 +23,6 @@
 </script>
 
 <div>
-	<h3>MNIST Dataset</h3>
 	<Button on:click={loadData}>
 		<span>Load Data</span>
 		<DownloadCloud size="18" stroke-width="3" />

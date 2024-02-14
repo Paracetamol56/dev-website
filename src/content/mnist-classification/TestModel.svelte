@@ -45,10 +45,10 @@
 </script>
 
 <div>
-	<h3>Draw New Image</h3>
 	<div class="w-full h-fit flex flex-col md:flex-row md:gap-4 items-stretch">
 		<div class="flex flex-row gap-4 md:flex-col md:gap-0 justify-star items-end">
 			<div class="relative w-fit h-fit">
+				<h4>New image</h4>
 				<canvas
 					bind:this={canvas}
 					on:mouseup={predict}

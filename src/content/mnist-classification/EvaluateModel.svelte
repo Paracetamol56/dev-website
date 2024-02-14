@@ -70,7 +70,6 @@
 </script>
 
 <div>
-	<h3>Evaluate Model</h3>
 	<Button
 		on:click={evaluateModel}
 		disabled={$data.isDownloaded === false || $model.layers.length === 0}
