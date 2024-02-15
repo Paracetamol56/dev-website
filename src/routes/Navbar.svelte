@@ -31,36 +31,30 @@
 		<a href="/">
 			<svg
 				class="square-8"
-				width="750"
-				height="606"
-				viewBox="0 0 750 606"
-				fill="none"
+				version="1.1"
 				xmlns="http://www.w3.org/2000/svg"
+				xmlns:xlink="http://www.w3.org/1999/xlink"
+				viewBox="0 0 769.3 606"
+				xml:space="preserve"
 			>
-				<g clip-path="url(#clip0_22_3)">
-					<path
-						class="fill-ctp-text"
-						d="M240.326 193.691L355.66 0H750V121.2H427.826L312.5 314.891L240.326 193.691Z"
-					/>
-					<path
-						class="fill-ctp-text"
-						d="M312.5 436.024L125 121.2H0L125 363.6L240.326 557.284L312.5 436.024Z"
-					/>
-					<path
-						class="fill-ctp-text"
-						d="M750 181.733V606H437.5L500 484.8H625V302.933L536.049 303L608.236 181.766L750 181.733Z"
-					/>
-					<path
-						class="fill-ctp-subtext0"
-						d="M463.875 181.8L240.326 557.284L269.34 606H355.625L608.236 181.766L463.875 181.8Z"
-					/>
-					<path class="fill-ctp-subtext0" d="M0 606H125V363.6L0 121.2V606Z" />
-				</g>
-				<defs>
-					<clipPath id="clip0_22_3">
-						<rect width="750" height="606" fill="white" />
+				<g>
+					<defs>
+						<rect id="SVGID_1_" width="769.3" height="606" />
+					</defs>
+					<clipPath id="SVGID_00000043451981554379318190000013841271621363195293_">
+						<use xlink:href="#SVGID_1_" style="overflow:visible;" />
 					</clipPath>
-				</defs>
+					<g style="clip-path:url(#SVGID_00000043451981554379318190000013841271621363195293_);">
+						<path class="fill-ctp-text" d="M259.7,193.7L375,0h394.3v121.2H447.2L331.8,314.9L259.7,193.7z" />
+						<path class="fill-ctp-text" d="M331.8,436L144.3,121.2h-125H0l259.7,436.1L331.8,436z" />
+						<path
+							class="fill-ctp-text"
+							d="M769.3,181.7V606H456.8l62.5-121.2h125V302.9l-89,0.1l72.2-121.2L769.3,181.7z"
+						/>
+						<path class="fill-ctp-subtext0" d="M483.2,181.8L259.7,557.3l29,48.7H375l252.6-424.2L483.2,181.8z" />
+						<path class="fill-ctp-subtext0" d="M0,606h125V331.1L0,121.2V606z" />
+					</g>
+				</g>
 			</svg>
 		</a>
 		<div class="flex items-center gap-3 text-md font-semibold">
