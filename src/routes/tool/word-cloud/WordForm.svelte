@@ -2,9 +2,8 @@
 	import { Send } from 'lucide-svelte';
 	import type { WordCloudSession } from './utils';
 	import axios from 'axios';
-	import { addToast } from '../+layout.svelte';
+	import { addToast } from '../../+layout.svelte';
 	import { onMount } from 'svelte';
-	import { browser } from '$app/environment';
 
 	export let session: WordCloudSession;
 

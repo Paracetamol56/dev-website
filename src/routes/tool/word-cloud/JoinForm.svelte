@@ -3,7 +3,7 @@
 	import { createPinInput, melt } from '@melt-ui/svelte';
 	import axios from 'axios';
 	import { ArrowRightToLine } from 'lucide-svelte';
-	import { addToast } from '../+layout.svelte';
+	import { addToast } from '../../+layout.svelte';
 	import type { WordCloudSession } from './utils';
 	import { user } from '$lib/store';
 

@@ -4,7 +4,7 @@
 	import JoinForm from './JoinForm.svelte';
 	import WordForm from './WordForm.svelte';
 	import axios from 'axios';
-	import { addToast } from '../+layout.svelte';
+	import { addToast } from '../../+layout.svelte';
 	import { browser } from '$app/environment';
 	import { onMount } from 'svelte';
 	import type { WordCloudSession } from './utils';

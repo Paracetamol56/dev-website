@@ -1,3 +1,10 @@
 [
-
+	{
+		"title": "Word cloud",
+		"slug": "word-cloud",
+		"description": "Online polling tool to create word clouds",
+		"tags": ["polling", "word-cloud"],
+		"listed": true,
+		"requiresAuth": true
+	}
 ]
