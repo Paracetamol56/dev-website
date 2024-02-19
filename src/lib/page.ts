@@ -1,4 +1,4 @@
-type Page = {
+interface Page {
 	title: string;
 	slug: string;
 	description: string;
@@ -6,4 +6,8 @@ type Page = {
 	listed: boolean;
 };
 
-export type { Page };
+interface Tool extends Page {
+	needsAuth: boolean;
+};
+
+export type { Page, Tool };

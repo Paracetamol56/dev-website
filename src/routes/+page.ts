@@ -1,6 +1,8 @@
-import type { Page } from '$lib/page';
+import type { Page, Tool } from '$lib/page';
 import type { PageLoad } from './$types';
+import toolsJson from '../content/tools.json';
 
+const tools = toolsJson as Tool[];
 interface File {
 	metadata: Omit<Page, 'slug'>;
 }
@@ -22,7 +24,7 @@ export const load: PageLoad = () => {
 		}
 	}
 
-	return { pages };
+	return { pages, tools };
 };
 
 export const prerender = true;

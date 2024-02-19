@@ -10,6 +10,7 @@
 	let scrollY: number;
 	let section0: HTMLElement;
 	let section1: HTMLElement;
+	let section2: HTMLElement;
 </script>
 
 <svelte:window bind:scrollY />
@@ -51,7 +52,6 @@
 	</div>
 </section>
 
-<!--
 <section class="relative container mx-auto" bind:this={section2}>
 	<span
 		class="absolute top-0 left-1/2 transform -translate-x-1/2
@@ -67,18 +67,10 @@
 	</div>
 	<div class="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
 		{#each data.tools as tool}
-			<div class="p-8 bg-ctp-crust/50 backdrop-blur-sm rounded-md shadow-md shadow-ctp-crust z-10">
-				<div class="mb-2 flex justify-left flex-wrap gap-x-2 items-center">
-				</div>
-				<a href={tool.path}>
-					<h4 class="mb-4 text-2xl font-bold hover:opacity-75 transition-opacity">{tool.title}</h4>
-					<p class="text-ctp-subtext0">{tool.description}</p>
-				</a>
-			</div>
+			<PageDisplay page={tool} path="/tool" />
 		{/each}
 	</div>
 </section>
--->
 
 <style lang="postcss">
 	.text-outline-2 {
