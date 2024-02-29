@@ -11,6 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+// GitHubUser represents a user from GitHub.
 type GitHubUser struct {
 	Login             string `json:"login" bson:"login"`
 	Id                int    `json:"id" bson:"id"`
@@ -46,13 +47,15 @@ type GitHubUser struct {
 	UpdatedAt         string `json:"updated_at" bson:"updated_at"`
 }
 
-type User struct {
+// UserLight represents a lightweight version of a user.
+type UserLight struct {
 	Id             primitive.ObjectID `json:"id" bson:"_id"`
 	Name           string             `json:"name" bson:"name"`
 	ProfilePicture string             `json:"profilePicture" bson:"profilePicture"`
 }
 
-type FullUser struct {
+// User represents a user entity.
+type User struct {
 	Id                primitive.ObjectID `json:"id" bson:"_id,omitempty"`
 	Name              string             `json:"name" bson:"name"`
 	Email             string             `json:"email" bson:"email"`
@@ -65,14 +68,39 @@ type FullUser struct {
 	Github            *GitHubUser        `json:"github,omitempty" bson:"github,omitempty"`
 }
 
-func CreateUser(c *gin.Context, user *FullUser) (*mongo.InsertOneResult, error) {
+// CreateUser creates a new user in the database.
+// It takes a gin.Context object and a pointer to a User struct as parameters.
+// It returns the result of the insertion operation (*mongo.InsertOneResult) and any error encountered.
+func CreateUser(c *gin.Context, user *User) (*mongo.InsertOneResult, error) {
 	db := db.GetDB()
 	collection := db.Collection("users")
 	result, err := collection.InsertOne(c, user)
 	return result, err
 }
 
-func GetUserById(c *gin.Context, id primitive.ObjectID) (*User, error) {
+// GetUserById retrieves a user by their ID from the database.
+// It takes a gin.Context object and the ID of the user as parameters.
+// It returns a pointer to a UserLight struct and an error.
+// The UserLight struct represents a simplified version of the user model.
+// If the user is found, the function returns the user object.
+// If the user is not found or an error occurs, it returns nil and the error.
+func GetUserById(c *gin.Context, id primitive.ObjectID) (*UserLight, error) {
+	db := db.GetDB()
+	collection := db.Collection("users")
+	var user UserLight
+	if err := collection.FindOne(c, bson.M{"_id": id, "deletedAt": bson.M{"$exists": false}}).Decode(&user); err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+// GetFullUserById retrieves a full user by their ID.
+// It takes a gin.Context object and an ID of type primitive.ObjectID as parameters.
+// It returns a pointer to a User struct and an error.
+// The function queries the database to find a user with the specified ID and no "deletedAt" field.
+// If the user is found, it is decoded into the user variable and returned.
+// If an error occurs during the query or decoding, the function returns nil and the error.
+func GetFullUserById(c *gin.Context, id primitive.ObjectID) (*User, error) {
 	db := db.GetDB()
 	collection := db.Collection("users")
 	var user User
@@ -82,20 +110,15 @@ func GetUserById(c *gin.Context, id primitive.ObjectID) (*User, error) {
 	return &user, nil
 }
 
-func GetFullUserById(c *gin.Context, id primitive.ObjectID) (*FullUser, error) {
+// GetFullUserByEmail retrieves the full user information by email.
+// It takes a gin.Context and an email string as parameters.
+// It returns a pointer to a User struct and an error.
+// If the user is not found, it returns nil, nil.
+// If an error occurs during the retrieval, it returns nil and the error.
+func GetFullUserByEmail(c *gin.Context, email string) (*User, error) {
 	db := db.GetDB()
 	collection := db.Collection("users")
-	var user FullUser
-	if err := collection.FindOne(c, bson.M{"_id": id, "deletedAt": bson.M{"$exists": false}}).Decode(&user); err != nil {
-		return nil, err
-	}
-	return &user, nil
-}
-
-func GetFullUserByEmail(c *gin.Context, email string) (*FullUser, error) {
-	db := db.GetDB()
-	collection := db.Collection("users")
-	var user FullUser
+	var user User
 	if err := collection.FindOne(c, bson.M{"email": email, "deletedAt": bson.M{"$exists": false}}).Decode(&user); err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, nil
@@ -105,7 +128,12 @@ func GetFullUserByEmail(c *gin.Context, email string) (*FullUser, error) {
 	return &user, nil
 }
 
-func UpdateUser(c *gin.Context, id primitive.ObjectID, user *FullUser) (*mongo.UpdateResult, error) {
+// UpdateUser updates a user in the database with the specified ID.
+// It takes a gin.Context, an ID of type primitive.ObjectID, and a user object as parameters.
+// It returns a pointer to mongo.UpdateResult and an error.
+// The function updates the user's name, email, flavour, profile picture, last login, last refresh,
+// GitHub access token, and GitHub information in the database.
+func UpdateUser(c *gin.Context, id primitive.ObjectID, user *User) (*mongo.UpdateResult, error) {
 	db := db.GetDB()
 	collection := db.Collection("users")
 	result, err := collection.UpdateOne(c, bson.M{"_id": id}, bson.M{"$set": bson.M{
@@ -121,15 +149,10 @@ func UpdateUser(c *gin.Context, id primitive.ObjectID, user *FullUser) (*mongo.U
 	return result, err
 }
 
-func UpdateGithubUser(c *gin.Context, id primitive.ObjectID, githubUser *GitHubUser) (*mongo.UpdateResult, error) {
-	db := db.GetDB()
-	collection := db.Collection("users")
-	result, err := collection.UpdateOne(c, bson.M{"_id": id}, bson.M{"$set": bson.M{
-		"github": githubUser,
-	}})
-	return result, err
-}
-
+// UpdateGithubUser updates the GitHub user information in the database.
+// It takes a gin.Context, an ObjectID representing the user ID, and a GitHubUser struct as parameters.
+// It returns a pointer to mongo.UpdateResult and an error.
+// The function updates the "github" field of the user document with the provided GitHubUser struct.
 func DeleteUser(c *gin.Context, id primitive.ObjectID) (*mongo.UpdateResult, error) {
 	db := db.GetDB()
 	collection := db.Collection("users")
@@ -140,6 +163,9 @@ func DeleteUser(c *gin.Context, id primitive.ObjectID) (*mongo.UpdateResult, err
 	return result, err
 }
 
+// DeleteOldUsers deletes old users from the database.
+// It takes a context as input and returns the delete result and an error, if any.
+// The function queries the "users" collection in the database and deletes users whose "deletedAt" field is older than 30 days ago.
 func DeleteOldUsers(c context.Context) (*mongo.DeleteResult, error) {
 	db := db.GetDB()
 	collection := db.Collection("users")

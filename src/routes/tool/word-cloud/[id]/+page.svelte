@@ -6,7 +6,7 @@
 	import type { PageLoad } from './$types';
 	import { browser } from '$app/environment';
 	import type { WordCloudSession } from '../utils';
-	import { addToast } from '../../+layout.svelte';
+	import { addToast } from '../../../+layout.svelte';
 	import { goto } from '$app/navigation';
 	import { createDialog, melt } from '@melt-ui/svelte';
 	import { QrCode, X } from 'lucide-svelte';
@@ -15,8 +15,9 @@
 	import QRCode from 'qrcode';
 	import { create } from 'd3';
 	import Button from '$lib/components/Button.svelte';
+	import type { PageData } from '../$types';
 
-	export let data: PageLoad;
+	export let data: PageData;
 	const distribution: { text: string; occurence: number }[] = [];
 	let session: WordCloudSession;
 

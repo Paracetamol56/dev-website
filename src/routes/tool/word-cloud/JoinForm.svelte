@@ -6,6 +6,8 @@
 	import { addToast } from '../../+layout.svelte';
 	import type { WordCloudSession } from './utils';
 	import { user } from '$lib/store';
+	import api from '$lib/api';
+	import Button from '$lib/components/Button.svelte';
 
 	export let joinSession: (session: WordCloudSession) => void;
 	let codeError: string = '';
@@ -19,12 +21,12 @@
 	});
 
 	const validateCode = (code: string[]) => {
-		if (code.length !== 5) {
+		if (code.length !== 5 || code.some((char) => char === '')) {
 			codeError = 'Code must be 5 characters long';
 			return false;
 		}
 		// Every character must be a number, lowercase letter or uppercase letter
-		if (!code.every((char) => /[0-9a-z]/.test(char))) {
+		if (!code.every((char) => /[a-zA-Z0-9]/.test(char))) {
 			codeError = 'Code must only contain numbers and letters';
 			return false;
 		}
@@ -35,12 +37,7 @@
 	const handleSubmit = (e: Event) => {
 		e.preventDefault();
 		if (validateCode($value)) {
-			axios
-				.get('/api/word-cloud', {
-					params: {
-						code: $value.join('')
-					}
-				})
+			api.call('GET', `/word-cloud?code=${$value.join('')}`)
 				.then((res) => {
 					if (res.data) {
 						joinSession(res.data);
@@ -82,30 +79,35 @@
 				{#each Array.from({ length: 5 }) as _}
 					<input
 						id="code"
-						class="rounded-md bg-ctp-surface0 text-center text-lg text-ctp-text shadow-sm square-12
-                  focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
+						autocomplete="off"
+						type="text"
+						maxlength="1"
+						class="rounded-md bg-ctp-surface0 text-center text-lg text-ctp-text square-12
+                  shadow-md shadow-ctp-crust focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
+						on:keydown={(e) => {
+							if (e.key === 'Enter') {
+								handleSubmit(e);
+							}
+						}}
 						use:melt={$input()}
 					/>
 				{/each}
 			</div>
 			<p class="text-left text-sm font-semibold text-ctp-red">{codeError}</p>
 		</div>
-		<button
-			class="flex justify-center items-center rounded-md bg-ctp-mauve px-3 py-1 font-medium
-            text-ctp-surface0 hover:opacity-75 active:opacity-50 transition-opacity"
-			type="submit"
-		>
-			Join&nbsp;<ArrowRightToLine size="18" />
-		</button>
+		<Button type="submit">
+			<span>Join</span>
+			<ArrowRightToLine size="18" />
+		</Button>
 	</div>
 </form>
 
 <div class="mt-8 flex justify-center gap-4">
-	<a class="font-semibold hover:text-ctp-blue transition-colors" href="/word-cloud/new"
+	<a class="font-semibold hover:text-ctp-blue transition-colors" href="/tool/word-cloud/new"
 		>Create a new session</a
 	>
 	{#if $user.id !== null}
-		<a class="font-semibold hover:text-ctp-blue transition-colors" href="/word-cloud/all"
+		<a class="font-semibold hover:text-ctp-blue transition-colors" href="/tool/word-cloud/all"
 			>View your sessions</a
 		>
 	{/if}

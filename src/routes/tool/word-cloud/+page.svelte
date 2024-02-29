@@ -8,13 +8,14 @@
 	import { browser } from '$app/environment';
 	import { onMount } from 'svelte';
 	import type { WordCloudSession } from './utils';
+	import api from '$lib/api';
 
 	let session: WordCloudSession | null = null;
 
 	onMount(() => {
 		if ($page.url.searchParams.has('session')) {
-			axios
-				.get(`/api/word-cloud/${$page.url.searchParams.get('session')}`)
+			api
+				.call('GET', `/word-cloud/${$page.url.searchParams.get('session')}`)
 				.then((res) => {
 					if (res.data) {
 						session = res.data;
@@ -56,9 +57,9 @@
 <section class="container mx-auto mb-32">
 	<hgroup>
 		<h1 class="mb-8 text-6xl font-bold text-center">
-			<span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender"
-				>Word cloud</span
-			>
+			<span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender">
+				Word cloud
+			</span>
 		</h1>
 	</hgroup>
 </section>

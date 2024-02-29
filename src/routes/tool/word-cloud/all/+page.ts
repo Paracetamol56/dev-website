@@ -1,14 +1,22 @@
-import axios from 'axios';
-import type { PageData } from '../$types';
+import { user } from '$lib/store';
+import { get } from 'svelte/store';
+import api from '$lib/api';
+import { error } from '@sveltejs/kit';
+import type { PageLoad } from './$types';
 
-export const load: PageData = async () => {
-	return axios
-		.get('/api/word-cloud')
+export const load: PageLoad = async () => {
+	// If the user is not logged in, throw a 401 error
+	if (!get(user).accessToken) {
+		error(401, 'Unauthorized');
+	}
+	const result = await api.callWithAuth('GET', `/word-cloud?user=${get(user).id}`)
 		.then((res) => {
-			return { sessions: res.data };
+			return res.data;
 		})
 		.catch((err) => {
 			console.error(err);
-			return { sessions: [] };
+			return [];
 		});
+	
+	return { sessions: result};
 };

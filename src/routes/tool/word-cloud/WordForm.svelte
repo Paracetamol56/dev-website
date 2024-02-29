@@ -21,6 +21,12 @@
 			.catch((error) => {
 				console.error(error);
 			});
+		
+		// Connect to the websocket
+		const ws = new WebSocket('/api/word-cloud/ws');
+		ws.onopen = () => {
+			ws.send(JSON.stringify({ type: 'join', code: session.id }));
+		};
 	});
 
 	const validateWord = () => {

@@ -26,10 +26,12 @@ func InitRouter() *gin.Engine {
 	contact := new(controllers.ContactController)
 	heatlh := new(controllers.HealthController)
 	hipparcos := new(controllers.HipparcosController)
+	wordCloud := new(controllers.WordCloudController)
 	user := new(controllers.UserController)
 
 	apiGroup := r.Group("/api")
 	{
+		apiGroup.Use(middlewares.RequestIdMiddleware())
 		apiGroup.GET("/doc/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 		apiGroup.GET("/health", heatlh.GetHealth)
 		apiGroup.POST("/contact", contact.PostContact)
@@ -45,6 +47,14 @@ func InitRouter() *gin.Engine {
 		{
 			hipparcosGroup.GET("", hipparcos.GetHipparcosHR)
 			hipparcosGroup.GET("/:hip", hipparcos.GetHipparcosHRByHIP)
+		}
+		apiGroup.GET("/word-cloud", wordCloud.GetWordCloud)
+		apiGroup.GET("/word-cloud/ws", wordCloud.GetWebSocket)
+		wordCloudGroup := apiGroup.Group("/word-cloud")
+		{
+			wordCloudGroup.Use(middlewares.JwtAuthMiddleware())
+			wordCloudGroup.GET("/:id", wordCloud.GetWordCloudById)
+			wordCloudGroup.POST("", wordCloud.PostWordCloud)
 		}
 		userGroup := apiGroup.Group("/users")
 		{

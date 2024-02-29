@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Plus } from 'lucide-svelte';
 	import type { PageData } from '../$types';
+	import Button from '$lib/components/Button.svelte';
 
 	export let data: PageData;
 </script>
@@ -9,7 +10,9 @@
 	<hgroup>
 		<h1 class="mb-8 text-6xl font-bold text-center">
 			<span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender"
-				>Your sessions</span
+				>
+				Your sessions
+				</span
 			>
 		</h1>
 	</hgroup>
@@ -17,15 +20,10 @@
 
 <section class="container mx-auto">
 	<div class="mb-8 flex justify-center">
-		<a href="/word-cloud/new">
-			<button
-				class="flex justify-center items-center rounded-md bg-ctp-mauve px-3 py-1 font-medium
-      text-ctp-surface0 hover:opacity-75 active:opacity-50 transition-opacity"
-			>
-				New session
-				<Plus stroke-width="3" />
-			</button>
-		</a>
+		<Button link="/tool/word-cloud/new">
+			<span>New session</span>
+			<Plus size="18" />
+		</Button>
 	</div>
 
 	<div class="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
@@ -47,7 +45,7 @@
 						{session.submitions} submition{session.submitions <= 1 ? '' : 's'}
 					</p>
 				</div>
-				<a href="/word-cloud/{session.id}">
+				<a href="tool/word-cloud/{session.id}">
 					<h4 class="mb-4 text-2xl font-bold hover:opacity-75 transition-opacity">
 						{session.name}
 					</h4>
