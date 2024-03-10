@@ -13,6 +13,7 @@ import (
 	"github.com/Paracetamol56/dev-website/api/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	uuid "github.com/satori/go.uuid"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -106,7 +107,7 @@ func (controller *WordCloudController) GetWordCloud(c *gin.Context) {
 	} else {
 		wordClouds, err := GetWordCloudByUser(c)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 			return
 		}
 
@@ -186,18 +187,32 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
+type WSMessage struct {
+	Word      string `json:"word"`
+	IP        string `json:"ip"`
+	UserAgent string `json:"userAgent"`
+}
+
 func (controller *WordCloudController) GetWebSocket(c *gin.Context) {
+	sessionId := c.Param("id")
 	ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	defer ws.Close()
+	clientId := uuid.NewV4()
+	ws.WriteJSON(gin.H{
+		"sessionId": sessionId,
+		"status":    "ready",
+		"connId":    clientId.String(),
+	})
 	for {
-		_, msg, err := ws.ReadMessage()
+		var message WSMessage
+		err := ws.ReadJSON(&message)
 		if err != nil {
 			break
 		}
-		fmt.Printf("%s\n", msg)
+		_, err := models.AddWordToWordCloud(c, sessionId, message.Word, message.IP, message.UserAgent)
 	}
 }

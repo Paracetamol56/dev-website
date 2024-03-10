@@ -23,7 +23,7 @@
 			});
 		
 		// Connect to the websocket
-		const ws = new WebSocket('/api/word-cloud/ws');
+		const ws = new WebSocket(`/api/word-cloud/${session.id}/ws`);
 		ws.onopen = () => {
 			ws.send(JSON.stringify({ type: 'join', code: session.id }));
 		};

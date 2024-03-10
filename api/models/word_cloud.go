@@ -18,7 +18,7 @@ type Word struct {
 
 // WordCloud represents a word cloud object.
 type WordCloud struct {
-	Id          primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
+	Id          primitive.ObjectID `json:"id" bson:"_id,omitempty"`
 	UserId      primitive.ObjectID `json:"user" bson:"user"`
 	Name        string             `json:"name" bson:"name"`
 	Description string             `json:"description" bson:"description"`
@@ -80,5 +80,17 @@ func CreateWordCloud(c *gin.Context, wordCloud *WordCloud) (*mongo.InsertOneResu
 	db := db.GetDB()
 	collection := db.Collection("word_cloud_sessions")
 	result, err := collection.InsertOne(c, wordCloud)
+	return result, err
+}
+
+// AddWordToWordCloud adds a word to a word cloud.
+// It takes a gin.Context, a pointer to a WordCloud object, and a pointer to a Word object as parameters.
+// It returns a pointer to a mongo.UpdateResult object and an error.
+func AddWordToWordCloud(c *gin.Context, wordCloud *WordCloud, word *Word) (*mongo.UpdateResult, error) {
+	db := db.GetDB()
+	collection := db.Collection("word_cloud_sessions")
+	filter := bson.M{"_id": wordCloud.Id}
+	update := bson.M{"$push": bson.M{"words": word}}
+	result, err := collection.UpdateOne(c, filter, update)
 	return result, err
 }

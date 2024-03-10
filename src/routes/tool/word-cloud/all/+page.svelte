@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Plus } from 'lucide-svelte';
-	import type { PageData } from '../$types';
+	import type { PageData } from './$types';
 	import Button from '$lib/components/Button.svelte';
 
 	export let data: PageData;
@@ -45,7 +45,7 @@
 						{session.submitions} submition{session.submitions <= 1 ? '' : 's'}
 					</p>
 				</div>
-				<a href="tool/word-cloud/{session.id}">
+				<a href="/tool/word-cloud/{session.id}">
 					<h4 class="mb-4 text-2xl font-bold hover:opacity-75 transition-opacity">
 						{session.name}
 					</h4>
