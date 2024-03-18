@@ -22,7 +22,7 @@ Again, I use a [Raspberry Pi 3 B+](https://www.raspberrypi.com/products/raspberr
 
 ## Software
 
-The software stack is pretty straightforward, I used [MainSail OS](https://docs-os.mainsail.xyz/) as the operating system for the Raspberry Pi, which comes with a few pre-installed services:
+The software stack is pretty straightforward, I used [Mainsail OS](https://docs-os.mainsail.xyz/) as the operating system for the Raspberry Pi, which comes with a few pre-installed services:
 - [Klipper](https://www.klipper3d.org/)
 - [Moonraker](https://moonraker.readthedocs.io/en/latest/)
 - [Mainsail](https://mainsail.xyz/)
@@ -35,15 +35,15 @@ I switched from Marlin to Klipper because I find it to be more flexible and easi
 
 Moonraker is a web server that provides a REST API to control Klipper.
 
-Since a REST API is very versatile, it allows me to control the printer from any device, such as my phone with [MobileRaker](https://mobileraker.com/) or via MainSail. In addition, it allows me to integrate the printer with other services, such as Home Assistant or Node-RED.
+Since a REST API is very versatile, it allows me to control the printer from any device, such as my phone with [MobileRaker](https://mobileraker.com/) or via Mainsail. In addition, it enables me to integrate the printer with other services, such as Home Assistant or Node-RED.
 
 ![Home assistant integration](/img/what-s-on-my-homelab-part-2/home-assistant.png)
 
-### MainSail
+### Mainsail
 
-MainSail is a web-based user interface for Moonraker. It's a very user-friendly interface that allows me to control the printer, upload files, and monitor the print progress.
+Mainsail is a web-based user interface for Moonraker. It's a very user-friendly interface that allows me to control the printer, upload files, and monitor the print progress.
 
-![MainSail dashboard](/img/what-s-on-my-homelab-part-2/mainsail.png)
+![Mainsail dashboard](/img/what-s-on-my-homelab-part-2/mainsail.png)
 
 Mainsail comes with a powerful gcode visualizer that allows me to see the print progress in real-time.
 
