@@ -52,7 +52,7 @@
 
 <div>
 	<div class="w-full">
-		<h3>Save Model</h3>
+		<h4>Save Model</h4>
 		<Button on:click={save} disabled={$model.layers.length === 0}>
 			<span>Save Model</span>
 			<Download size="18" stroke-width="3" />
@@ -62,7 +62,7 @@
 		</h4>
 	</div>
 	<div class="w-full">
-		<h3>Load Model</h3>
+		<h4>Load Model</h4>
 		<div class="flex flex-col items-start gap-2">
 			<div class="flex bg-ctp-mantle rounded-md items-center gap-2 shadow-md shadow-ctp-crust">
 				<label
@@ -75,6 +75,7 @@
 				</label>
 				<input
 					type="file"
+					accept=".json"
 					id="json-upload"
 					name="json-upload"
 					class="hidden"
@@ -97,6 +98,7 @@
 				</label>
 				<input
 					type="file"
+					accept=".bin"
 					id="weights-upload"
 					name="weights-upload"
 					class="hidden"

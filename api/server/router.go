@@ -20,12 +20,6 @@ func InitRouter() *gin.Engine {
 		AllowMethods: []string{"GET", "POST", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders: []string{"Origin", "Content-Type", "Authorization"},
 	}))
-	r.Use(func(c *gin.Context) {
-		c.Header("Cross-Origin-Resource-Policy", "cross-origin")
-		c.Header("Cross-Origin-Opener-Policy", "same-origin")
-		c.Header("Cross-Origin-Embedder-Policy", "require-corp")
-		c.Next()
-	})
 
 	// Init controllers
 	auth := new(controllers.AuthController)

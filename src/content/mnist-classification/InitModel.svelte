@@ -62,7 +62,6 @@
 </script>
 
 <div>
-	<h3>Model Architecture</h3>
 	<!-- <div>
 		<textarea
       class="flex h-44 w-full items-center justify-between rounded-md bg-ctp-surface0 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"

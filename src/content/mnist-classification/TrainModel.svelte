@@ -85,7 +85,6 @@
 <div>
 	<div class="flex flex-col lg:flex-row gap-4">
 		<div class="lg:w-64">
-			<h3>Train Model</h3>
 			<div class="mb-2">
 				<fieldset class="w-full">
 					<label for="epoch" class="mb-2 text-sm font-semibold">Max Epoch</label>
@@ -137,7 +136,6 @@
 			{/if}
 		</div>
 		<div class="w-full">
-			<h3>Training Progress</h3>
 			<div class="w-full flex flex-col gap-4 md:flex-row justify-stretch">
 				<div class="w-full">
 					<h4>Loss{lossLogs.length > 0 ? ` - ${lossLogs[lossLogs.length - 1].toFixed(4)}` : ''}</h4>
