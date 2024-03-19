@@ -1,51 +1,78 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import JoinForm from './JoinForm.svelte';
-	import WordForm from './WordForm.svelte';
-	import axios from 'axios';
-	import { addToast } from '../../+layout.svelte';
-	import { browser } from '$app/environment';
-	import { onMount } from 'svelte';
-	import type { WordCloudSession } from './utils';
 	import api from '$lib/api';
+	import Button from '$lib/components/Button.svelte';
+	import { ArrowRightToLine } from 'lucide-svelte';
+	import { addToast } from '../../+layout.svelte';
+	import { createPinInput, melt } from '@melt-ui/svelte';
+	import { user } from '$lib/store';
 
-	let session: WordCloudSession | null = null;
+	let codeError: string = '';
 
-	onMount(() => {
-		if ($page.url.searchParams.has('session')) {
+	const {
+		elements: { root, input },
+		states: { value }
+	} = createPinInput({
+		placeholder: '•',
+		defaultValue: $page.url.searchParams.get('code')?.split('') ?? []
+	});
+
+	const validateCode = (code: string[]) => {
+		if (code.length !== 5 || code.some((char) => char === '')) {
+			codeError = 'Code must be 5 characters long';
+			return false;
+		}
+		// Every character must be a number, lowercase letter or uppercase letter
+		if (!code.every((char) => /[a-zA-Z0-9]/.test(char))) {
+			codeError = 'Code must only contain numbers and letters';
+			return false;
+		}
+		codeError = '';
+		return true;
+	};
+
+	const handleSubmit = (e: Event) => {
+		e.preventDefault();
+		if (validateCode($value)) {
 			api
-				.call('GET', `/word-cloud/${$page.url.searchParams.get('session')}`)
+				.call('GET', `/word-cloud?code=${$value.join('')}`)
 				.then((res) => {
-					if (res.data) {
-						session = res.data;
+					if (res.data.open) {
+						goto(`/tool/word-cloud/${res.data.id}`);
 					} else {
-						$page.url.searchParams.delete('session');
-						if (browser) {
-							goto($page.url.toString());
-						}
+						codeError = 'This session is closed';
+						addToast({
+							data: {
+								title: 'Error',
+								description: 'The code you provided does not match any open session',
+								color: 'bg-ctp-red'
+							}
+						});
 					}
 				})
 				.catch((error) => {
 					console.error(error);
-					$page.url.searchParams.delete('session');
-					goto($page.url.toString());
-					addToast({
-						data: {
-							title: 'Warning',
-							description: 'The session you are trying to join does not exist or has been closed.',
-							color: 'bg-ctp-orange'
-						}
-					});
+					if (error.response.status === 404) {
+						codeError = 'Session not found';
+						addToast({
+							data: {
+								title: 'Error',
+								description: 'The code you provided does not match any open session',
+								color: 'bg-ctp-red'
+							}
+						});
+					} else {
+						codeError = 'An error occured';
+						addToast({
+							data: {
+								title: 'Error',
+								description: 'An error occured while joining the session',
+								color: 'bg-ctp-red'
+							}
+						});
+					}
 				});
-		}
-	});
-
-	const joinSession = (s: WordCloudSession) => {
-		session = s;
-		$page.url.searchParams.set('session', s.id);
-		if (browser) {
-			goto($page.url.toString());
 		}
 	};
 </script>
@@ -65,9 +92,45 @@
 </section>
 
 <section class="container mx-auto">
-	{#if !session}
-		<JoinForm {joinSession} />
-	{:else}
-		<WordForm {session} />
-	{/if}
+	<form on:submit={handleSubmit}>
+		<div class="flex flex-col gap-8 items-center">
+			<div class="w-fit">
+				<label for="code" class="mb-2 text-sm font-semibold"> Session code </label>
+				<div use:melt={$root} class="flex items-center gap-2">
+					{#each Array.from({ length: 5 }) as _}
+						<input
+							id="code"
+							autocomplete="off"
+							type="text"
+							maxlength="1"
+							class="rounded-md bg-ctp-surface0 text-center text-lg text-ctp-text square-12
+                  shadow-md shadow-ctp-crust focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
+							on:keydown={(e) => {
+								if (e.key === 'Enter') {
+									handleSubmit(e);
+								}
+							}}
+							use:melt={$input()}
+						/>
+					{/each}
+				</div>
+				<p class="text-left text-sm font-semibold text-ctp-red">{codeError}</p>
+			</div>
+			<Button type="submit">
+				<span>Join</span>
+				<ArrowRightToLine size="18" />
+			</Button>
+		</div>
+	</form>
+
+	<div class="mt-8 flex justify-center gap-4">
+		<a class="font-semibold hover:text-ctp-blue transition-colors" href="/tool/word-cloud/new"
+			>Create a new session</a
+		>
+		{#if $user.id !== null}
+			<a class="font-semibold hover:text-ctp-blue transition-colors" href="/tool/word-cloud/manage"
+				>View your sessions</a
+			>
+		{/if}
+	</div>
 </section>

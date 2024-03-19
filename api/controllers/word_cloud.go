@@ -59,9 +59,7 @@ func GetWordCloudByCode(c *gin.Context, code string) (*models.WordCloud, error) 
 	return wordCloud, nil
 }
 
-func GetWordCloudByUser(c *gin.Context) ([]*models.WordCloud, error) {
-	// Extract the user ID from the query string
-	userIdString := c.Query("user")
+func GetWordCloudByUser(c *gin.Context, userIdString string) ([]*models.WordCloud, error) {
 	queryUserId, err := primitive.ObjectIDFromHex(userIdString)
 	if err != nil {
 		return nil, fmt.Errorf("invalid user id")
@@ -90,22 +88,27 @@ func GetWordCloudByUser(c *gin.Context) ([]*models.WordCloud, error) {
 
 func (controller *WordCloudController) GetWordCloud(c *gin.Context) {
 	code := c.Query("code")
+	user := c.Query("user")
 
 	if code != "" {
 		wordCloud, err := GetWordCloudByCode(c, code)
 		if err != nil {
+			if err.Error() == "mongo: no documents in result" {
+				c.JSON(http.StatusNotFound, gin.H{"error": "word cloud not found"})
+				return
+			}
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 		c.JSON(http.StatusOK, gin.H{
-			"_id":         wordCloud.Id,
+			"id":          wordCloud.Id,
 			"name":        wordCloud.Name,
 			"description": wordCloud.Description,
 			"code":        wordCloud.Code,
 			"open":        wordCloud.Open,
 		})
-	} else {
-		wordClouds, err := GetWordCloudByUser(c)
+	} else if user != "" {
+		wordClouds, err := GetWordCloudByUser(c, user)
 		if err != nil {
 			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 			return
@@ -123,6 +126,8 @@ func (controller *WordCloudController) GetWordCloud(c *gin.Context) {
 			})
 		}
 		c.JSON(http.StatusOK, response)
+	} else {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing query parameter"})
 	}
 }
 
@@ -136,16 +141,30 @@ func (controller *WordCloudController) GetWordCloudById(c *gin.Context) {
 
 	wordCloud, err := models.GetWordCloudById(c, id)
 	if err != nil {
+		if err.Error() == "mongo: no documents in result" {
+			c.JSON(http.StatusNotFound, gin.H{"error": "word cloud not found"})
+			return
+		}
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	if wordCloud.UserId != c.MustGet("x-user-id").(primitive.ObjectID) {
-		c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
-		return
+	if c.GetHeader("x-user-id") != "" {
+		userId := c.MustGet("x-user-id").(primitive.ObjectID)
+
+		if wordCloud.UserId == userId {
+			c.JSON(http.StatusOK, wordCloud)
+			return
+		}
 	}
 
-	c.JSON(http.StatusOK, wordCloud)
+	c.JSON(http.StatusOK, gin.H{
+		"id":          wordCloud.Id,
+		"name":        wordCloud.Name,
+		"description": wordCloud.Description,
+		"code":        wordCloud.Code,
+		"open":        wordCloud.Open,
+	})
 }
 
 type PostWordCloudBody struct {
@@ -213,6 +232,6 @@ func (controller *WordCloudController) GetWebSocket(c *gin.Context) {
 		if err != nil {
 			break
 		}
-		_, err := models.AddWordToWordCloud(c, sessionId, message.Word, message.IP, message.UserAgent)
+		// _, err := models.AddWordToWordCloud(c, sessionId, message.Word, message.IP, message.UserAgent)
 	}
 }

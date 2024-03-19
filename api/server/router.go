@@ -48,12 +48,12 @@ func InitRouter() *gin.Engine {
 			hipparcosGroup.GET("", hipparcos.GetHipparcosHR)
 			hipparcosGroup.GET("/:hip", hipparcos.GetHipparcosHRByHIP)
 		}
-		apiGroup.GET("/word-cloud", wordCloud.GetWordCloud)
-		apiGroup.GET("/word-cloud/:id/ws", wordCloud.GetWebSocket)
 		wordCloudGroup := apiGroup.Group("/word-cloud")
 		{
-			wordCloudGroup.Use(middlewares.JwtAuthMiddleware())
+			// wordCloudGroup.Use(middlewares.JwtAuthMiddleware())
+			wordCloudGroup.GET("", wordCloud.GetWordCloud)
 			wordCloudGroup.GET("/:id", wordCloud.GetWordCloudById)
+			wordCloudGroup.GET("/:id/ws", wordCloud.GetWebSocket)
 			wordCloudGroup.POST("", wordCloud.PostWordCloud)
 		}
 		userGroup := apiGroup.Group("/users")

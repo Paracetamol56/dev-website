@@ -4,6 +4,7 @@
 	import axios from 'axios';
 	import { addToast } from '../../+layout.svelte';
 	import { onMount } from 'svelte';
+	import Button from '$lib/components/Button.svelte';
 
 	export let session: WordCloudSession;
 
@@ -103,13 +104,10 @@
 				/>
 				<p class="text-left text-sm font-semibold text-ctp-red">{textError}</p>
 			</div>
-			<button
-				class="flex justify-center items-center rounded-md bg-ctp-mauve px-3 py-1 font-medium
-              text-ctp-surface0 hover:opacity-75 active:opacity-50 transition-opacity"
-				type="submit"
-			>
-				Send&nbsp;<Send size="18" />
-			</button>
+			<Button type="submit">
+				<span>Send</span>
+				<Send size="18" />
+			</Button>
 		</div>
 	</form>
 

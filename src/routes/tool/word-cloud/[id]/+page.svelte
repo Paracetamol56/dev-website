@@ -1,175 +1,93 @@
 <script lang="ts">
-	import WordCloud from './WordCloud.svelte';
-	import BarChart from './BarChart.svelte';
-	import Table from './Table.svelte';
-	import axios from 'axios';
-	import { addToast } from '../../../+layout.svelte';
-	import { createDialog, melt } from '@melt-ui/svelte';
-	import { QrCode, X } from 'lucide-svelte';
-	import { fade, fly } from 'svelte/transition';
-	import QRCode from 'qrcode';
-	import type { PageData } from './$types';
+	import axios from "axios";
+	import { onMount } from "svelte";
+	import type { PageData } from "./$types";
+	import Button from "$lib/components/Button.svelte";
+	import { Send } from "lucide-svelte";
 
-	export let data: PageData;
+  export let data: PageData;
+  let ip: string | null = null;
+	let text: string = '';
+	let textError: string = '';
+	let textSuccess: boolean = false;
 
-	let qrWidthAvailable: number;
-	let canvas: HTMLCanvasElement;
-
-	$: {
-		if (canvas !== undefined) {
-			const url = `${window.location.origin}/tool/word-cloud?code=${data.session.code}`;
-			QRCode.toCanvas(
-				canvas,
-				url,
-				{
-					errorCorrectionLevel: 'H',
-					scale: 3 + qrWidthAvailable / 175
-				},
-				(error) => {
-					if (error) console.error(error);
-				}
-			);
-		}
-	}
-
-	const humanReadableDate = (date: Date | null) => {
-		if (date === null) return '';
-		return date.toLocaleString();
-	};
-
-	const closeSession = (e: Event) => {
-		e.preventDefault();
-
+	/*onMount(() => {
 		axios
-			.delete(`/api/word-cloud/${data.session.id}`)
+			.get('https://api.ipify.org?format=json')
 			.then((res) => {
-				if (res.status === 204) {
-					addToast({
-						data: {
-							title: 'Success',
-							description: 'The session has been closed',
-							color: 'bg-ctp-green'
-						}
-					});
-					data.session.open = false;
-					data.session.closedAt = new Date();
-				}
+				ip = res.data.ip;
 			})
-			.catch((err) => {
-				console.error(err);
-				addToast({
-					data: {
-						title: 'Error',
-						description: 'An error occured while closing the session',
-						color: 'bg-ctp-red'
-					}
-				});
+			.catch((error) => {
+				console.error(error);
 			});
+		
+		// Connect to the websocket
+		const ws = new WebSocket(`/api/word-cloud/${data.session!.id}/ws`);
+		ws.onopen = () => {
+			ws.send(JSON.stringify({ type: 'join', code: data.session!.id }));
+		};
+	});*/
+
+	const validateWord = () => {
+		if (text.length === 0) {
+			textError = 'A word is required';
+			return false;
+		}
+		if (text.length > 100) {
+			textError = 'Your word must be less than 100 characters long';
+			return false;
+		}
+		if (JSON.parse(sessionStorage.getItem(data.session!.id)!)?.includes(text.toLowerCase())) {
+			textError = 'This word has already been sent';
+			return false;
+		}
+		textError = '';
+		return true;
 	};
 
-	const {
-		elements: { trigger, overlay, content, title, close, portalled },
-		states: { open }
-	} = createDialog({
-		forceVisible: true
-	});
+	const handleSubmit = (e: Event) => {
+		e.preventDefault();
+		if (!validateWord()) return;
+		// TODO: Send the word to the server
+	};
 </script>
 
-<svelte:head>
-	<title>Word cloud - Mathéo Galuba</title>
-</svelte:head>
+<div class="mx-auto max-w-xl">
+	<h2 class="mb-4 text-4xl font-bold text-center">
+		{data.session?.name}
+	</h2>
+	<p class="text-center">
+		{data.session?.description}
+	</p>
 
-<section class="container mx-auto mb-32">
-	<hgroup>
-		<h1 class="mb-8 text-6xl font-bold text-center">
-			<span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender"
-				>Word cloud</span
-			>
-			{data.session?.name || ''}
-		</h1>
-	</hgroup>
-</section>
-
-<section class="container mx-auto">
-	{#if data.session}
-		<WordCloud data={data.distribution} />
-		<div class="mb-4 p-4 w-full bg-ctp-mantle rounded-md">
-			<p><strong>Submitions:</strong> {data.session.words.length}</p>
-			<p><strong>Unique words:</strong> {data.distribution.length}</p>
-			<p><strong>Created at:</strong> {humanReadableDate(new Date(data.session.createdAt))}</p>
-			{#if !data.session.open}
-				<p>
-					<strong>Closed at:</strong>
-					{humanReadableDate(data.session.closedAt ? new Date(data.session.closedAt) : null)}
-				</p>
-			{/if}
-
-			<div class="mt-2 flex justify-start gap-2">
-				{#if data.session.open}
-					<button
-						class="flex items-center gap-1 rounded-md bg-ctp-mauve px-3 py-1
-                  font-semibold text-ctp-mantle
-                  shadow-md shadow-ctp-crust transition-opacity
-                  hover:opacity-80 active:opacity-60"
-						use:melt={$trigger}
-					>
-						Session info <QrCode size="20" stroke-width="3" />
-					</button>
-					<button
-						class="flex items-center gap-1 rounded-md bg-ctp-red px-3 py-1
-                  font-semibold text-ctp-mantle
-                  shadow-md shadow-ctp-crust transition-opacity
-                  hover:opacity-80 active:opacity-60"
-						on:click={closeSession}
-					>
-						Close session <X size="20" stroke-width="3" />
-					</button>
-				{/if}
+	<form class="my-16" on:submit={handleSubmit}>
+		<div class="flex flex-col gap-8 items-center">
+			<div class="w-full">
+				<label for="text" class="mb-2 text-sm font-semibold"> Write something </label>
+				<input
+					id="text"
+					name="text"
+					type="text"
+					class="flex h-8 w-full items-center justify-between rounded-md bg-ctp-surface0
+                px-3 pr-12 focus:outline-none
+                {textError ? 'ring-2 ring-ctp-red' : ''}
+                {textSuccess
+						? 'ring-2 ring-ctp-green'
+						: 'focus:ring-2 focus:ring-ctp-mauve'} transition-colors"
+					bind:value={text}
+					on:blur={() => validateWord()}
+					on:input={() => (textSuccess = false)}
+				/>
+				<p class="text-left text-sm font-semibold text-ctp-red">{textError}</p>
 			</div>
+			<Button type="submit">
+				<span>Send</span>
+				<Send size="18" />
+			</Button>
 		</div>
-		<BarChart data={data.distribution} />
-		<Table data={data.session.words} id={data.session.id} />
-	{/if}
-</section>
+	</form>
 
-<div use:melt={$portalled}>
-	{#if $open}
-		<div
-			use:melt={$overlay}
-			class="fixed inset-0 z-30 bg-black/50"
-			transition:fade={{ duration: 200 }}
-		/>
-		<div
-			class="fixed left-[50%] top-[50%] z-50 h-[90vh] w-[90vw]
-            translate-x-[-50%] translate-y-[-50%] rounded-md bg-ctp-base
-            p-6 shadow-md overflow-auto"
-			transition:fly={{ duration: 200, y: 10 }}
-			use:melt={$content}
-		>
-			<h2 use:melt={$title} class="mt-4 mb-8 text-center text-4xl font-bold">Join the session !</h2>
-			<div class="w-full flex flex-col items-center" bind:clientWidth={qrWidthAvailable}>
-				<canvas bind:this={canvas} />
-				<a
-					class="my-8 text-3xl font-medium"
-					href="{window.location.origin}/word-cloud?code={data.session.code}"
-					target="_blank"
-				>
-					{window.location.origin}/word-cloud
-				</a>
-				<p class="my-8 text-4xl font-bold">
-					Code: <span class="text-ctp-mauve">{data.session.code}</span>
-				</p>
-			</div>
-
-			<button
-				use:melt={$close}
-				aria-label="close"
-				class="absolute right-4 top-4 inline-flex h-6 w-6 appearance-none
-                items-center justify-center rounded-full p-1 text-base
-                hover:bg-ctp-mauve hover:text-ctp-base transition-colors"
-			>
-				<X class="square-4" />
-			</button>
-		</div>
-	{/if}
+	<p class="mt-8 text-center">
+		The session code is <strong>{data.session?.code}</strong>,<br />share it with your neighbors.
+	</p>
 </div>
