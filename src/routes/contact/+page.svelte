@@ -140,7 +140,7 @@
 					type="email"
 					name="email"
 					class="flex h-8 w-full items-center justify-between rounded-md bg-ctp-surface0
-                shadow-md shadow-ctp-crust px-3 pr-12 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
+                shadow-md shadow-ctp-crust px-3 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
 					bind:value={email}
 					on:blur={() => validateEmail(email)}
 				/>

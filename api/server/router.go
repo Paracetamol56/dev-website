@@ -26,6 +26,7 @@ func InitRouter() *gin.Engine {
 	contact := new(controllers.ContactController)
 	heatlh := new(controllers.HealthController)
 	hipparcos := new(controllers.HipparcosController)
+	ormi := new(controllers.OrmiController)
 	user := new(controllers.UserController)
 
 	apiGroup := r.Group("/api")
@@ -45,6 +46,12 @@ func InitRouter() *gin.Engine {
 		{
 			hipparcosGroup.GET("", hipparcos.GetHipparcosHR)
 			hipparcosGroup.GET("/:hip", hipparcos.GetHipparcosHRByHIP)
+		}
+		ormiGroup := apiGroup.Group("/ormi")
+		{
+			ormiGroup.Use(middlewares.JwtAuthMiddleware())
+			ormiGroup.GET("", ormi.GetTodos)
+			ormiGroup.POST("", ormi.PostTodo)
 		}
 		userGroup := apiGroup.Group("/users")
 		{
