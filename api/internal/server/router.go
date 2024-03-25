@@ -31,6 +31,7 @@ func InitRouter() *gin.Engine {
 	icon := new(controllers.IconController)
 	wordCloud := new(controllers.WordCloudController)
 	microprocessor := new(controllers.MicroprocessorController)
+	ormi := new(controllers.OrmiController)
 	user := new(controllers.UserController)
 
 	apiGroup := r.Group("/api")
@@ -70,6 +71,11 @@ func InitRouter() *gin.Engine {
 		{
 			microprocessorGroup.GET("", microprocessor.GetMicroprocessor)
 			microprocessorGroup.GET("/:id", microprocessor.GetMicroprocessorById)
+		ormiGroup := apiGroup.Group("/ormi")
+		{
+			ormiGroup.Use(middlewares.JwtAuthMiddleware())
+			ormiGroup.GET("", ormi.GetTodos)
+			ormiGroup.POST("", ormi.PostTodo)
 		}
 		userGroup := apiGroup.Group("/users")
 		{
