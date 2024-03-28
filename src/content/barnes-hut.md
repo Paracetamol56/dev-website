@@ -63,9 +63,7 @@ This component is made in C++ and compiled to WebAssembly.
 
 In 3d, the core idea is the same but we use an octree (8 children per node) instead of a quadtree (4 children per node).
 
-<div style="overflow: auto;">
-  <iframe src="/files/barnes-hut/barnes-hut.html" title="Barnes-Hut WASM simulation" style="width: 800px; height: 800px; border: none; margin: 0 auto;"></iframe>
-</div>
+<iframe src="/files/barnes-hut/barnes-hut.html" title="Barnes-Hut WASM simulation" style="width: 800px; height: 800px; border: none; margin: 0 auto;"></iframe>
 
 ## Other use cases
 
