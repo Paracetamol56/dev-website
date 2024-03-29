@@ -42,14 +42,20 @@
 		<p class="text-ctp-subtext0">Pages with various content...</p>
 		<hr class="my-8 h-1 w-6 border-none rounded-full bg-ctp-mauve" />
 	</div>
-	<div class="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
-		{#each data.pages.slice(($pageNumber - 1) * 6, $pageNumber * 6) as page}
-			<PageDisplay {page} />
-		{/each}
-	</div>
-	<div class="my-4 flex justify-center">
-		<Pagination page={pageNumber} count={data.pages.length} perPage={6} />
-	</div>
+	{#if data.pages.length === 0}
+		<div class="my-8 font-semibold text-lg text-center">
+			<p>Comming soon...</p>
+		</div>
+	{:else}
+		<div class="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
+			{#each data.pages.slice(($pageNumber - 1) * 6, $pageNumber * 6) as page}
+				<PageDisplay {page} />
+			{/each}
+		</div>
+		<div class="my-4 flex justify-center">
+			<Pagination page={pageNumber} count={data.pages.length} perPage={6} />
+		</div>
+	{/if}
 </section>
 
 <section class="relative container mx-auto" bind:this={section2}>
@@ -65,11 +71,17 @@
 		<p class="text-ctp-subtext0">Tools to help you in your daily life...</p>
 		<hr class="my-8 h-1 w-6 border-none rounded-full bg-ctp-mauve" />
 	</div>
-	<div class="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
-		{#each data.tools as tool}
-			<PageDisplay page={tool} path="/tool" />
-		{/each}
-	</div>
+	{#if data.tools.length === 0}
+		<div class="my-8 font-semibold text-lg text-center">
+			<p>Comming soon...</p>
+		</div>
+	{:else}
+		<div class="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
+			{#each data.tools as tool}
+				<PageDisplay page={tool} path="/tool" />
+			{/each}
+		</div>
+	{/if}
 </section>
 
 <style lang="postcss">
