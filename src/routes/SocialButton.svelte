@@ -29,6 +29,6 @@
 		class="z-10 rounded-lg bg-ctp-text shadow"
 	>
 		<div use:melt={$arrow} />
-		<p class="px-4 py-1 text-ctp-mantle">{tooltip}</p>
+		<p class="px-4 py-1 font-semibold text-ctp-mantle">{tooltip}</p>
 	</div>
 {/if}
