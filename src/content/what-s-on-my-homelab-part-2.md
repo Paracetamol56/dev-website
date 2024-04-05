@@ -37,14 +37,14 @@ Moonraker is a web server that provides a REST API to control Klipper.
 
 Since a REST API is very versatile, it allows me to control the printer from any device, such as my phone with [MobileRaker](https://mobileraker.com/) or via Mainsail. In addition, it enables me to integrate the printer with other services, such as Home Assistant or Node-RED.
 
-![Home assistant integration](/img/what-s-on-my-homelab-part-2/home-assistant.png)
+<img class="max-w-7xl" src="/img/what-s-on-my-homelab-part-2/home-assistant.png" alt="Home assistant integration" />
 
 ### Mainsail
 
 Mainsail is a web-based user interface for Moonraker. It's a very user-friendly interface that allows me to control the printer, upload files, and monitor the print progress.
 
-![Mainsail dashboard](/img/what-s-on-my-homelab-part-2/mainsail.png)
+<img class="max-w-7xl" src="/img/what-s-on-my-homelab-part-2/mainsail.png" alt="Mainsail" />
 
 Mainsail comes with a powerful gcode visualizer that allows me to see the print progress in real-time.
 
-![Gcode viewer in Mainsail](/img/what-s-on-my-homelab-part-2/mainsail-gcode-viewer.png)
+<img class="max-w-7xl" src="/img/what-s-on-my-homelab-part-2/mainsail-gcode-viewer.png" alt="Gcode viewer in Mainsail" />
