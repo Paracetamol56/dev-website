@@ -28,14 +28,16 @@ I use a [Raspberry Pi 4](https://www.raspberrypi.com/products/raspberry-pi-4-mod
 
 ## Software
 
-<img src="https://user.oc-static.com/upload/2021/11/10/1636542639252_Moby-logo.png" alt="Home Assistant logo" width="100px" align="left" style="margin-top: 0; margin-right: 1rem;"/>
+<img class="content-ignore float-left w-20 mr-4 mb-2" src="https://user.oc-static.com/upload/2021/11/10/1636542639252_Moby-logo.png" alt="Docker logo" />
 I use docker to run all the different services and applications on my Raspberry Pi. Docker is a great way to manage and run services in isolated containers, which makes it easy to keep everything organized and up to date.
 
 [Docker official website](https://www.docker.com/)
 
+<div class="clear-left">
+
 ### Home Assistant
 
-<img src="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/home-assistant.png" alt="Home Assistant logo" width="100px" align="left" style="margin-top: 0; margin-right: 1rem;"/>
+<img class="content-ignore float-left w-20 mr-4 mb-2" src="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/home-assistant.png" alt="Home Assistant logo" />
 
 [Home Assistant](https://www.home-assistant.io/) is the heart of my home automation setup. It's the central hub that connects all the different devices and services together.
 
@@ -46,30 +48,43 @@ In addition to the core Home Assistant server, I also use a few add-ons to exten
 - [Mosquitto](https://mosquitto.org/)
 - [ESPHome](https://esphome.io/)
 
-![Home assistant dashboard](/img/what-s-on-my-homelab-part-1/home-assistant.png)
+</div>
+
+<img class="clear-left max-w-7xl" src="/img/what-s-on-my-homelab-part-1/home-assistant.png" alt="Home Assistant dashboard" />
+
+<div class="clear-left">
 
 #### Installation notes
 
 Home Assistant comes in many different flavors, the recommended way to install it is using the Home Assistant OS image, which is a pre-configured operating system with Home Assistant and all its dependencies pre-installed. However, I prefer to use the Home Assistant Supervised installation method, which allows me to run Home Assistant on top of a regular Linux distribution, such as Debian, and to install other services and applications alongside it.
 
+</div>
+<div class="clear-left">
+
 ### Node-RED
 
 Node-RED is a visual programming tool that I use to create automations and scripts for Home Assistant. It's a great way to create complex automations without having to write a lot of code.
 
-![NodeRED editor](/img/what-s-on-my-homelab-part-1/node-red.png)
+<img class="max-w-7xl" src="/img/what-s-on-my-homelab-part-1/node-red.png" alt="Node-RED editor" />
+
+</div>
+<div class="clear-left">
 
 ### Mosquitto
 
-<img src="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/eclipse-mosquitto.png" alt="Mosquitto logo" width="100px" align="left" style="margin-top: 0; margin-right: 1rem;"/>
+<img class="content-ignore float-left w-20 mr-4 mb-2" src="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/eclipse-mosquitto.png" alt="Mosquitto logo" />
 
 Mosquitto is an open source MQTT broker that I use to connect all my IoT devices together. It's an efficient way to send messages between different devices and services. I use it to send sensor data from my custom sensors to Home Assistant.
 
 *MQTT ([Message Queuing Telemetry Transport](https://en.wikipedia.org/wiki/MQTT)) is a lightweight, publish-subscribe, machine to machine network protocol for message queue/message queuing service. It is designed for connections with remote locations that have devices with resource constraints or limited network bandwidth, such as in the Internet of Things (IoT).*
 
+</div>
+<div class="clear-left">
+
 ### ESPHome
 
-<img src="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/esphome.png" alt="ESPHome logo" width="100px" align="left" style="margin-top: 0; margin-right: 1rem;"/>
+<img class="content-ignore float-left w-20 mr-4 mb-2" src="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/esphome.png" alt="ESPHome logo" />
 
 ESPHome is a system to program ESP8266/ESP32 boards by simple yet powerful `.yaml` configuration files and control them remotely through the Home Assistant API.
 
-
+</div>

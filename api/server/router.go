@@ -20,6 +20,7 @@ func InitRouter() *gin.Engine {
 		AllowMethods: []string{"GET", "POST", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders: []string{"Origin", "Content-Type", "Authorization"},
 	}))
+	r.Use(middlewares.CORPMiddleware())
 
 	// Init controllers
 	auth := new(controllers.AuthController)
@@ -57,7 +58,7 @@ func InitRouter() *gin.Engine {
 	}
 
 	// Static files
-	r.Use(static.Serve("/", static.LocalFile("./build", true)))
+	r.Use(static.Serve("/", static.LocalFile("./build", false)))
 	r.NoRoute(func(c *gin.Context) {
 		c.File("./build/index.html")
 	})
