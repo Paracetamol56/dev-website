@@ -36,7 +36,7 @@
 		the streak counter are here to motivate you to keep working on your project.
 	</p>
 
-	<TodoList todos={data.todos} {focusedTodoId} />
+	<!--<TodoList todos={data.todos} {focusedTodoId} />-->
 </section>
 
 <section class="container mx-auto">
