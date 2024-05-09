@@ -8,6 +8,7 @@ listed: true
 ---
 
 <script>
-
+  import Chart from './moore-s-law/Chart.svelte';
 </script>
 
+<Chart />
