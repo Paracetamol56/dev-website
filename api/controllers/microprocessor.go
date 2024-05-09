@@ -12,7 +12,16 @@ type MicroprocessorController struct {
 }
 
 func (controller *MicroprocessorController) GetMicroprocessor(c *gin.Context) {
-	data, err := models.GetAllMicroprocessors(c)
+	// Apply optional filters to the query
+	// Get query parameters in the struct models.MicroprocessorFilter
+	var filter models.MicroprocessorFilter
+	if err := c.ShouldBindQuery(&filter); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	println(filter.Type, filter.Vendor)
+
+	data, err := models.GetAllMicroprocessors(c, &filter)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

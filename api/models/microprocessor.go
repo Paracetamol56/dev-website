@@ -20,11 +20,26 @@ type Microprocessor struct {
 	Vendor      string             `json:"vendor" bson:"vendor"`
 }
 
-func GetAllMicroprocessors(c *gin.Context) ([]Microprocessor, error) {
+type MicroprocessorFilter struct {
+	Type   string `form:"type,omitempty"`
+	Vendor string `form:"vendor,omitempty"`
+}
+
+func GetAllMicroprocessors(c *gin.Context, filter *MicroprocessorFilter) ([]Microprocessor, error) {
 	db := db.GetDB()
 	collection := db.Collection("transistors_per_microprocessor")
 
-	cursor, err := collection.Find(c, bson.M{}, nil)
+	query := bson.M{}
+	if filter.Type != "" {
+		query["type"] = filter.Type
+	}
+	if filter.Vendor != "" {
+		query["vendor"] = filter.Vendor
+	}
+
+	println(filter.Type, filter.Vendor)
+
+	cursor, err := collection.Find(c, query, nil)
 	if err != nil {
 		return nil, err
 	}
