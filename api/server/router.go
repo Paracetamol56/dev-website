@@ -27,6 +27,7 @@ func InitRouter() *gin.Engine {
 	contact := new(controllers.ContactController)
 	heatlh := new(controllers.HealthController)
 	hipparcos := new(controllers.HipparcosController)
+	microprocessor := new(controllers.MicroprocessorController)
 	user := new(controllers.UserController)
 
 	apiGroup := r.Group("/api")
@@ -46,6 +47,11 @@ func InitRouter() *gin.Engine {
 		{
 			hipparcosGroup.GET("", hipparcos.GetHipparcosHR)
 			hipparcosGroup.GET("/:hip", hipparcos.GetHipparcosHRByHIP)
+		}
+		microprocessorGroup := apiGroup.Group("/microprocessors")
+		{
+			microprocessorGroup.GET("", microprocessor.GetMicroprocessor)
+			microprocessorGroup.GET("/:id", microprocessor.GetMicroprocessorById)
 		}
 		userGroup := apiGroup.Group("/users")
 		{
