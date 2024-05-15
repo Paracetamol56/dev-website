@@ -19,7 +19,6 @@ func (controller *MicroprocessorController) GetMicroprocessor(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	println(filter.Type, filter.Vendor)
 
 	data, err := models.GetAllMicroprocessors(c, &filter)
 	if err != nil {

@@ -16,7 +16,7 @@ type Microprocessor struct {
 	TDP         int                `json:"tdp" bson:"tdp"`
 	DieSize     int                `json:"dieSize" bson:"die_size"`
 	Transistors int                `json:"transistors" bson:"transistors"`
-	Frequency   int                `json:"frequency" bson:"frequency"`
+	Frequency   int                `json:"frequency" bson:"freq"`
 	Vendor      string             `json:"vendor" bson:"vendor"`
 }
 
@@ -27,7 +27,7 @@ type MicroprocessorFilter struct {
 
 func GetAllMicroprocessors(c *gin.Context, filter *MicroprocessorFilter) ([]Microprocessor, error) {
 	db := db.GetDB()
-	collection := db.Collection("transistors_per_microprocessor")
+	collection := db.Collection("microprocessors")
 
 	query := bson.M{}
 	if filter.Type != "" {
@@ -36,8 +36,6 @@ func GetAllMicroprocessors(c *gin.Context, filter *MicroprocessorFilter) ([]Micr
 	if filter.Vendor != "" {
 		query["vendor"] = filter.Vendor
 	}
-
-	println(filter.Type, filter.Vendor)
 
 	cursor, err := collection.Find(c, query, nil)
 	if err != nil {
@@ -54,7 +52,7 @@ func GetAllMicroprocessors(c *gin.Context, filter *MicroprocessorFilter) ([]Micr
 
 func GetMicroprocessorById(c *gin.Context, id primitive.ObjectID) (*Microprocessor, error) {
 	db := db.GetDB()
-	collection := db.Collection("transistors_per_microprocessor")
+	collection := db.Collection("microprocessors")
 
 	var value Microprocessor
 	if err := collection.FindOne(c, bson.M{"_id": id}).Decode(&value); err != nil {
