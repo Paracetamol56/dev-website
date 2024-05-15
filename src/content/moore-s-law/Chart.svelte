@@ -47,7 +47,7 @@
 		{ name: 'linear', label: 'Linear' },
 		{ name: 'log', label: 'Logarithmic' }
 	];
-	let selectedScale: Writable<string> = writable(scales[0].name);
+	let selectedScale: Writable<string> = writable(scales[1].name);
 
 	onMount(() => {
 		api.call('GET', '/microprocessors').then((res) => {
@@ -112,8 +112,8 @@
 					Plot.dot(data, {
 						x: 'release',
 						y: $selectedFeature,
-						stroke: 'vendor',
-						strokeWidth: 1,
+						fill: 'vendor',
+						opacity: 0.4,
 						symbol: 'type',
 						r: 4
 					}),
