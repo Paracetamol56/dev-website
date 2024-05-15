@@ -1,10 +1,10 @@
 <script lang="ts">
 	import * as tf from '@tensorflow/tfjs';
 	import Button from '$lib/components/Button.svelte';
-	import { createRadioGroup, melt } from '@melt-ui/svelte';
-	import type { Writable } from 'svelte/store';
+	import { writable, type Writable } from 'svelte/store';
 	import { BrainCog } from 'lucide-svelte';
 	import { addToast } from '../../routes/+layout.svelte';
+	import MeltRadioGroup from '$lib/components/MeltRadioGroup.svelte';
 
 	export let model: Writable<tf.Sequential>;
 
@@ -52,13 +52,11 @@
 		$model = newModel;
 	};
 
-	const {
-		elements: { root, item, hiddenInput },
-		states: { value },
-		helpers: { isChecked }
-	} = createRadioGroup({});
-
-	const radioOptions = ['ANN', 'CNN'];
+	const modelOptions = [
+		{ name: 'ANN', label: 'ANN' },
+		{ name: 'CNN', label: 'CNN' }
+	];
+	const value: Writable<string> = writable(modelOptions[0].name);
 </script>
 
 <div>
@@ -72,27 +70,7 @@
 	<div
 		class="my-4 p-4 rounded-md bg-ctp-mantle flex flex-col md:flex-row gap-4 justify-between items-center"
 	>
-		<div use:melt={$root} class="flex gap-4" aria-label="View density">
-			{#each radioOptions as option}
-				<div class="flex items-center gap-2">
-					<button
-						use:melt={$item(option)}
-						class="grid square-3.5 cursor-default place-items-center rounded-full bg-ctp-surface0 shadow-sm shadow-ctp-crust
-                  hover:bg-ctp-surface1"
-						id={option}
-						aria-labelledby="{option}-label"
-					>
-						{#if $isChecked(option)}
-							<div class="square-2 rounded-full bg-ctp-mauve" />
-						{/if}
-					</button>
-					<label class="capitalize leading-none font-semibold" for={option} id="{option}-label">
-						{option}
-					</label>
-				</div>
-			{/each}
-			<input name="line-height" use:melt={$hiddenInput} />
-		</div>
+		<MeltRadioGroup options={modelOptions} value={value} orientation="horizontal" />
 		<Button on:click={initModel}>
 			<span>Initialize Model</span>
 			<BrainCog size="18" stroke-width="3" />
