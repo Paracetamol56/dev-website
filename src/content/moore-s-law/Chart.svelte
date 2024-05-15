@@ -1,15 +1,19 @@
 <script lang="ts">
 	import api from '$lib/api';
-  import * as Plot from '@observablehq/plot';
+	import * as Plot from '@observablehq/plot';
 	import { onMount } from 'svelte';
 	import { user } from '$lib/store';
 	import { variants } from '@catppuccin/palette';
 	import * as d3 from 'd3';
+	import MeltRadioGroup from '$lib/components/MeltRadioGroup.svelte';
+	import { get, writable, type Writable } from 'svelte/store';
+	import MeltCheckbox from '$lib/components/MeltCheckbox.svelte';
+	import { valueAndGrad } from '@tensorflow/tfjs';
 
 	type Microprocessors = {
 		id: string;
 		name: string;
-		type: "CPU" | "GPU";
+		type: 'CPU' | 'GPU';
 		release: Date;
 		gateSize: number;
 		tdp: number;
@@ -18,25 +22,36 @@
 		vendor: string;
 	};
 
-  let div: HTMLDivElement;
-  let chipsData: Microprocessors[] = [];
+	let div: HTMLDivElement;
+	let width: number;
+
+	let chipsData: Microprocessors[] = [];
+	const mooreData = d3
+		.ticks(2000, 2024, 24)
+		.map((year) => ({ release: new Date(year, 0), transistors: 30 * 2 ** ((year - 2000) / 2.5) }));
 
 	const features = [
 		{ name: 'transistors', label: 'Transistors (millions)' },
 		{ name: 'gateSize', label: 'Gate size (nm)' },
 		{ name: 'frequency', label: 'Frequency (MHz)' },
-		{ name: 'tdp', label: 'TDP (W)' },
+		{ name: 'tdp', label: 'TDP (W)' }
 	];
-	let selectedFeature = 0;
+	let selectedFeature: Writable<string> = writable(features[0].name);
 	const types = [
 		{ name: 'CPU', label: 'CPU' },
-		{ name: 'GPU', label: 'GPU' },
+		{ name: 'GPU', label: 'GPU' }
 	];
-	let selectedType = [true, true];
+	const cpuSelected: Writable<boolean> = writable(true);
+	const gpuSelected: Writable<boolean> = writable(false);
+	const scales = [
+		{ name: 'linear', label: 'Linear' },
+		{ name: 'log', label: 'Logarithmic' }
+	];
+	let selectedScale: Writable<string> = writable(scales[0].name);
 
-  onMount(() => {
-    api.call('GET', '/microprocessors?type=CPU').then((res) => {
-			chipsData = Array.from(res.data, (chip) => ({
+	onMount(() => {
+		api.call('GET', '/microprocessors').then((res) => {
+			chipsData = Array.from(res.data, (chip: any) => ({
 				id: chip.id,
 				name: chip.name,
 				type: chip.type,
@@ -45,63 +60,91 @@
 				tdp: chip.tdp,
 				transistors: chip.transistors,
 				frequency: chip.frequency,
-				vendor: chip.vendor,
+				vendor: chip.vendor
 			}));
-    });
-  });
+		});
+	});
 
-  $: {
-		console.log(selectedFeature);
+	$: {
 		div?.firstChild?.remove();
+
+		let data: Microprocessors[] = [];
+		if ($cpuSelected && $gpuSelected) {
+			data = chipsData;
+		} else if ($cpuSelected) {
+			data = chipsData.filter((chip) => chip.type === 'CPU');
+		} else if ($gpuSelected) {
+			data = chipsData.filter((chip) => chip.type === 'GPU');
+		}
+
 		div?.append(
 			Plot.plot({
-				width: 1000,
-				height: 750,
+				width: Math.max(width, 800),
+				height: 600,
 				grid: true,
 				x: {
 					label: 'Release date',
-					type: 'time',
+					type: 'time'
 				},
 				y: {
-					label: features[selectedFeature].label,
-					type: 'log',
+					label: features.find((f) => f.name === $selectedFeature)?.label,
+					type: $selectedScale as Plot.ScaleType
 				},
-				symbol: {legend: true},
-				color: {legend: true},
+				symbol: {
+					legend: true,
+					range: ['circle', 'square'],
+					domain: ['CPU', 'GPU']
+				},
+				color: {
+					legend: true,
+					range: [
+						variants[$user.flavour].peach.rgb,
+						variants[$user.flavour].maroon.rgb,
+						variants[$user.flavour].red.rgb,
+						variants[$user.flavour].lavender.rgb,
+						variants[$user.flavour].green.rgb,
+						variants[$user.flavour].mauve.rgb,
+						variants[$user.flavour].blue.rgb
+					],
+					domain: ['3dfx', 'AMD', 'ATI', 'Intel', 'NVIDIA', 'Sony', 'VIA']
+				},
 				marks: [
-					Plot.dot(chipsData, {
+					Plot.dot(data, {
 						x: 'release',
-						y: features[selectedFeature].name,
+						y: $selectedFeature,
 						stroke: 'vendor',
 						strokeWidth: 1,
 						symbol: 'type',
-						r: 4,
+						r: 4
 					}),
+					Plot.line($selectedFeature === features[0].name ? mooreData : [], {
+						x: 'release',
+						y: 'transistors',
+						stroke: variants[$user.flavour].blue.rgb,
+						strokeWidth: 2
+					})
 				]
 			})
 		);
 	}
 </script>
 
-<form class="flex justify-center gap-4">
-	<div class="p-4 bg-ctp-mantle shadow-md shadow-ctp-crust rounded-md flex flex-col">
-		<h4 class="content-ignore text-lg font-bold">Features</h4>
-		{#each features as feature, i}
-			<label>
-				<input type="radio" name="feature" value={feature.name} checked={selectedFeature === i} on:input={() => selectedFeature = i} />
-				{feature.label}
-			</label>
-		{/each}
+<form class="mb-2 p-4 bg-ctp-mantle shadow-md shadow-ctp-crust rounded-md flex justify-center gap-4">
+	<div class="flex flex-col">
+		<h4 class="content-ignore mb-2 text-lg font-bold">Features</h4>
+		<MeltRadioGroup options={features} value={selectedFeature} orientation="vertical" />
 	</div>
-	<div class="p-4 bg-ctp-mantle shadow-md shadow-ctp-crust rounded-md flex flex-col">
-		<h4 class="content-ignore text-lg font-bold">Types</h4>
-		{#each types as type}
-			<label>
-				<input type="checkbox" name="type" bind:checked={selectedType[types.indexOf(type)]} />
-				{type.label}
-			</label>
-		{/each}
+	<div class="flex flex-col">
+		<h4 class="content-ignore mb-2 text-lg font-bold">Types</h4>
+		<div class="flex flex-col gap-3">
+			<MeltCheckbox name={types[0].name} label={types[0].label} checked={cpuSelected} />
+			<MeltCheckbox name={types[1].name} label={types[1].label} checked={gpuSelected} />
+		</div>
+	</div>
+	<div class=" flex flex-col">
+		<h4 class="content-ignore mb-2 text-lg font-bold">Scale</h4>
+		<MeltRadioGroup options={scales} value={selectedScale} orientation="vertical" />
 	</div>
 </form>
 
-<div bind:this={div} class="flex justify-center" role="img" />
+<div bind:clientWidth={width} bind:this={div} class="flex justify-center" role="img" />

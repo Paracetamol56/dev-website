@@ -11,4 +11,7 @@ listed: true
   import Chart from './moore-s-law/Chart.svelte';
 </script>
 
+The Moore's Law is an observation made by Gordon Moore, co-founder of Intel, in 1965 :
+> The number of transistors in a dense integrated circuit doubles approximately every two years.
+
 <Chart />
