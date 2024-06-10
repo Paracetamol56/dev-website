@@ -14,6 +14,7 @@ export type Todo = {
 		newState: string;
 		timeStamp: Date;
 	}[];
+	state: string | null;
 	gitURL: string;
 	gitIssue: string;
 	createdAt: Date;
@@ -24,7 +25,7 @@ export const load: PageLoad = async () => {
 
 	try {
 		todos = await api
-			.callWithAuth('GET', '/ormi?closed=false')
+			.callWithAuth('GET', '/ormi?state=TODO')
 			.then((res) => {
 				return res.data as Todo[];
 			});

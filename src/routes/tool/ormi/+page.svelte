@@ -7,11 +7,7 @@
 	export let data: PageData;
 	const focusedTodoId: Writable<string | null> = writable(null)
 	$: focusedTodo = $focusedTodoId === null ? null : data.todos!.find(todo => todo.id === $focusedTodoId)
-
-	$: console.log($focusedTodoId)
 </script>
-
-
 
 <svelte:head>
 	<title>Ormi - Mathéo Galuba</title>
@@ -27,7 +23,7 @@
 	</hgroup>
 </section>
 
-<section class="container mx-auto mb-32">
+<section class="container mx-auto mb-16">
 	<p class="text-justify max-w-xl mx-auto mb-16">
 		Okay so as a developer, I have to make a todo app at some point...<br>
 		<strong>Ορμή</strong> means "momentum" in greek, this is because when you dive into a project,
@@ -35,10 +31,9 @@
 		aims to help you keep that momentum going. The github like calendar below and
 		the streak counter are here to motivate you to keep working on your project.
 	</p>
-
-	<!--<TodoList todos={data.todos} {focusedTodoId} />-->
 </section>
 
 <section class="container mx-auto">
-	<Calendar />
+	<TodoList todos={data.todos ?? []} {focusedTodoId} />
+	<!--<Calendar />-->
 </section>

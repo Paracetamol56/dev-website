@@ -51,6 +51,7 @@ func InitRouter() *gin.Engine {
 		{
 			ormiGroup.Use(middlewares.JwtAuthMiddleware())
 			ormiGroup.GET("", ormi.GetTodos)
+			ormiGroup.GET("/:id", ormi.GetTodo)
 			ormiGroup.POST("", ormi.PostTodo)
 		}
 		userGroup := apiGroup.Group("/users")

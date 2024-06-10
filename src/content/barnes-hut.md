@@ -60,6 +60,7 @@ This is a simulation of a galaxy with 10000 stars. Their positions and velocitie
 This component is made in C++ and compiled to WebAssembly.
 
 **Your browser must support WebAssembly. Mobile devices are strongly discouraged.**
+**Refresh the page if the simulation is not working on the first load.**
 
 In 3d, the core idea is the same but we use an octree (8 children per node) instead of a quadtree (4 children per node).
 
