@@ -5,29 +5,29 @@
 	import type { Todo } from './proxy+page';
 	import Button from '$lib/components/Button.svelte';
   import { createDatePicker, melt } from '@melt-ui/svelte';
-  import { ChevronRight, ChevronLeft, Calendar } from 'lucide-svelte';
+  import { ChevronRight, ChevronLeft, Calendar, Save } from 'lucide-svelte';
   import { fade } from 'svelte/transition';
-  import { CalendarDateTime } from '@internationalized/date';
+  import { CalendarDateTime, fromDate } from '@internationalized/date';
+	import { onMount } from 'svelte';
+	import { invalidateAll } from '$app/navigation';
 
 	export let todoId: string;
 	export let title: MeltElement<any, any, any, any>;
 	export let description: MeltElement<any, any, any, any>;
 
 	let todo: Todo | null = null;
-	let newTitle = '';
-	let titleError = '';
-	let newDescription = '';
-	let descriptionError = '';
-	let newDueDate = '';
-	let dueDateError = '';
+	let newTitle: string = '';
+	let titleError: string = '';
+	let newDescription: string = '';
+	let descriptionError: string = '';
 
-	$: {
+	onMount(() => {
 		api.callWithAuth('GET', `/ormi/${todoId}`).then((response) => {
 			if (response.status === 200) {
 				todo = response.data;
-				newTitle = response.data.title;
-				newDescription = response.data.description;
-				newDueDate = response.data.dueDate;
+				newTitle = todo?.title ?? '';
+				newDescription = todo?.description ?? '';
+				$value = todo?.dueDate ? fromDate(new Date(todo.dueDate), 'UTC') : undefined;
 			} else {
 				console.error('Failed to fetch todo:', response);
 				addToast({
@@ -39,16 +39,72 @@
 				});
 			}
 		});
+	});
+
+	function validateTitle(title: string) {
+		if (title.length === 0) {
+			titleError = 'Title is required';
+			return false;
+		}
+		if (title.length < 2) {
+			titleError = 'Title must be at least 2 characters long';
+			return false;
+		}
+		if (title.length > 100) {
+			titleError = 'Title must be less than 100 characters long';
+			return false;
+		}
+		titleError = '';
+		return true;
 	}
 
-	function validateDescription(description: string) {
-		if (description.length > 1000) {
+	function validateDescription(desc: string) {
+		if (desc.length > 1000) {
 			descriptionError = 'Description must be less than 1000 characters long';
 			return false;
 		}
 		descriptionError = '';
 		return true;
 	}
+
+	const handleSubmit = (e: Event) => {
+		e.preventDefault();
+		if (!validateTitle(newTitle) || !validateDescription(newDescription)) {
+			addToast({
+				data: {
+					title: 'Invalid form',
+					description: 'Please check your inputs',
+					color: 'bg-ctp-red'
+				}
+			});
+			return;
+		}
+
+		api.callWithAuth('PATCH', `/ormi/${todoId}`, {
+			title: newTitle,
+			description: newDescription,
+		}).then((response) => {
+			if (response.status === 200) {
+				addToast({
+					data: {
+						title: 'Success',
+						description: 'Todo updated successfully.',
+						color: 'bg-ctp-mint'
+					}
+				});
+				invalidateAll();
+			} else {
+				console.error('Failed to update todo:', response);
+				addToast({
+					data: {
+						title: 'Error',
+						description: 'Failed to update todo.',
+						color: 'bg-ctp-peach'
+					}
+				});
+			}
+		});
+	};
 
 	const {
 		elements: {
@@ -64,7 +120,7 @@
 			segment,
 			trigger
 		},
-		states: { months, headingValue, weekdays, segmentContents, open },
+		states: { months, headingValue, weekdays, segmentContents, open, value },
 		helpers: { isDateDisabled, isDateUnavailable }
 	} = createDatePicker({
 		forceVisible: true,
@@ -73,10 +129,18 @@
 </script>
 
 {#if todo !== null}
-	<h2 use:melt={$title} class="mb-0 text-lg font-semibold text-ctp-text">
-		{todo.title}
-	</h2>
-	<form use:melt={$description} class="mb-5 mt-2 flex flex-col gap-6">
+<form use:melt={$description} class="mb-5 mt-2 flex flex-col gap-6" on:submit={handleSubmit}>
+		<fieldset>
+			<input
+				use:melt={$title}
+				id="title"
+				name="title"
+				class="bg-transparent outline-none text-lg font-semibold text-ctp-text"
+				bind:value={newTitle}
+				on:blur={() => validateTitle(newTitle)}
+			/>
+			<p class="text-left text-sm font-semibold text-ctp-red">{titleError}</p>
+		</fieldset>
 		<fieldset>
 			<label for="description" class="mb-2 text-sm font-semibold">Description</label>
 			<textarea
@@ -106,11 +170,11 @@
 					</div>
 				</div>
 			</div>
-			<p class="text-left text-sm font-semibold text-ctp-red">{dueDateError}</p>
 		</fieldset>
 
 		<div class="flex flex-row-reverse gap-2">
-			<Button>
+			<Button type="submit">
+				<Save size={16} />
 				<span>Save</span>
 			</Button>
 		</div>

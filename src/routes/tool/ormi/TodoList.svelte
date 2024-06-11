@@ -98,7 +98,6 @@
 					>
 						<TodoContent {todo} />
 						<div
-							class="ml-auto"
 							role="button"
 							tabindex="0"
 							on:mousedown={(event) => startMoving(event, index)}
