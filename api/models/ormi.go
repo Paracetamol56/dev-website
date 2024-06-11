@@ -30,13 +30,6 @@ type Todo struct {
 	CreatedAt   primitive.DateTime `json:"createdAt" bson:"createdAt,omitempty"`
 }
 
-func CreateTodo(c *gin.Context, todo *Todo) (*mongo.InsertOneResult, error) {
-	db := db.GetDB()
-	collection := db.Collection("ormi")
-	result, err := collection.InsertOne(c, todo)
-	return result, err
-}
-
 func GetTodoById(c *gin.Context, id primitive.ObjectID) (*Todo, error) {
 	db := db.GetDB()
 	collection := db.Collection("ormi")
@@ -101,4 +94,18 @@ func GetTodosByUserIdAndState(c *gin.Context, userId primitive.ObjectID, state s
 		return nil, err
 	}
 	return todos, nil
+}
+
+func CreateTodo(c *gin.Context, todo *Todo) (*mongo.InsertOneResult, error) {
+	db := db.GetDB()
+	collection := db.Collection("ormi")
+	result, err := collection.InsertOne(c, todo)
+	return result, err
+}
+
+func UpdateTodo(c *gin.Context, todo *Todo) (*mongo.UpdateResult, error) {
+	db := db.GetDB()
+	collection := db.Collection("ormi")
+	result, err := collection.UpdateOne(c, bson.M{"_id": todo.Id}, bson.M{"$set": todo})
+	return result, err
 }

@@ -53,6 +53,7 @@ func InitRouter() *gin.Engine {
 			ormiGroup.GET("", ormi.GetTodos)
 			ormiGroup.GET("/:id", ormi.GetTodo)
 			ormiGroup.POST("", ormi.PostTodo)
+			ormiGroup.PATCH("/:id", ormi.PatchTodo)
 		}
 		userGroup := apiGroup.Group("/users")
 		{

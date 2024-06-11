@@ -6,17 +6,17 @@ export type Todo = {
 	id: string;
 	user: string;
 	title: string;
-	description: string;
+	description: string | null;
+	dueDate: Date | null;
 	labels: string[];
 	history: {
-		eventType: string;
 		previousState: string;
 		newState: string;
-		timeStamp: Date;
+		updatedAt: Date;
 	}[];
 	state: string | null;
-	gitURL: string;
-	gitIssue: string;
+	gitURL: string | null;
+	gitIssue: string | null;
 	createdAt: Date;
 };
 
