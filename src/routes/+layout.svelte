@@ -23,7 +23,11 @@
 </script>
 
 <svelte:head>
-	<script defer data-domain="dev.matheo-galuba.com" src="https://analytics.matheo-galuba.com/js/script.js"></script>
+	<script
+		async
+		src="https://analytics.matheo-galuba.com/script.js"
+		data-website-id="c99860ae-f5a2-4f86-9dd2-5697c596efb4"
+	></script>
 	<title>Dev - Mathéo Galuba</title>
 	<meta name="description" content="A showcase of my little dev projects" />
 </svelte:head>
