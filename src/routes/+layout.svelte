@@ -32,26 +32,30 @@
 	<meta name="description" content="A showcase of my little dev projects" />
 </svelte:head>
 
-<!-- Toast list -->
-<div
-	class="fixed right-0 top-0 z-50 m-4
-				flex flex-col items-end gap-2
-				md:bottom-0 md:top-auto"
-	use:portal
->
-	{#each $toasts as toast (toast.id)}
-		<div animate:flip={{ duration: 500 }}>
-			<Toast {elements} {toast} />
-		</div>
-	{/each}
-</div>
+{#if data.url.includes('/embed')}
+	<slot />
+{:else}
+	<!-- Toast list -->
+	<div
+		class="fixed right-0 top-0 z-50 m-4
+					flex flex-col items-end gap-2
+					md:bottom-0 md:top-auto"
+		use:portal
+	>
+		{#each $toasts as toast (toast.id)}
+			<div animate:flip={{ duration: 500 }}>
+				<Toast {elements} {toast} />
+			</div>
+		{/each}
+	</div>
 
-<Navbar />
+	<Navbar />
 
-<main class="py-32 mb-auto">
-	<Transition url={data.url}>
-		<slot />
-	</Transition>
-</main>
+	<main class="py-32 mb-auto">
+		<Transition url={data.url}>
+			<slot />
+		</Transition>
+	</main>
 
-<Footer />
+	<Footer />
+{/if}
