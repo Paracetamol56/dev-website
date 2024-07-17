@@ -22,11 +22,14 @@
 
   let syncDiv: HTMLDivElement;
   let asyncDiv: HTMLDivElement;
+  let width: number;
   $: {
     syncDiv?.firstChild?.remove();
     syncDiv?.append(
       Plot.plot({
         height: 300,
+        width,
+        marginLeft: 50,
         axis: null,
         y: {
           axis: 'left',
@@ -48,6 +51,8 @@
     asyncDiv?.append(
       Plot.plot({
         height: 300,
+        width,
+        marginLeft: 50,
         axis: null,
         y: {
           axis: 'left',
@@ -68,12 +73,12 @@
 </script>
 
 <div class="w-full flex flex-col md:flex-row gap-4">
-  <div>
+  <div class="w-full">
     <h4>Synchrone</h4>
-    <div bind:this={syncDiv} class="flex justify-start" role="img" />
+    <div bind:this={syncDiv} class="flex justify-start w-full" role="img" bind:clientWidth={width} />
   </div>
-  <div>
+  <div class="w-full">
     <h4>Asynchrone</h4>
-    <div bind:this={asyncDiv} class="flex justify-start" role="img" />
+    <div bind:this={asyncDiv} class="flex justify-start w-full" role="img" />
   </div>
 </div>
