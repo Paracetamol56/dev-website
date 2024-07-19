@@ -73,8 +73,6 @@ En 1965, Gordon Moore, cofondateur d'Intel, a énoncé :
     - L'histoire conjointe de l'informatique et de la course à l'espace 
     - Perspectives futures
 
-Conclusion et perspectives futures
-
 ---
 <!-- _class: lead -->
 
@@ -270,7 +268,6 @@ Pour résumer, l'informatique est un outil indispensable à la recherche en astr
 </div>
 
 ---
-<!-- Simulation du systeme solaire -->
 
 
 
