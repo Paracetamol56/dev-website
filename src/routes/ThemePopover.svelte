@@ -103,6 +103,8 @@
 							]} bg-ctp-base relative cursor-pointer scroll-my-2 rounded-md py-2 pl-4 pr-4 text-ctp-text
                     {$isChecked(variant) ? 'bg-ctp-mauve/25 text-ctp-mauve' : ''}
                     hover:bg-ctp-mauve/25 hover:text-ctp-mauve"
+							data-umami-event="update-theme"
+							data-umami-event-properties={`{ "theme": "${variant}" }`}
 						>
 							{#if $isChecked(variant)}
 								<div

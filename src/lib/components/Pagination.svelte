@@ -27,8 +27,12 @@
 			class="grid h-8 items-center rounded-md bg-ctp-mantle px-3 text-sm text-ctp-subtext0 shadow-md shadow-ctp-crust
       hover:opacity-75 disabled:cursor-not-allowed disabled:opacity-50 data-[selected]:bg-ctp-mauve
       data-[selected]:text-ctp-text"
-			use:melt={$prevButton}><ChevronLeft class="square-4" /></button
+			use:melt={$prevButton}
+			data-umami-event="pagination"
+			data-umami-event-type="previous"
 		>
+			<ChevronLeft class="square-4" />
+		</button>
 		{#each $pages as page (page.key)}
 			{#if page.type === 'ellipsis'}
 				<span>...</span>
@@ -37,15 +41,24 @@
 					class="grid h-8 items-center rounded-md bg-ctp-mantle px-3 text-sm font-semibold text-ctp-subtext0 shadow-md shadow-ctp-crust
           hover:opacity-75 disabled:cursor-not-allowed disabled:opacity-50 data-[selected]:bg-ctp-mauve
           data-[selected]:text-ctp-base"
-					use:melt={$pageTrigger(page)}>{page.value}</button
+					use:melt={$pageTrigger(page)}
+					data-umami-event="pagination"
+					data-umami-event-type="page"
+					data-umami-event-properties={`{ "page": ${page.value} }`}
 				>
+					{page.value}
+				</button>
 			{/if}
 		{/each}
 		<button
 			class="grid h-8 items-center rounded-md bg-ctp-mantle px-3 text-sm text-ctp-subtext0 shadow-md shadow-ctp-crust
       hover:opacity-75 disabled:cursor-not-allowed disabled:opacity-50 data-[selected]:bg-ctp-mauve
       data-[selected]:text-ctp-text"
-			use:melt={$nextButton}><ChevronRight class="square-4" /></button
+			use:melt={$nextButton}
+			data-umami-event="pagination"
+			data-umami-event-type="next"
 		>
+			<ChevronRight class="square-4" />
+		</button>
 	</div>
 </nav>

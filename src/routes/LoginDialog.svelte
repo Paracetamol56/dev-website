@@ -61,6 +61,7 @@
   font-semibold text-ctp-mantle
   shadow-md shadow-ctp-crust transition-opacity hover:opacity-80 active:opacity-60"
 	use:melt={$trigger}
+	data-umami-event="login-dialog"
 >
 	Login
 </button>
@@ -85,6 +86,8 @@
 			<div class="mt-6 flex justify-center gap-4">
 				<Button
 					link={`https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${window.location.origin}/verify/github?path=${window.location.pathname}&scope=user:email`}
+					data-umami-event="login-oauth"
+					data-umami-event-properties={`{ "provider": "GitHub" }`}
 				>
 					<span>Continue with GitHub</span>
 					<Github size="16" />
@@ -118,7 +121,12 @@
 				</fieldset>
 				<p class="mb-4 text-right text-sm text-ctp-red">{emailError}</p>
 				<div class="mt-6 flex justify-center gap-4">
-					<Button type="submit">
+					<Button
+						type="submit"
+						data={{
+							"umami-event":"login-email",
+						}}
+					>
 						<span>Send the magic link</span>
 						<Send size="16" />
 					</Button>

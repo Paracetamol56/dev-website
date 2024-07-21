@@ -189,7 +189,12 @@
 				<p class="text-left text-sm font-semibold text-ctp-red">{privacyError}</p>
 			</fieldset>
 			<div class="sm:col-span-2 flex justify-end">
-				<Button type="submit">
+				<Button
+					type="submit"
+					data={{
+						'umami-event': 'contact'
+					}}
+				>
 					<span>Send</span>
 					<Send size="16" />
 				</Button>

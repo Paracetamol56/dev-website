@@ -5,6 +5,8 @@
 	export let type: 'button' | 'submit' | 'reset' = 'button';
 	export let disabled: boolean = false;
 	export let link: string | null = null;
+	export let data: Record<string, any> = {};
+	$: dataProps = Object.entries(data).reduce((acc, [key, value]) => ({...acc, [`data-${key}`]: value}), {});
 
 	const dispatch = createEventDispatcher();
 
@@ -23,7 +25,7 @@
         shadow-md shadow-ctp-crust transition-opacity
         {disabled ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-80 active:opacity-60'}"
 	on:click={handleClick}
-	{type}
+	{...dataProps}
 >
 	<slot />
 </button>

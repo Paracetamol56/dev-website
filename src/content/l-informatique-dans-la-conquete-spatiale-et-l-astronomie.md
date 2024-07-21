@@ -179,5 +179,5 @@ Vidéo d'une simulation moderne de formation d'une galaxie massive :
 
 <MarsMissions />
 
-### 2.2. Conclusion et perspectives futures
+### 2.2. Perspectives futures
 

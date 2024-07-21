@@ -126,7 +126,13 @@
 		</small>
 	</fieldset>
 	<div class="flex justify-start">
-		<Button type="submit">
+		<Button
+			type="submit"
+			data={{
+				'umami-event': 'save-theme',
+				'umami-event-properties': "{ \"data-umami-event\"=\"Signup button\" }"
+			}}
+		>
 			<span>Save</span>
 			<Save size="16" />
 		</Button>
