@@ -59,7 +59,12 @@
 					</a>
 				</li>
 				<li class="mb-2 text-ctp-text hover:text-ctp-blue transition-colors">
-					<button type="button" class="flex justify-start items-center gap-2" on:click={logOut}>
+					<button
+						type="button"
+						class="flex justify-start items-center gap-2"
+						on:click={logOut}
+						data-umami-event="logout"
+					>
 						<LogOut size="18" stroke-width="3" />
 						<span>Log out</span>
 					</button>

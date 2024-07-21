@@ -116,7 +116,12 @@
 		<span class="text-left text-sm font-semibold text-ctp-red">{emailError}</span>
 	</fieldset>
 	<div class="flex justify-start">
-		<Button type="submit">
+		<Button
+			type="submit"
+			data={{
+				'umami-event': 'save-profile'
+			}}
+		>
 			<span>Save</span>
 			<Save size="16" />
 		</Button>

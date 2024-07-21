@@ -118,7 +118,12 @@
 			<Archive size="18" /> Export your data
 		</h4>
 		<div class="flex justify-start">
-			<Button on:click={handleExport}>
+			<Button
+				on:click={handleExport}
+				data={{
+					"umami-event": "export-data"
+				}}
+			>
 				<span>Export</span>
 				<Download size="16" />
 			</Button>
@@ -135,6 +140,7 @@
 					font-semibold text-ctp-mantle
 					shadow-md shadow-ctp-crust transition-opacity
 					hover:opacity-80 active:opacity-60"
+				data-umami-event="delete-account"
 			>
 				<span>Delete</span>
 				<Trash2 size="16" />

@@ -18,7 +18,14 @@
 	});
 </script>
 
-<a {href} target="_blank" rel="noopener noreferrer" use:melt={$trigger}>
+<a
+	{href}
+	target="_blank"
+	rel="noopener noreferrer"
+	use:melt={$trigger} 
+	data-umami-event="social-button"
+	data-umami-event-properties={`{ "href": "${href}" }`}
+>
 	<slot />
 </a>
 
