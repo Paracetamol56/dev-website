@@ -65,7 +65,8 @@
 		"tslib": "^2.4.1",
 		"typescript": "^5.0.0",
 		"vite": "^4.4.2",
-		"vitest": "^0.34.6"
+		"vitest": "^0.34.6",
+		"@ethercorps/sveltekit-og": "^3.0.0"
 	},
 	"type": "module"
 }
