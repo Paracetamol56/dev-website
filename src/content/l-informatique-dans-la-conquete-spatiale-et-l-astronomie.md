@@ -149,7 +149,12 @@ int main(int argc, char *argv[]) {
 
 Image très haute résolution de la galaxie d'Andromède :
 
-<iframe src="https://esahubble.org/images/heic1502a/zoomable/" class="w-full max-w-2xl mx-auto aspect-video" frameborder="0"></iframe>
+<iframe
+  src="https://esahubble.org/images/heic1502a/zoomable/"
+  class="w-full max-w-2xl mx-auto aspect-video"
+  title="Hubble Space Telescope"
+  frameborder="0"
+></iframe>
 
 Source : [Hubble Space Telescope](https://esahubble.org/images/heic1502a/zoomable/)
 

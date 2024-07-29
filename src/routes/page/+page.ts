@@ -5,8 +5,7 @@ interface File {
 	metadata: Omit<Page, 'slug'>;
 }
 
-export const load: PageLoad = async ({ url }) => {
-	const tag = url.searchParams.get('tag');
+export const load: PageLoad = async () => {
 	const pages: Page[] = [];
 
 	const paths = import.meta.glob('/src/content/*.md', { eager: true });
@@ -19,11 +18,12 @@ export const load: PageLoad = async ({ url }) => {
 		if (slug && typeof file === 'object' && 'metadata' in file) {
 			const metadata: Omit<Page, 'slug'> = file.metadata;
 			const page: Page = { ...metadata, slug } satisfies Page;
-			if (page.listed && (!tag || page.tags.includes(tag))) {
-				pages.push(page);
-			}
+			if (page.listed) pages.push(page);
 		}
 	}
 
-	return { tag, pages };
+	return { pages };
 };
+
+export const prerender = true;
+export const ssr = true;

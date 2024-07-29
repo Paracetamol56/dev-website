@@ -12,3 +12,5 @@ export const load: PageLoad = async ({ params }) => {
 		throw error(404, `Could not find ${params.slug}`);
 	}
 };
+
+export const prerender = true;

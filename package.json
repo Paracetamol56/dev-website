@@ -68,5 +68,8 @@
 		"vitest": "^0.34.6",
 		"@ethercorps/sveltekit-og": "^3.0.0"
 	},
-	"type": "module"
+	"type": "module",
+	"dependencies": {
+		"@ethercorps/sveltekit-og": "^3.0.0"
+	}
 }
