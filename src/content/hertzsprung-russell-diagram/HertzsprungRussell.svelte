@@ -12,7 +12,7 @@
 	import api from '$lib/api';
 
 	let data: StarHR[] = [];
-	let search: string = $page.url.searchParams.get('q') ?? '';
+	let search: string
 
 	let searchError: string = '';
 	let selectedStar: StarHR | null = null;
@@ -67,8 +67,9 @@
 		}
 	};
 
-	getData();
 	onMount(() => {
+		let search: string = $page.url.searchParams.get('q') ?? '';
+		getData();
 		if (search) {
 			updateSelectedStar();
 		}
