@@ -357,6 +357,20 @@ And voilà! The starfield is now centered:
 
 ![Starfield animation centered](/img/starfield-animation/centered.png)
 
+## Downloadable content
+
+- Download the full source code [here](https://git.matheo-galuba.com/mga/starfield-animaiton).
+- Download the compiled version for Windows [here](https://git.matheo-galuba.com/mga/starfield-animaiton/releases).
+- Embed the animation in your website using the following code:
+
+<CodeBlock>
+
+```html
+<iframe src="https://dev.matheo-galuba.com/files/starfield-animation/starfield-animaiton.html" title="Starfield simulation"></iframe>
+```
+
+</CodeBlock>
+
 ## Conclusion
 
 For further improvements, here is a list of ideas:
