@@ -130,9 +130,17 @@
 			return;
 		}
 		const zip = new JSZip();
+		const fileNamesCounter: Record<string, number> = {};
 		files.forEach((file) => {
 			if (file.convertedFile) {
-				zip.file(file.convertedFile.name, file.convertedFile);
+				let fileName = file.convertedFile.name;
+				if (fileNamesCounter[fileName]) {
+					fileNamesCounter[fileName]++;
+					fileName = `${fileName.split('.')[0]}_${fileNamesCounter[fileName]}.${fileName.split('.')[1]}`;
+				} else {
+					fileNamesCounter[fileName] = 1;
+				}
+				zip.file(fileName, file.convertedFile);
 			}
 		});
 		zip.generateAsync({ type: 'blob' }).then((content) => {
