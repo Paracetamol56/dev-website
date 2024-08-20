@@ -16,7 +16,11 @@
 				{$page.error?.message}
 			</h1>
 			<p class="mt-6 text-base leading-7 text-ctp-subtext0">
-				Sorry, we couldn’t find the page you’re looking for.
+				{#if $page.status === 404}
+					Sorry, we couldn’t find the page you’re looking for.
+				{:else}
+					An error occurred while trying to process your request.
+				{/if}
 			</p>
 			<div>
 				<pre class="mt-10 mx-auto w-fit antialiased text-left text-ctp-lavender">
