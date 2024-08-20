@@ -48,6 +48,10 @@ func InitRouter() *gin.Engine {
 			hipparcosGroup.GET("", hipparcos.GetHipparcosHR)
 			hipparcosGroup.GET("/:hip", hipparcos.GetHipparcosHRByHIP)
 		}
+		imgConvertGroup := apiGroup.Group("/img-convert")
+		{
+			imgConvertGroup.POST("", controllers.PostImgConvert)
+		}
 		microprocessorGroup := apiGroup.Group("/microprocessors")
 		{
 			microprocessorGroup.GET("", microprocessor.GetMicroprocessor)
