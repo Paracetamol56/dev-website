@@ -16,7 +16,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func PostImgConvert(c *gin.Context) {
+type ImgConvertController struct {
+}
+
+func (controller *ImgConvertController) PostImgConvert(c *gin.Context) {
 	destFormat := strings.ToLower(strings.TrimSpace(c.PostForm("format")))
 
 	file, err := c.FormFile("image")
@@ -53,7 +56,14 @@ func PostImgConvert(c *gin.Context) {
 	c.Writer.Header().Set("Content-Type", "image/"+destFormat)
 	c.Writer.Header().Set("Content-Disposition", "attachment; filename=image."+destFormat)
 
-	// Convert image
+	ConvertImage(c, img, destFormat)
+
+	// Return image
+	c.Writer.Header().Set("Content-Length", strconv.Itoa(c.Writer.Size()))
+	c.Status(200)
+}
+
+func ConvertImage(c *gin.Context, img image.Image, destFormat string) {
 	switch destFormat {
 	case "jpg", "jpeg":
 		destQuality, err := strconv.Atoi(c.DefaultPostForm("quality", "100"))
@@ -112,8 +122,4 @@ func PostImgConvert(c *gin.Context) {
 		c.JSON(500, gin.H{"error": "Invalid format"})
 		return
 	}
-
-	// Return image
-	c.Writer.Header().Set("Content-Length", strconv.Itoa(c.Writer.Size()))
-	c.Status(200)
 }
