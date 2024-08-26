@@ -5,6 +5,7 @@ import (
 	"image/gif"
 	"image/jpeg"
 	"image/png"
+	"mime/multipart"
 	"strconv"
 	"strings"
 
@@ -41,13 +42,7 @@ func (controller *ImgConvertController) PostImgConvert(c *gin.Context) {
 	}
 	defer src.Close()
 
-	// If the image is avif, use the AVIF decoder instead of the default image decoder
-	var img image.Image
-	if strings.HasSuffix(file.Filename, ".avif") {
-		img, err = avif.Decode(src)
-	} else {
-		img, _, err = image.Decode(src)
-	}
+	img, err := DecodeImage(src, file.Filename[strings.LastIndex(file.Filename, ".")+1:])
 	if err != nil {
 		c.JSON(400, gin.H{"error": "Unable to decode image"})
 		return
@@ -56,14 +51,23 @@ func (controller *ImgConvertController) PostImgConvert(c *gin.Context) {
 	c.Writer.Header().Set("Content-Type", "image/"+destFormat)
 	c.Writer.Header().Set("Content-Disposition", "attachment; filename=image."+destFormat)
 
-	ConvertImage(c, img, destFormat)
-
-	// Return image
-	c.Writer.Header().Set("Content-Length", strconv.Itoa(c.Writer.Size()))
-	c.Status(200)
+	EncodeImage(c, img, destFormat)
 }
 
-func ConvertImage(c *gin.Context, img image.Image, destFormat string) {
+func DecodeImage(src multipart.File, format string) (image.Image, error) {
+	switch format {
+	case "bmp":
+		return bmp.Decode(src)
+	case "tiff":
+		return tiff.Decode(src)
+	case "avif":
+		return avif.Decode(src)
+	}
+	img, _, err := image.Decode(src)
+	return img, err
+}
+
+func EncodeImage(c *gin.Context, img image.Image, destFormat string) {
 	switch destFormat {
 	case "jpg", "jpeg":
 		destQuality, err := strconv.Atoi(c.DefaultPostForm("quality", "100"))
@@ -115,11 +119,15 @@ func ConvertImage(c *gin.Context, img image.Image, destFormat string) {
 		}
 		o := avif.Options{Quality: destQuality}
 		if err := avif.Encode(c.Writer, img, o); err != nil {
+			println(err.Error())
 			c.JSON(500, gin.H{"error": "Failed to convert image"})
 			return
 		}
 	default:
-		c.JSON(500, gin.H{"error": "Invalid format"})
+		c.JSON(400, gin.H{"error": "Invalid format"})
 		return
 	}
+
+	c.Writer.Header().Set("Content-Length", strconv.Itoa(c.Writer.Size()))
+	c.Status(200)
 }
