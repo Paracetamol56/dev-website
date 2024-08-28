@@ -28,6 +28,7 @@ func InitRouter() *gin.Engine {
 	heatlh := new(controllers.HealthController)
 	hipparcos := new(controllers.HipparcosController)
 	imgConvert := new(controllers.ImgConvertController)
+	imgRemoveBg := new(controllers.ImgRemoveBgController)
 	microprocessor := new(controllers.MicroprocessorController)
 	user := new(controllers.UserController)
 
@@ -36,6 +37,8 @@ func InitRouter() *gin.Engine {
 		apiGroup.GET("/doc/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 		apiGroup.GET("/health", heatlh.GetHealth)
 		apiGroup.POST("/contact", contact.PostContact)
+		apiGroup.POST("/img-convert", imgConvert.PostImgConvert)
+		apiGroup.POST("/img-removebg", imgRemoveBg.PostImgRemoveBg)
 		authGroup := apiGroup.Group("/auth")
 		{
 			authGroup.POST("/login", auth.PostLogin)
@@ -48,10 +51,6 @@ func InitRouter() *gin.Engine {
 		{
 			hipparcosGroup.GET("", hipparcos.GetHipparcosHR)
 			hipparcosGroup.GET("/:hip", hipparcos.GetHipparcosHRByHIP)
-		}
-		imgConvertGroup := apiGroup.Group("/img-convert")
-		{
-			imgConvertGroup.POST("", imgConvert.PostImgConvert)
 		}
 		microprocessorGroup := apiGroup.Group("/microprocessors")
 		{
