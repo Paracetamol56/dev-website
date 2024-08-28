@@ -1,4 +1,12 @@
 [
+	{
+		"title": "Image background remover",
+		"slug": "image-remove-bg",
+		"description": "Remove image background online.",
+		"tags": ["image", "background", "tool"],
+		"listed": true,
+		"requiresAuth": false
+	},
   {
 		"title": "Image converter",
 		"slug": "image-converter",
