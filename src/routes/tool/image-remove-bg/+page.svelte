@@ -81,7 +81,6 @@
 		formData.append('ae', $erosionSize[0].toString());
 		formData.append('om', $onlyMask.toString());
 		formData.append('ppm', $ppm.toString());
-		console.log(formData);
 
 		await axios
 			.post('/api/img-removebg', formData, {
