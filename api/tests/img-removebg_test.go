@@ -17,6 +17,10 @@ import (
 
 func TestPostImgRemoveBg(t *testing.T) {
 	godotenv.Load()
+	if os.Getenv("REMBG_ENDPOINT") == "" {
+		// Skip the test if REMBG_ENDPOINT is not set
+		t.Skip("REMBG_ENDPOINT is not set")
+	}
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 	imgRemoveBg := new(controllers.ImgRemoveBgController)
