@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { createSelect, melt, type SelectOption } from '@melt-ui/svelte';
 	import { Check, ChevronDown } from 'lucide-svelte';
-	import type { Writable } from 'svelte/store';
+	import { writable, type Writable } from 'svelte/store';
 	import { fade } from 'svelte/transition';
 
 	export let name: string;
 	export let options: string[];
-	export let value: Writable<SelectOption<string>>;
+	export let value: Writable<SelectOption<string>> = writable({ value: '', label: '' });
 	export let disabled: boolean = false;
 
 	const {

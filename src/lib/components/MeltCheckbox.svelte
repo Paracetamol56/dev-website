@@ -1,10 +1,10 @@
 <script lang="ts">
   import { createCheckbox, melt } from '@melt-ui/svelte';
   import { Check, Minus } from 'lucide-svelte';
-	import type { Writable } from 'svelte/store';
+	import { writable, type Writable } from 'svelte/store';
 
   export let defaultChecked: boolean | 'indeterminate' = false;
-  export let checked: Writable<boolean>;
+  export let checked: Writable<boolean> = writable(defaultChecked === 'indeterminate' ? false : defaultChecked);
   export let name: string;
   export let required: boolean = false;
   export let disabled: boolean = false;

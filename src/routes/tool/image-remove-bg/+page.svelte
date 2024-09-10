@@ -1,22 +1,40 @@
 <script lang="ts">
 	import Dropzone from 'svelte-file-dropzone';
 	import { addToast } from '../../+layout.svelte';
-	import { Download, Repeat, RotateCcw } from 'lucide-svelte';
+	import { Download, Eraser, Repeat, RotateCcw } from 'lucide-svelte';
 	import Button from '$lib/components/Button.svelte';
 	import axios from 'axios';
+	import MeltSelect from '$lib/components/MeltSelect.svelte';
+	import MeltCheckbox from '$lib/components/MeltCheckbox.svelte';
+	import MeltSlider from '$lib/components/MeltSlider.svelte';
+	import { type SelectOption } from '@melt-ui/svelte';
+	import { writable, type Writable } from 'svelte/store';
 
+	// Inputs
 	let file: File | null = null;
+	let model: Writable<SelectOption<string>> = writable({ value: 'u2net', label: 'u2net' });
+	let alphaMatting: Writable<boolean> = writable(false);
+	let foregroundThreshold: Writable<number[]> = writable([240]);
+	let backgroundThreshold: Writable<number[]> = writable([15]);
+	let erosionSize: Writable<number[]> = writable([40]);
+	let onlyMask: Writable<boolean> = writable(false);
+	let ppm: Writable<boolean> = writable(true);
+
 	let processing = false;
 	let processed = false;
 	let result: File | null = null;
 
 	function handleFilesSelect(e: any) {
 		const { acceptedFiles, _ } = e.detail as { acceptedFiles: File[]; _: File[] };
+		if (acceptedFiles.length === 0) {
+			return;
+		}
 		file = acceptedFiles[0];
 	}
 
 	function handleFileRejected(e: any) {
 		console.error(e);
+		console.log(e.detail.fileRejections[e.detail.fileRejections.length - 1].errors[0].code);
 		switch (e.detail.fileRejections[e.detail.fileRejections.length - 1].errors[0].code) {
 			case 'file-invalid-type':
 				addToast({
@@ -56,6 +74,14 @@
 
 		const formData = new FormData();
 		formData.append('file', file);
+		formData.append('model', $model.value);
+		formData.append('a', $alphaMatting.toString());
+		formData.append('af', $foregroundThreshold[0].toString());
+		formData.append('ab', $backgroundThreshold[0].toString());
+		formData.append('ae', $erosionSize[0].toString());
+		formData.append('om', $onlyMask.toString());
+		formData.append('ppm', $ppm.toString());
+		console.log(formData);
 
 		await axios
 			.post('/api/img-removebg', formData, {
@@ -124,50 +150,97 @@
 		class="container mx-auto flex flex-col gap-2 md:gap-4 items-start justify-stretch md:flex-row content"
 	>
 		<div class="w-full bg-ctp-mantle shadow-md shadow-ctp-crust rounded-md p-4">
-			<form action="" class="flex flex-col gap-2 md:gap-4 items-stretch justify-start">
+			<form class="flex flex-col gap-2 md:gap-4 items-stretch justify-start">
 				{#if file === null}
 					<div>
-					<Dropzone
-						on:drop={handleFilesSelect}
-						on:droprejected={handleFileRejected}
-						accept={['image/png', 'image/jpeg', 'image/webp', 'image/avif']}
-						containerClasses="w-full aspect-video border-2 border-dashed border-ctp-lavender rounded-lg flex flex-col items-center justify-center"
-						disableDefaultStyles
-						maxSize={20 * 1024 * 1024}
-						required
-					>
-						<p class="content-ignore text-center"><strong>Drop an image here</strong><br>- or -<br><strong>Click to upload</strong></p>
-					</Dropzone>
-					<p class="content-ignore text-xs mt-1">
-						Supported formats are <a
-							href="https://en.wikipedia.org/wiki/Portable_Network_Graphics">PNG</a
-						>,
-						<a href="https://en.wikipedia.org/wiki/JPEG">JPEG/JPG</a>,
-						<a href="https://en.wikipedia.org/wiki/WebP">WebP</a>,
-						<a href="https://en.wikipedia.org/wiki/AVIF">AVIF</a>.<br />
-						The maximum file size is 20MB.
-					</p>
-				</div>
+						<Dropzone
+							on:drop={handleFilesSelect}
+							on:droprejected={handleFileRejected}
+							name="file"
+							accept={['image/png']}
+							containerClasses="w-full aspect-video border-2 border-dashed border-ctp-lavender rounded-lg flex flex-col items-center justify-center"
+							disableDefaultStyles
+							maxSize={20 * 1024 * 1024}
+							required
+						>
+							<p class="content-ignore text-center">
+								<strong>Drop an image here</strong><br />- or -<br /><strong>Click to upload</strong
+								>
+							</p>
+						</Dropzone>
+						<p class="content-ignore text-xs mt-1">
+							Supported format is <a
+								href="https://en.wikipedia.org/wiki/Portable_Network_Graphics">PNG</a
+							>, The maximum file size is 20MB.
+						</p>
+					</div>
 				{:else}
-					<img
-						src={URL.createObjectURL(file)}
-						alt="Uploaded file preview"
-						class="w-full h-auto border-2 border-dashed border-ctp-lavender rounded-lg"
-					/>
+					<div class="relative w-full h-fit">
+						<img
+							src={URL.createObjectURL(file)}
+							alt="Uploaded file preview"
+							class="content-ignore w-full h-auto border-2 border-dashed border-ctp-lavender rounded-lg"
+						/>
+						<button type="button" class="absolute bottom-2 right-2" on:click={handleReset}>
+							<Eraser size="16" />
+						</button>
+						</div>
 				{/if}
+				<details class="content-ignore">
+					<summary class="font-semibold select-none">Advanced options</summary>
+					<div class="flex flex-col gap-4">
+						<MeltSelect
+							name="Model"
+							value={model}
+							options={[
+								'isnet-anime',
+								'isnet-general-use',
+								'sam',
+								'silueta',
+								'u2net_cloth_seg',
+								'u2net_custom',
+								'u2net_human_seg',
+								'u2net',
+								'u2netp'
+							]}
+						/>
+						<MeltCheckbox name="alpha-mattin" label="Alpha matting" checked={alphaMatting} />
+						<MeltSlider
+							name="Foreground threshold"
+							value={foregroundThreshold}
+							defaultValue={240}
+							min={0}
+							max={255}
+						/>
+						<MeltSlider
+							name="Background threshold"
+							value={backgroundThreshold}
+							defaultValue={15}
+							min={0}
+							max={255}
+						/>
+						<MeltSlider
+							name="Erosion size"
+							value={erosionSize}
+							defaultValue={40}
+							min={0}
+							max={255}
+						/>
+						<MeltCheckbox name="only-mask" label="Only mask" checked={onlyMask} />
+						<MeltCheckbox name="ppm" label="Prepocess mask" checked={ppm} defaultChecked={true} />
+					</div>
+				</details>
 				<div class="flex flex-row items-center justify-center gap-4">
 					<Button on:click={handleProcess} type="button" disabled={file === null}>
 						<span>Remove background</span>
 						<Repeat size="18" />
 					</Button>
-					<Button on:click={handleReset} type="button" disabled={file === null}>
-						<span>Reset</span>
-						<RotateCcw size="18" />
-					</Button>
 				</div>
 			</form>
 		</div>
-		<div class="w-full bg-ctp-mantle shadow-md shadow-ctp-crust rounded-md p-4 flex flex-col gap-2 md:gap-4 items-stretch justify-start">
+		<div
+			class="w-full bg-ctp-mantle shadow-md shadow-ctp-crust rounded-md p-4 flex flex-col gap-2 md:gap-4 items-stretch justify-start"
+		>
 			<div
 				class="w-full aspect-video border-2 border-dashed border-ctp-lavender rounded-lg flex items-center justify-center"
 			>
@@ -177,7 +250,7 @@
 					<img
 						src={URL.createObjectURL(result)}
 						alt="Processed file preview"
-						class="w-full h-auto"
+						class="content-ignore w-full h-auto"
 					/>
 				{/if}
 			</div>
