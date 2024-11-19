@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/Paracetamol56/dev-website/api/db"
 	"github.com/Paracetamol56/dev-website/api/server"
 	_ "github.com/Paracetamol56/dev-website/docs"
 	"github.com/joho/godotenv"
@@ -28,6 +29,6 @@ import (
 
 func main() {
 	godotenv.Load()
-	// db.Init()
+	db.Init()
 	server.Run()
 }

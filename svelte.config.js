@@ -4,7 +4,7 @@ import { vitePreprocess } from '@sveltejs/kit/vite';
 import { escapeSvelte, mdsvex } from 'mdsvex';
 import { preprocessMeltUI } from '@melt-ui/pp';
 import shiki from 'shiki';
-import fs from 'node:fs';
+import fs from 'fs';
 import remarkUnwrapImages from 'remark-unwrap-images';
 import remarkToc from 'remark-toc';
 import remarkMermaid from 'remark-mermaidjs';
