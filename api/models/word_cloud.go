@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/Paracetamol56/dev-website/api/db"
 	"github.com/gin-gonic/gin"
@@ -21,16 +22,15 @@ type Word struct {
 
 // WordCloud represents a word cloud object.
 type WordCloud struct {
-	Id          primitive.ObjectID `json:"id" bson:"_id,omitempty"`
-	UserId      primitive.ObjectID `json:"user" bson:"user"`
-	Name        string             `json:"name" bson:"name"`
-	Description string             `json:"description" bson:"description"`
-	Code        string             `json:"code" bson:"code"`
-	Open        bool               `json:"open" bson:"open"`
-	Words       []Word             `json:"words" bson:"words"`
-	CreatedAt   primitive.DateTime `json:"createdAt" bson:"createdAt"`
-	UpdatedAt   primitive.DateTime `json:"updatedAt" bson:"updatedAt"`
-	ClosedAt    primitive.DateTime `json:"closedAt,omitempty" bson:"closedAt,omitempty"`
+	Id          primitive.ObjectID  `json:"id" bson:"_id,omitempty"`
+	UserId      primitive.ObjectID  `json:"user" bson:"user"`
+	Name        string              `json:"name" bson:"name"`
+	Description string              `json:"description" bson:"description"`
+	Code        string              `json:"code" bson:"code"`
+	Words       []Word              `json:"words" bson:"words"`
+	CreatedAt   primitive.DateTime  `json:"createdAt" bson:"createdAt"`
+	UpdatedAt   primitive.DateTime  `json:"updatedAt" bson:"updatedAt"`
+	ClosedAt    *primitive.DateTime `json:"closedAt,omitempty" bson:"closedAt,omitempty"`
 }
 
 // GetWordCloudByCode retrieves a word cloud by its code.
@@ -110,6 +110,18 @@ func AddWordToWordCloud(c *gin.Context, sessionId primitive.ObjectID, word *Word
 
 	filter := bson.M{"_id": sessionId}
 	update := bson.M{"$push": bson.M{"words": word}}
+	result, err := collection.UpdateOne(c, filter, update)
+	return result, err
+}
+
+// CloseWordCloud closes a word cloud session.
+// It takes a gin.Context and an ID of type primitive.ObjectID as parameters.
+// It returns a pointer to mongo.UpdateResult and an error.
+func CloseWordCloud(c *gin.Context, id primitive.ObjectID) (*mongo.UpdateResult, error) {
+	db := db.GetDB()
+	collection := db.Collection("word_cloud_sessions")
+	filter := bson.M{"_id": id}
+	update := bson.M{"$set": bson.M{"closedAt": primitive.NewDateTimeFromTime(time.Now())}}
 	result, err := collection.UpdateOne(c, filter, update)
 	return result, err
 }

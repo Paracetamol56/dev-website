@@ -3,7 +3,15 @@ import { get } from 'svelte/store';
 import api from '$lib/api';
 import { error } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
-import type { WordCloudSessionAdmin } from '../utils';
+
+interface ManagePageData {
+  id: string,
+  name: string,
+  description: string,
+  submitions: number,
+  code: string,
+  open: boolean,
+}
 
 export const load: PageLoad = async () => {
   // If the user is not logged in, throw a 401 error
@@ -12,7 +20,7 @@ export const load: PageLoad = async () => {
   }
   const result = await api.callWithAuth('GET', `/word-cloud?user=${get(user).id}`)
     .then((res) => {
-      return res.data as WordCloudSessionAdmin[];
+      return res.data as ManagePageData[];
     })
     .catch((err) => {
       console.error(err);

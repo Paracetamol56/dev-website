@@ -40,7 +40,7 @@
 						<p class="text-ctp-subtext0 text-sm">Closed</p>
 					{/if}
 					<p class="ml-auto text-ctp-subtext0 text-sm">
-						{session.submitions} submition{session.submitions <= 1 ? '' : 's'}
+						{session.submitions} submition{session.submitions == 0 ? '' : 's'}
 					</p>
 				</div>
 				<a href="/tool/word-cloud/manage/{session.id}">

@@ -143,12 +143,15 @@ func (controller *WordCloudController) GetWordCloud(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
+		if wordCloud.ClosedAt != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "word cloud not found"})
+			return
+		}
 		c.JSON(http.StatusOK, gin.H{
 			"id":          wordCloud.Id,
 			"name":        wordCloud.Name,
 			"description": wordCloud.Description,
 			"code":        wordCloud.Code,
-			"open":        wordCloud.Open,
 		})
 	} else if user != "" {
 		wordClouds, err := GetWordCloudByUser(c, user)
@@ -165,7 +168,7 @@ func (controller *WordCloudController) GetWordCloud(c *gin.Context) {
 				"description": wordCloud.Description,
 				"submitions":  len(wordCloud.Words),
 				"code":        wordCloud.Code,
-				"open":        wordCloud.Open,
+				"open":        wordCloud.ClosedAt == nil,
 			})
 		}
 		c.JSON(http.StatusOK, response)
@@ -189,6 +192,10 @@ func (controller *WordCloudController) GetWordCloudById(c *gin.Context) {
 			return
 		}
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if wordCloud.ClosedAt != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "word cloud not found"})
 		return
 	}
 
@@ -224,7 +231,6 @@ func (controller *WordCloudController) GetWordCloudById(c *gin.Context) {
 		"name":        wordCloud.Name,
 		"description": wordCloud.Description,
 		"code":        wordCloud.Code,
-		"open":        wordCloud.Open,
 		"uuid":        uuid.NewV4(),
 	})
 }
@@ -289,7 +295,6 @@ func (controller *WordCloudController) PostWordCloud(c *gin.Context) {
 		Name:        postWordCloud.Name,
 		Description: postWordCloud.Description,
 		Code:        GenerateCode(),
-		Open:        true,
 		Words:       []models.Word{},
 		CreatedAt:   primitive.NewDateTimeFromTime(time.Now()),
 		UpdatedAt:   primitive.NewDateTimeFromTime(time.Now()),
@@ -366,4 +371,32 @@ func (controller *WordCloudController) WSWordCloud(c *gin.Context) {
 			break // Disconnect on error
 		}
 	}
+}
+
+func (controller *WordCloudController) DeleteWordCloud(c *gin.Context) {
+	idString := c.Param("id")
+	id, err := primitive.ObjectIDFromHex(idString)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+		return
+	}
+	userId := c.MustGet("x-user-id").(primitive.ObjectID)
+	wordCloud, err := models.GetWordCloudById(c, id)
+	if err != nil {
+		if err.Error() == "mongo: no documents in result" {
+			c.JSON(http.StatusNotFound, gin.H{"error": "word cloud not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	if wordCloud.UserId != userId {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+	if _, err := models.CloseWordCloud(c, id); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{})
 }

@@ -10,7 +10,6 @@ interface WordCloudSession {
   name: string;
   description: string;
   code: string;
-  open: boolean;
 }
 
 interface WordCloudSessionAdmin extends WordCloudSession {

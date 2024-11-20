@@ -2,7 +2,6 @@
 	import WordCloud from './WordCloud.svelte';
 	import BarChart from './BarChart.svelte';
 	import Table from './Table.svelte';
-	import axios from 'axios';
 	import { createDialog, melt } from '@melt-ui/svelte';
 	import { QrCode, X } from 'lucide-svelte';
 	import { fade, fly } from 'svelte/transition';
@@ -11,11 +10,12 @@
 	import { addToast } from '../../../../+layout.svelte';
 	import { onMount } from 'svelte';
 	import type { WordCloudWord } from '../../utils';
+	import api from '$lib/api';
 
 	export let data: PageData;
 
 	onMount(() => {
-		if (data.session.open) {
+		if (data.session.closedAt !== null) {
 			// Connect to a WebSocket to fetch new word submissions in real time
 			const ws = new WebSocket(`ws://localhost:8080/api/word-cloud/${data.session.id}/ws`);
 
@@ -37,9 +37,6 @@
 				} else {
 					data.distribution.push({ text: message.text, occurence: 1 });
 				}
-				data.discussion = [...data.discussion];
-				console.log(data.distribution);
-				console.log(data.session);
 			};
 
 			ws.onclose = () => {
@@ -76,8 +73,8 @@
 	const closeSession = (e: Event) => {
 		e.preventDefault();
 
-		axios
-			.delete(`/api/word-cloud/${data.session.id}`)
+		api
+			.callWithAuth('DELETE', `/word-cloud/${data.session.id}`)
 			.then((res) => {
 				if (res.status === 204) {
 					addToast({
@@ -87,7 +84,6 @@
 							color: 'bg-ctp-green'
 						}
 					});
-					data.session.open = false;
 					data.session.closedAt = new Date();
 				}
 			})
@@ -133,7 +129,7 @@
 			<p><strong>Submitions:</strong> {data.session.words.length}</p>
 			<p><strong>Unique words:</strong> {data.distribution.length}</p>
 			<p><strong>Created at:</strong> {humanReadableDate(new Date(data.session.createdAt))}</p>
-			{#if !data.session.open}
+			{#if data.session.closedAt !== null}
 				<p>
 					<strong>Closed at:</strong>
 					{humanReadableDate(data.session.closedAt ? new Date(data.session.closedAt) : null)}
@@ -141,7 +137,7 @@
 			{/if}
 
 			<div class="mt-2 flex justify-start gap-2">
-				{#if data.session.open}
+				{#if data.session.closedAt === null}
 					<button
 						class="flex items-center gap-1 rounded-md bg-ctp-mauve px-3 py-1
                   font-semibold text-ctp-mantle

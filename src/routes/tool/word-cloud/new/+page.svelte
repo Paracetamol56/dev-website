@@ -59,10 +59,11 @@
 			});
 			return;
 		}
-		api.callWithAuth('POST', '/word-cloud', {
-			name,
-			description
-		})
+		api
+			.callWithAuth('POST', '/word-cloud', {
+				name,
+				description
+			})
 			.then((res) => {
 				addToast({
 					data: {
@@ -71,7 +72,7 @@
 						color: 'bg-ctp-green'
 					}
 				});
-				goto(`/tool/word-cloud/${res.data.id}`);
+				goto(`/tool/word-cloud/manage/${res.data.id}`);
 			})
 			.catch((err) => {
 				addToast({
@@ -119,7 +120,9 @@
 					<p class="text-left text-sm font-semibold text-ctp-red">{nameError}</p>
 				</fieldset>
 				<fieldset class="sm:col-span-2">
-					<label for="description" class="mb-2 text-sm font-semibold"> Description <small>(optional)</small></label>
+					<label for="description" class="mb-2 text-sm font-semibold">
+						Description <small>(optional)</small></label
+					>
 					<textarea
 						id="description"
 						name="description"
@@ -132,18 +135,18 @@
 					<p class="text-left text-sm font-semibold text-ctp-red">{descriptionError}</p>
 				</fieldset>
 				<div class="sm:col-span-2 flex justify-end">
-					<Button
-						type="submit"
-					>
+					<Button type="submit">
 						<span>Create</span>
 						<Send size="16" />
-				</Button>
+					</Button>
 				</div>
 			</div>
 		</form>
 		{#if $user.accessToken === null}
 			<div>
-				<div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+				<div
+					class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center"
+				>
 					<div class="text-ctp-red font-semibold mb-4 flex items-baseline gap-1">
 						<AlertTriangle size="16" />
 						<p>You must be logged in to create a new session</p>

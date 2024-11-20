@@ -55,6 +55,7 @@ func InitRouter() *gin.Engine {
 			wordCloudGroup.GET("/:id/ws", wordCloud.WSWordCloud)
 			wordCloudGroup.POST("/:id/word", wordCloud.PostWordCloudWord)
 			wordCloudGroup.POST("", middlewares.JwtAuthMiddleware(), wordCloud.PostWordCloud)
+			wordCloudGroup.DELETE("/:id", middlewares.JwtAuthMiddleware(), wordCloud.DeleteWordCloud)
 		}
 		userGroup := apiGroup.Group("/users")
 		{
