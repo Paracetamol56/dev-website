@@ -3,15 +3,7 @@ import { get } from 'svelte/store';
 import api from '$lib/api';
 import { error } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
-
-interface ManagePageData {
-  id: string,
-  name: string,
-  description: string,
-  submitions: number,
-  code: string,
-  open: boolean,
-}
+import type { ManagePageData } from '../utils';
 
 export const load: PageLoad = async () => {
   // If the user is not logged in, throw a 401 error

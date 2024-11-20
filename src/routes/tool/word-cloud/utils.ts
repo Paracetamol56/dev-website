@@ -23,4 +23,9 @@ interface WordCloudSessionUser extends WordCloudSession {
   uuid: string;
 }
 
-export type { WordCloudWord, WordCloudSessionAdmin, WordCloudSessionUser };
+interface ManagePageData extends WordCloudSession {
+  submitions: number,
+}
+
+export type { WordCloudWord, WordCloudSessionAdmin, WordCloudSessionUser, ManagePageData };
+

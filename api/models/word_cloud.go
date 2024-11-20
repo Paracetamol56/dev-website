@@ -40,7 +40,7 @@ func GetWordCloudByCode(c *gin.Context, code string) (*WordCloud, error) {
 	db := db.GetDB()
 	collection := db.Collection("word_cloud_sessions")
 	var wordCloud WordCloud
-	if err := collection.FindOne(c, bson.M{"code": code}).Decode(&wordCloud); err != nil {
+	if err := collection.FindOne(c, bson.M{"code": code, "closedAt": bson.M{"$exists": false}}).Decode(&wordCloud); err != nil {
 		return nil, err
 	}
 	return &wordCloud, nil
@@ -62,11 +62,20 @@ func GetWordCloudById(c *gin.Context, id primitive.ObjectID) (*WordCloud, error)
 // GetWordCloudByUser retrieves all word clouds associated with a user.
 // It takes a gin.Context and a userID of type primitive.ObjectID as parameters.
 // It returns a slice of pointers to WordCloud objects and an error.
-func GetWordCloudByUser(c *gin.Context, userId primitive.ObjectID) ([]*WordCloud, error) {
+func GetWordCloudByUser(c *gin.Context, userId primitive.ObjectID, status string) ([]*WordCloud, error) {
 	db := db.GetDB()
 	collection := db.Collection("word_cloud_sessions")
+	var filter bson.M
+	switch status {
+	case "open":
+		filter = bson.M{"user": userId, "closedAt": bson.M{"$exists": false}}
+	case "closed":
+		filter = bson.M{"user": userId, "closedAt": bson.M{"$exists": true}}
+	default:
+		return nil, fmt.Errorf("invalid status")
+	}
 	var wordClouds []*WordCloud
-	cursor, err := collection.Find(c, bson.M{"user": userId})
+	cursor, err := collection.Find(c, filter)
 	if err != nil {
 		return nil, err
 	}

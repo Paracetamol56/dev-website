@@ -90,43 +90,71 @@ func removeConnection(connections []*AdminConnection, connectionToRemove *AdminC
 	return connections
 }
 
-func GetWordCloudByCode(c *gin.Context, code string) (*models.WordCloud, error) {
+func GetWordCloudByCode(c *gin.Context, code string) {
 	if err := ValidateCode(code); err != nil {
-		return nil, err
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
 
 	wordCloud, err := models.GetWordCloudByCode(c, code)
 	if err != nil {
-		return nil, err
+		if err.Error() == "mongo: no documents in result" {
+			c.JSON(http.StatusNotFound, gin.H{"error": "word cloud not found"})
+			return
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
-	return wordCloud, nil
+
+	c.JSON(http.StatusOK, gin.H{
+		"id":          wordCloud.Id,
+		"name":        wordCloud.Name,
+		"description": wordCloud.Description,
+		"code":        wordCloud.Code,
+	})
 }
 
-func GetWordCloudByUser(c *gin.Context, userIdString string) ([]*models.WordCloud, error) {
+func GetWordCloudByUser(c *gin.Context, userIdString string) {
+	status := c.DefaultQuery("status", "open")
+
 	queryUserId, err := primitive.ObjectIDFromHex(userIdString)
 	if err != nil {
-		return nil, fmt.Errorf("invalid user id")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user id"})
+		return
 	}
 
 	// Extract the auth header and verify the token
 	authHeader := c.GetHeader("Authorization")
 	t := strings.Split(authHeader, " ")
 	if len(t) != 2 {
-		return nil, fmt.Errorf("unauthorized")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
 	}
 	authToken := t[1]
 	// Check if the token is authorized and if the user ID matches the token
 	authorized, _ := utils.IsAuthorized(authToken, os.Getenv("ACCESS_TOKEN_SECRET"))
 	tokenUserId, _ := utils.ExtractID(authToken, os.Getenv("ACCESS_TOKEN_SECRET"))
 	if !authorized || queryUserId != tokenUserId {
-		return nil, fmt.Errorf("unauthorized")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
 	}
 
-	wordClouds, err := models.GetWordCloudByUser(c, tokenUserId)
+	wordClouds, err := models.GetWordCloudByUser(c, tokenUserId, status)
 	if err != nil {
-		return nil, err
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
-	return wordClouds, nil
+
+	var response []gin.H
+	for _, wordCloud := range wordClouds {
+		response = append(response, gin.H{
+			"id":          wordCloud.Id,
+			"name":        wordCloud.Name,
+			"description": wordCloud.Description,
+			"submitions":  len(wordCloud.Words),
+			"code":        wordCloud.Code,
+		})
+	}
+
+	c.JSON(http.StatusOK, response)
 }
 
 func (controller *WordCloudController) GetWordCloud(c *gin.Context) {
@@ -134,47 +162,15 @@ func (controller *WordCloudController) GetWordCloud(c *gin.Context) {
 	user := c.Query("user")
 
 	if code != "" {
-		wordCloud, err := GetWordCloudByCode(c, code)
-		if err != nil {
-			if err.Error() == "mongo: no documents in result" {
-				c.JSON(http.StatusNotFound, gin.H{"error": "word cloud not found"})
-				return
-			}
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-		if wordCloud.ClosedAt != nil {
-			c.JSON(http.StatusNotFound, gin.H{"error": "word cloud not found"})
-			return
-		}
-		c.JSON(http.StatusOK, gin.H{
-			"id":          wordCloud.Id,
-			"name":        wordCloud.Name,
-			"description": wordCloud.Description,
-			"code":        wordCloud.Code,
-		})
+		GetWordCloudByCode(c, code)
+		return
 	} else if user != "" {
-		wordClouds, err := GetWordCloudByUser(c, user)
-		if err != nil {
-			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
-			return
-		}
-
-		var response []gin.H
-		for _, wordCloud := range wordClouds {
-			response = append(response, gin.H{
-				"id":          wordCloud.Id,
-				"name":        wordCloud.Name,
-				"description": wordCloud.Description,
-				"submitions":  len(wordCloud.Words),
-				"code":        wordCloud.Code,
-				"open":        wordCloud.ClosedAt == nil,
-			})
-		}
-		c.JSON(http.StatusOK, response)
-	} else {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "missing query parameter"})
+		GetWordCloudByUser(c, user)
+		return
 	}
+
+	// Missing required query parameter
+	c.JSON(http.StatusBadRequest, gin.H{"error": "missing query parameter"})
 }
 
 func (controller *WordCloudController) GetWordCloudById(c *gin.Context) {
@@ -192,10 +188,6 @@ func (controller *WordCloudController) GetWordCloudById(c *gin.Context) {
 			return
 		}
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	if wordCloud.ClosedAt != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "word cloud not found"})
 		return
 	}
 
