@@ -48,6 +48,15 @@ func ValidateCode(code string) error {
 	return nil
 }
 
+func cleanText(text string) string {
+	res := strings.TrimSpace(text)
+	res = strings.ToLower(res)
+	re := regexp.MustCompile(`[^\w-]+`)
+	res = re.ReplaceAllString(res, "")
+
+	return res
+}
+
 func broadcastToAdmins(sessionId primitive.ObjectID, data models.Word) {
 	connMutex.Lock()
 	defer connMutex.Unlock()
@@ -241,14 +250,19 @@ func (controllers *WordCloudController) PostWordCloudWord(c *gin.Context) {
 	}
 
 	word := models.Word{
-		Text:      body.Text,
+		Text:      cleanText(body.Text),
 		UUID:      body.UUID,
 		UserAgent: body.UserAgent,
 		CreatedAt: primitive.NewDateTimeFromTime(time.Now()),
 	}
 
 	if _, err := models.AddWordToWordCloud(c, sessionId, &word); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		if err.Error() == "word already submitted" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		return
 	}
 
 	go broadcastToAdmins(sessionId, word)

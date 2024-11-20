@@ -1,6 +1,8 @@
 package models
 
 import (
+	"fmt"
+
 	"github.com/Paracetamol56/dev-website/api/db"
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
@@ -90,6 +92,22 @@ func CreateWordCloud(c *gin.Context, wordCloud *WordCloud) (*mongo.InsertOneResu
 func AddWordToWordCloud(c *gin.Context, sessionId primitive.ObjectID, word *Word) (*mongo.UpdateResult, error) {
 	db := db.GetDB()
 	collection := db.Collection("word_cloud_sessions")
+
+	// Check if the word already exists within this session
+	existingWord := collection.FindOne(c, bson.M{
+		"_id": sessionId,
+		"words": bson.M{
+			"$elemMatch": bson.M{
+				"text": word.Text,
+				"uuid": word.UUID,
+			},
+		},
+	})
+	if existingWord.Err() == nil {
+		// If a word with the same text and UUID exists, return an error
+		return nil, fmt.Errorf("word already submitted")
+	}
+
 	filter := bson.M{"_id": sessionId}
 	update := bson.M{"$push": bson.M{"words": word}}
 	result, err := collection.UpdateOne(c, filter, update)

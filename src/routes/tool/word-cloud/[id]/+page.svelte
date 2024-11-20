@@ -44,6 +44,12 @@
 					words.push(text.toLowerCase());
 					sessionStorage.setItem(data.session!.id, JSON.stringify(words));
 				}
+			})
+			.catch((error) => {
+				console.log(error);
+				if (error.response.status === 400) {
+					textError = 'You already submitted this word';
+				}
 			});
 	};
 </script>
