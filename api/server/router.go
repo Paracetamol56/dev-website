@@ -52,7 +52,7 @@ func InitRouter() *gin.Engine {
 		{
 			wordCloudGroup.GET("", wordCloud.GetWordCloud)
 			wordCloudGroup.GET("/:id", wordCloud.GetWordCloudById)
-			wordCloudGroup.GET("/:id/ws", middlewares.JwtAuthMiddleware(), wordCloud.WSWordCloud)
+			wordCloudGroup.GET("/:id/ws", wordCloud.WSWordCloud)
 			wordCloudGroup.POST("/:id/word", wordCloud.PostWordCloudWord)
 			wordCloudGroup.POST("", middlewares.JwtAuthMiddleware(), wordCloud.PostWordCloud)
 		}

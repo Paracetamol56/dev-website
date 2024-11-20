@@ -10,29 +10,36 @@
 	import type { PageData } from './$types';
 	import { addToast } from '../../../../+layout.svelte';
 	import { onMount } from 'svelte';
+	import type { WordCloudWord } from '../../utils';
 
 	export let data: PageData;
 
 	onMount(() => {
 		if (data.session.open) {
 			// Connect to a WebSocket to fetch new word submissions in real time
-			const ws = new WebSocket(
-				`ws://${window.location.host}/api/word-cloud/${data.session.id}/ws`,
-				{
-					perMessageDeflate: false,
-					headers: {
-						Authorization: `Bearer ${localStorage.getItem('token')}`
-					}
-				}
-			);
+			const ws = new WebSocket(`ws://localhost:8080/api/word-cloud/${data.session.id}/ws`);
 
 			ws.onopen = () => {
 				console.log('Connected to WebSocket');
 			};
 
 			ws.onmessage = (event) => {
-				const message = JSON.parse(event.data);
+				const message = JSON.parse(event.data) as WordCloudWord;
 				console.log(message);
+				// Update the session data with the new word
+				data.session.words = [...data.session.words, message];
+				// Udpate the distribution of words
+				const found = (data.distribution as { text: string; occurence: number }[]).find(
+					(word) => word.text === message.text
+				);
+				if (found !== undefined) {
+					found.occurence++;
+				} else {
+					data.distribution.push({ text: message.text, occurence: 1 });
+				}
+				data.discussion = [...data.discussion];
+				console.log(data.distribution);
+				console.log(data.session);
 			};
 
 			ws.onclose = () => {
