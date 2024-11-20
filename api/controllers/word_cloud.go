@@ -2,11 +2,13 @@ package controllers
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
 	"net/http"
 	"os"
 	"regexp"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/Paracetamol56/dev-website/api/models"
@@ -17,8 +19,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type WordCloudController struct {
-}
+type WordCloudController struct{}
 
 func GenerateCode() string {
 	// Create a 5 characters long alphanumeric code
@@ -45,6 +46,39 @@ func ValidateCode(code string) error {
 		return fmt.Errorf("code must contain only letters and numbers")
 	}
 	return nil
+}
+
+func broadcastToAdmins(sessionId primitive.ObjectID, data models.Word) {
+	connMutex.Lock()
+	defer connMutex.Unlock()
+
+	// Get connections for the specific session
+	connections, exists := adminConnections[sessionId]
+	if !exists {
+		return // No admins connected to this session
+	}
+
+	// Broadcast message to all connections
+	for _, admin := range connections {
+		err := admin.Conn.WriteJSON(data)
+		if err != nil {
+			// Remove broken connections
+			log.Println("Error writing to admin connection:", err)
+			admin.Conn.Close()
+
+			// Remove the connection from the list
+			adminConnections[sessionId] = removeConnection(connections, admin)
+		}
+	}
+}
+
+func removeConnection(connections []*AdminConnection, connectionToRemove *AdminConnection) []*AdminConnection {
+	for i, conn := range connections {
+		if conn == connectionToRemove {
+			return append(connections[:i], connections[i+1:]...)
+		}
+	}
+	return connections
 }
 
 func GetWordCloudByCode(c *gin.Context, code string) (*models.WordCloud, error) {
@@ -149,12 +183,30 @@ func (controller *WordCloudController) GetWordCloudById(c *gin.Context) {
 		return
 	}
 
-	if c.GetHeader("x-user-id") != "" {
-		userId := c.MustGet("x-user-id").(primitive.ObjectID)
-
-		if wordCloud.UserId == userId {
-			c.JSON(http.StatusOK, wordCloud)
+	authHeader := c.GetHeader("Authorization")
+	if authHeader != "" {
+		t := strings.Split(authHeader, " ")
+		if len(t) != 2 {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+			c.Abort()
 			return
+		}
+		authToken := t[1]
+		authorized, err := utils.IsAuthorized(authToken, os.Getenv("ACCESS_TOKEN_SECRET"))
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+			return
+		}
+		if authorized {
+			userId, err := utils.ExtractID(authToken, os.Getenv("ACCESS_TOKEN_SECRET"))
+			if err != nil {
+				c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+				return
+			}
+			if wordCloud.UserId == userId {
+				c.JSON(http.StatusOK, wordCloud)
+				return
+			}
 		}
 	}
 
@@ -164,7 +216,44 @@ func (controller *WordCloudController) GetWordCloudById(c *gin.Context) {
 		"description": wordCloud.Description,
 		"code":        wordCloud.Code,
 		"open":        wordCloud.Open,
+		"uuid":        uuid.NewV4(),
 	})
+}
+
+type PostWordCloudWordBody struct {
+	Text      string    `json:"text" binding:"required,min=1,max=100"`
+	UUID      uuid.UUID `json:"uuid" binding:"required"`
+	UserAgent string    `json:"userAgent" binding:"required"`
+}
+
+func (controllers *WordCloudController) PostWordCloudWord(c *gin.Context) {
+	idString := c.Param("id")
+	sessionId, err := primitive.ObjectIDFromHex(idString)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+		return
+	}
+
+	var body PostWordCloudWordBody
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	word := models.Word{
+		Text:      body.Text,
+		UUID:      body.UUID,
+		UserAgent: body.UserAgent,
+		CreatedAt: primitive.NewDateTimeFromTime(time.Now()),
+	}
+
+	if _, err := models.AddWordToWordCloud(c, sessionId, &word); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	}
+
+	go broadcastToAdmins(sessionId, word)
+
+	c.JSON(http.StatusCreated, gin.H{})
 }
 
 type PostWordCloudBody struct {
@@ -201,37 +290,66 @@ func (controller *WordCloudController) PostWordCloud(c *gin.Context) {
 	})
 }
 
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
+type AdminConnection struct {
+	Conn        *websocket.Conn
+	ConnectedAt time.Time
+	SessionID   primitive.ObjectID
 }
 
-type WSMessage struct {
-	Word      string `json:"word"`
-	IP        string `json:"ip"`
-	UserAgent string `json:"userAgent"`
-}
+var (
+	adminConnections = make(map[primitive.ObjectID][]*AdminConnection)
+	connMutex        = sync.Mutex{} // Mutex to protect concurrent access to the map
+	upgrader         = websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+		CheckOrigin: func(r *http.Request) bool {
+			return true
+		},
+	}
+)
 
-func (controller *WordCloudController) GetWebSocket(c *gin.Context) {
-	sessionId := c.Param("id")
-	ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
+func (controller *WordCloudController) WSWordCloud(c *gin.Context) {
+	idString := c.Param("id")
+	sessionId, err := primitive.ObjectIDFromHex(idString)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+		return
+	}
+
+	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	defer ws.Close()
-	clientId := uuid.NewV4()
-	ws.WriteJSON(gin.H{
-		"sessionId": sessionId,
-		"status":    "ready",
-		"connId":    clientId.String(),
-	})
-	for {
-		var message WSMessage
-		err := ws.ReadJSON(&message)
-		if err != nil {
-			break
+
+	connection := &AdminConnection{
+		Conn:        conn,
+		ConnectedAt: time.Now(),
+		SessionID:   sessionId,
+	}
+
+	connMutex.Lock()
+	adminConnections[sessionId] = append(adminConnections[sessionId], connection)
+	connMutex.Unlock()
+
+	defer func() {
+		// Clean up on disconnect
+		connMutex.Lock()
+		connections := adminConnections[sessionId]
+		for i, conn := range connections {
+			if conn == connection {
+				adminConnections[sessionId] = append(connections[:i], connections[i+1:]...)
+				conn.Conn.Close()
+				break
+			}
 		}
-		// _, err := models.AddWordToWordCloud(c, sessionId, message.Word, message.IP, message.UserAgent)
+		connMutex.Unlock()
+	}()
+
+	// Keep the connection alive
+	for {
+		if _, _, err := conn.ReadMessage(); err != nil {
+			break // Disconnect on error
+		}
 	}
 }

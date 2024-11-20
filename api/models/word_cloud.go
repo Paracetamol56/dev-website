@@ -3,6 +3,7 @@ package models
 import (
 	"github.com/Paracetamol56/dev-website/api/db"
 	"github.com/gin-gonic/gin"
+	uuid "github.com/satori/go.uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -11,7 +12,7 @@ import (
 // Word represents a word in a word cloud.
 type Word struct {
 	Text      string             `json:"text" bson:"text"`
-	IP        string             `json:"ip" bson:"ip"`
+	UUID      uuid.UUID          `json:"uuid" bson:"uuid"`
 	UserAgent string             `json:"userAgent" bson:"userAgent"`
 	CreatedAt primitive.DateTime `json:"createdAt" bson:"createdAt"`
 }
@@ -86,10 +87,10 @@ func CreateWordCloud(c *gin.Context, wordCloud *WordCloud) (*mongo.InsertOneResu
 // AddWordToWordCloud adds a word to a word cloud.
 // It takes a gin.Context, a pointer to a WordCloud object, and a pointer to a Word object as parameters.
 // It returns a pointer to a mongo.UpdateResult object and an error.
-func AddWordToWordCloud(c *gin.Context, wordCloud *WordCloud, word *Word) (*mongo.UpdateResult, error) {
+func AddWordToWordCloud(c *gin.Context, sessionId primitive.ObjectID, word *Word) (*mongo.UpdateResult, error) {
 	db := db.GetDB()
 	collection := db.Collection("word_cloud_sessions")
-	filter := bson.M{"_id": wordCloud.Id}
+	filter := bson.M{"_id": sessionId}
 	update := bson.M{"$push": bson.M{"words": word}}
 	result, err := collection.UpdateOne(c, filter, update)
 	return result, err
