@@ -1,28 +1,13 @@
 <script lang="ts">
+	import type { PageData } from './$types';
+	import Button from '$lib/components/Button.svelte';
 	import { Send } from 'lucide-svelte';
-	import type { WordCloudSession } from './utils';
-	import axios from 'axios';
-	import { addToast } from '../+layout.svelte';
-	import { onMount } from 'svelte';
-	import { browser } from '$app/environment';
+	import api from '$lib/api';
 
-	export let session: WordCloudSession;
-
-	let ip: string | null = null;
+	export let data: PageData;
 	let text: string = '';
 	let textError: string = '';
 	let textSuccess: boolean = false;
-
-	onMount(() => {
-		axios
-			.get('https://api.ipify.org?format=json')
-			.then((res) => {
-				ip = res.data.ip;
-			})
-			.catch((error) => {
-				console.error(error);
-			});
-	});
 
 	const validateWord = () => {
 		if (text.length === 0) {
@@ -33,7 +18,7 @@
 			textError = 'Your word must be less than 100 characters long';
 			return false;
 		}
-		if (JSON.parse(sessionStorage.getItem(session.id)!)?.includes(text.toLowerCase())) {
+		if (JSON.parse(sessionStorage.getItem(data.session!.id)!)?.includes(text.toLowerCase())) {
 			textError = 'This word has already been sent';
 			return false;
 		}
@@ -41,41 +26,40 @@
 		return true;
 	};
 
-	const handleSubmit = (e: Event) => {
+	const handleSubmit = async (e: Event) => {
 		e.preventDefault();
 		if (!validateWord()) return;
-		axios
-			.put(`/api/word-cloud/${session.id}`, { text, ip })
-			.then(() => {
-				const words = sessionStorage.getItem(session.id)
-					? JSON.parse(sessionStorage.getItem(session.id)!)
-					: [];
-				words.push(text.toLowerCase());
-				sessionStorage.setItem(session.id, JSON.stringify(words));
-				text = '';
-				textError = '';
-				textSuccess = true;
+
+		await api
+			.call('POST', `/word-cloud/${data.session!.id}/word`, {
+				text: text,
+				uuid: data.session!.uuid,
+				userAgent: navigator.userAgent
+			})
+			.then((response) => {
+				if (response.status === 201) {
+					textSuccess = true;
+					text = '';
+					const words = JSON.parse(sessionStorage.getItem(data.session!.id)!) || [];
+					words.push(text.toLowerCase());
+					sessionStorage.setItem(data.session!.id, JSON.stringify(words));
+				}
 			})
 			.catch((error) => {
-				console.error(error);
-				textError = 'An error occured';
-				addToast({
-					data: {
-						title: 'Error',
-						description: 'An error occured while sending your word',
-						color: 'bg-ctp-red'
-					}
-				});
+				console.log(error);
+				if (error.response.status === 400) {
+					textError = 'You already submitted this word';
+				}
 			});
 	};
 </script>
 
 <div class="mx-auto max-w-xl">
 	<h2 class="mb-4 text-4xl font-bold text-center">
-		{session.name}
+		{data.session?.name}
 	</h2>
 	<p class="text-center">
-		{session.description}
+		{data.session?.description}
 	</p>
 
 	<form class="my-16" on:submit={handleSubmit}>
@@ -98,17 +82,14 @@
 				/>
 				<p class="text-left text-sm font-semibold text-ctp-red">{textError}</p>
 			</div>
-			<button
-				class="flex justify-center items-center rounded-md bg-ctp-mauve px-3 py-1 font-medium
-              text-ctp-surface0 hover:opacity-75 active:opacity-50 transition-opacity"
-				type="submit"
-			>
-				Send&nbsp;<Send size="18" />
-			</button>
+			<Button type="submit">
+				<span>Send</span>
+				<Send size="18" />
+			</Button>
 		</div>
 	</form>
 
 	<p class="mt-8 text-center">
-		The session code is <strong>{session.code}</strong>,<br />share it with your neighbors.
+		The session code is <strong>{data.session?.code}</strong>,<br />share it with your neighbors.
 	</p>
 </div>

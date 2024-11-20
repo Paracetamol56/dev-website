@@ -19,7 +19,7 @@ type AuthController struct {
 
 // SendVerificationEmail godoc
 // Sends a verification email to the user with the provided url
-func SendVerificationEmail(c *gin.Context, user *models.FullUser, url string) error {
+func SendVerificationEmail(c *gin.Context, user *models.User, url string) error {
 	from := mail.NewEmail("Matheo Galuba", os.Getenv("ADMIN_EMAIL"))
 	subject := "Verify your email address"
 	to := mail.NewEmail(user.Name, user.Email)
@@ -60,7 +60,7 @@ func SendVerificationEmail(c *gin.Context, user *models.FullUser, url string) er
 
 // AddContact godoc
 // Adds the user to the SendGrid contact list
-func AddContact(c *gin.Context, user *models.FullUser) error {
+func AddContact(c *gin.Context, user *models.User) error {
 	host := "https://api.sendgrid.com"
 	request := sendgrid.GetRequest(os.Getenv("SENDGRID_API_KEY"), "/v3/marketing/contacts", host)
 	request.Method = "PUT"
@@ -102,6 +102,7 @@ type LoginBody struct {
 }
 
 // PostLogin godoc
+//
 //	@Summary		Login or register a user
 //	@Description	Login or register a user by email
 //	@Tags			auth
@@ -121,7 +122,7 @@ func (controller *AuthController) PostLogin(c *gin.Context) {
 	user, _ := models.GetFullUserByEmail(c, login.Email)
 
 	if user == nil {
-		result, err := models.CreateUser(c, &models.FullUser{
+		result, err := models.CreateUser(c, &models.User{
 			Email:   login.Email,
 			Flavour: "mocha",
 		})
@@ -154,6 +155,7 @@ type VerifyBody struct {
 }
 
 // PostVerify godoc
+//
 //	@Summary		Verify a user's email
 //	@Description	Verify a user's email by token
 //	@Tags			auth
@@ -211,6 +213,7 @@ func (controller *AuthController) PostVerify(c *gin.Context) {
 }
 
 // PostRefresh godoc
+//
 //	@Summary		Refresh a user's access token
 //	@Description	Refresh a user's access token by refresh token
 //	@Tags			auth
@@ -267,6 +270,7 @@ type GithubLoginBody struct {
 }
 
 // PostGithubLogin godoc
+//
 //	@Summary		Login or register a user with GitHub
 //	@Description	Login or register a user with GitHub by code
 //	@Tags			auth
@@ -306,7 +310,7 @@ func (controller *AuthController) PostGithubLogin(c *gin.Context) {
 
 	if user == nil {
 		// If not, create it
-		result, err := models.CreateUser(c, &models.FullUser{
+		result, err := models.CreateUser(c, &models.User{
 			Email:             githubUser.Email,
 			Name:              githubUser.Name,
 			Flavour:           "mocha",
