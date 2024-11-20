@@ -9,8 +9,37 @@
 	import QRCode from 'qrcode';
 	import type { PageData } from './$types';
 	import { addToast } from '../../../../+layout.svelte';
+	import { onMount } from 'svelte';
 
 	export let data: PageData;
+
+	onMount(() => {
+		if (data.session.open) {
+			// Connect to a WebSocket to fetch new word submissions in real time
+			const ws = new WebSocket(
+				`ws://${window.location.host}/api/word-cloud/${data.session.id}/ws`,
+				{
+					perMessageDeflate: false,
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem('token')}`
+					}
+				}
+			);
+
+			ws.onopen = () => {
+				console.log('Connected to WebSocket');
+			};
+
+			ws.onmessage = (event) => {
+				const message = JSON.parse(event.data);
+				console.log(message);
+			};
+
+			ws.onclose = () => {
+				console.log('Disconnected from WebSocket');
+			};
+		}
+	});
 
 	let qrWidthAvailable: number;
 	let canvas: HTMLCanvasElement;

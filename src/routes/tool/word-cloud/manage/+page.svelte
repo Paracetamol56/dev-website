@@ -9,11 +9,9 @@
 <section class="container mx-auto mb-32">
 	<hgroup>
 		<h1 class="mb-8 text-6xl font-bold text-center">
-			<span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender"
-				>
+			<span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender">
 				Your sessions
-				</span
-			>
+			</span>
 		</h1>
 	</hgroup>
 </section>
@@ -45,7 +43,7 @@
 						{session.submitions} submition{session.submitions <= 1 ? '' : 's'}
 					</p>
 				</div>
-				<a href="/tool/word-cloud/{session.id}">
+				<a href="/tool/word-cloud/manage/{session.id}">
 					<h4 class="mb-4 text-2xl font-bold hover:opacity-75 transition-opacity">
 						{session.name}
 					</h4>

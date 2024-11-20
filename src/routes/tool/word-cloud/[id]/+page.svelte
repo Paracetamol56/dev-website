@@ -1,32 +1,13 @@
 <script lang="ts">
-	import axios from "axios";
-	import { onMount } from "svelte";
-	import type { PageData } from "./$types";
-	import Button from "$lib/components/Button.svelte";
-	import { Send } from "lucide-svelte";
+	import type { PageData } from './$types';
+	import Button from '$lib/components/Button.svelte';
+	import { Send } from 'lucide-svelte';
+	import api from '$lib/api';
 
-  export let data: PageData;
-  let ip: string | null = null;
+	export let data: PageData;
 	let text: string = '';
 	let textError: string = '';
 	let textSuccess: boolean = false;
-
-	/*onMount(() => {
-		axios
-			.get('https://api.ipify.org?format=json')
-			.then((res) => {
-				ip = res.data.ip;
-			})
-			.catch((error) => {
-				console.error(error);
-			});
-		
-		// Connect to the websocket
-		const ws = new WebSocket(`/api/word-cloud/${data.session!.id}/ws`);
-		ws.onopen = () => {
-			ws.send(JSON.stringify({ type: 'join', code: data.session!.id }));
-		};
-	});*/
 
 	const validateWord = () => {
 		if (text.length === 0) {
@@ -45,10 +26,25 @@
 		return true;
 	};
 
-	const handleSubmit = (e: Event) => {
+	const handleSubmit = async (e: Event) => {
 		e.preventDefault();
 		if (!validateWord()) return;
-		// TODO: Send the word to the server
+
+		await api
+			.call('POST', `/word-cloud/${data.session!.id}/word`, {
+				text: text,
+				uuid: data.session!.uuid,
+				userAgent: navigator.userAgent
+			})
+			.then((response) => {
+				if (response.status === 201) {
+					textSuccess = true;
+					text = '';
+					const words = JSON.parse(sessionStorage.getItem(data.session!.id)!) || [];
+					words.push(text.toLowerCase());
+					sessionStorage.setItem(data.session!.id, JSON.stringify(words));
+				}
+			});
 	};
 </script>
 

@@ -1,20 +1,27 @@
 interface WordCloudWord {
-	text: string;
-	ip: string;
-	userAgent: string;
-	createdAt: Date;
+  text: string;
+  uuid: string;
+  userAgent: string;
+  createdAt: Date;
 }
 
 interface WordCloudSession {
-	id: string;
-	user: string;
-	name: string;
-	description: string;
-	code: string;
-	open: boolean;
-	words: WordCloudWord[];
-	createdAt: Date;
-	closedAt: Date | null;
+  id: string;
+  name: string;
+  description: string;
+  code: string;
+  open: boolean;
 }
 
-export type { WordCloudWord, WordCloudSession };
+interface WordCloudSessionAdmin extends WordCloudSession {
+  user: string;
+  words: WordCloudWord[];
+  createdAt: Date;
+  closedAt: Date | null;
+}
+
+interface WordCloudSessionUser extends WordCloudSession {
+  uuid: string;
+}
+
+export type { WordCloudWord, WordCloudSessionAdmin, WordCloudSessionUser };

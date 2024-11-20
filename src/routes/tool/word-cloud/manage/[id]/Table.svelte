@@ -40,19 +40,20 @@
 	<table class="w-full table-auto">
 		<thead>
 			<tr>
-				<th class="px-4 py-2">Word</th>
-				<th class="px-4 py-2">IP address</th>
-				<th class="px-4 py-2">User agent</th>
+				<th class="px-4 py-2 text-start">Word</th>
+				<th class="px-4 py-2 text-start">UUID</th>
+				<th class="px-4 py-2 text-start">OS</th>
+				<th class="px-4 py-2 text-start">Browser</th>
 			</tr>
 		</thead>
 		<tbody class="divide-y divide-ctp-surface0">
 			{#each data as d}
 				<tr class="hover:bg-ctp-crust">
 					<td class="px-4 py-1">{d.text}</td>
-					<td class="px-4 py-1">{d.ip}</td>
-					<td class="px-4 py-1 line-clamp-1 text-ellipsis overflow-hidden">{d.userAgent}</td>
-				</tr>
-			{/each}
+					<td class="px-4 py-1">{d.uuid}</td>
+					<td class="px-4 py-1">{d.userAgent.match(/\(([^)]+)\)/)[1].split(';')[1]}</td>
+					<td class="px-4 py-1">{d.userAgent.split(' ').at(-1)}</td>
+				</tr>{/each}
 		</tbody>
 	</table>
 </div>
