@@ -38,18 +38,7 @@
 			api
 				.call('GET', `/word-cloud?code=${$value.join('')}`)
 				.then((res) => {
-					if (res.data.open) {
-						goto(`/tool/word-cloud/${res.data.id}`);
-					} else {
-						codeError = 'This session is closed';
-						addToast({
-							data: {
-								title: 'Error',
-								description: 'The code you provided does not match any open session',
-								color: 'bg-ctp-red'
-							}
-						});
-					}
+					goto(`/tool/word-cloud/${res.data.id}`);
 				})
 				.catch((error) => {
 					console.error(error);

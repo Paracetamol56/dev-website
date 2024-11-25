@@ -11,13 +11,14 @@
 	import { onMount } from 'svelte';
 	import type { WordCloudWord } from '../../utils';
 	import api from '$lib/api';
+	import { invalidateAll } from '$app/navigation';
 
 	export let data: PageData;
 
 	onMount(() => {
 		if (data.session.closedAt !== null) {
 			// Connect to a WebSocket to fetch new word submissions in real time
-			const ws = new WebSocket(`ws://localhost:8080/api/word-cloud/${data.session.id}/ws`);
+			const ws = new WebSocket(`ws://${window.location.host}/api/word-cloud/${data.session.id}/ws`);
 
 			ws.onopen = () => {
 				console.log('Connected to WebSocket');
@@ -75,7 +76,7 @@
 
 		api
 			.callWithAuth('DELETE', `/word-cloud/${data.session.id}`)
-			.then((res) => {
+			.then(async (res) => {
 				if (res.status === 204) {
 					addToast({
 						data: {
@@ -129,15 +130,13 @@
 			<p><strong>Submitions:</strong> {data.session.words.length}</p>
 			<p><strong>Unique words:</strong> {data.distribution.length}</p>
 			<p><strong>Created at:</strong> {humanReadableDate(new Date(data.session.createdAt))}</p>
-			{#if data.session.closedAt !== null}
+			{#if data.session.closedAt !== undefined}
 				<p>
 					<strong>Closed at:</strong>
 					{humanReadableDate(data.session.closedAt ? new Date(data.session.closedAt) : null)}
 				</p>
-			{/if}
-
-			<div class="mt-2 flex justify-start gap-2">
-				{#if data.session.closedAt === null}
+			{:else}
+				<div class="mt-2 flex justify-start gap-2">
 					<button
 						class="flex items-center gap-1 rounded-md bg-ctp-mauve px-3 py-1
                   font-semibold text-ctp-mantle
@@ -156,8 +155,8 @@
 					>
 						Close session <X size="20" stroke-width="3" />
 					</button>
-				{/if}
-			</div>
+				</div>
+			{/if}
 		</div>
 		<BarChart data={data.distribution} />
 		<Table data={data.session.words} id={data.session.id} />

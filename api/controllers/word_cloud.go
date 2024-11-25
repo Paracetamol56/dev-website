@@ -10,6 +10,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unicode"
 
 	"github.com/Paracetamol56/dev-website/api/models"
 	"github.com/Paracetamol56/dev-website/api/utils"
@@ -17,6 +18,7 @@ import (
 	"github.com/gorilla/websocket"
 	uuid "github.com/satori/go.uuid"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"golang.org/x/text/unicode/norm"
 )
 
 type WordCloudController struct{}
@@ -48,9 +50,21 @@ func ValidateCode(code string) error {
 	return nil
 }
 
+func removeDiacritics(text string) string {
+	t := norm.NFD.String(text)
+	result := strings.Map(func(r rune) rune {
+		if unicode.Is(unicode.Mn, r) {
+			return -1
+		}
+		return r
+	}, t)
+	return result
+}
+
 func cleanText(text string) string {
 	res := strings.TrimSpace(text)
 	res = strings.ToLower(res)
+	res = removeDiacritics(res)
 	re := regexp.MustCompile(`[^\w-]+`)
 	res = re.ReplaceAllString(res, "")
 
@@ -386,9 +400,13 @@ func (controller *WordCloudController) DeleteWordCloud(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
+	if wordCloud.ClosedAt != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "word cloud already closed"})
+		return
+	}
 	if _, err := models.CloseWordCloud(c, id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{})
+	c.JSON(http.StatusNoContent, gin.H{})
 }

@@ -10,8 +10,12 @@ export const load: PageLoad = async () => {
   if (!get(user).accessToken) {
     error(401, 'Unauthorized');
   }
-  const result = await api.callWithAuth('GET', `/word-cloud?user=${get(user).id}`)
+  const result: ManagePageData[] = await api.callWithAuth('GET', `/word-cloud?user=${get(user).id}`)
     .then((res) => {
+      if (res.data === null) {
+        return [];
+      }
+
       return res.data as ManagePageData[];
     })
     .catch((err) => {
