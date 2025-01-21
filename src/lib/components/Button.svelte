@@ -25,6 +25,7 @@
         shadow-md shadow-ctp-crust transition-opacity
         {disabled ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-80 active:opacity-60'}"
 	on:click={handleClick}
+	{type}
 	{...dataProps}
 >
 	<slot />

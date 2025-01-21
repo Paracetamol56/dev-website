@@ -22,5 +22,5 @@ type HealthResponse struct {
 //	@Success		200 {object} HealthResponse
 //	@Router			/health [get]
 func (controller *HealthController) GetHealth(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"status": "ok"})
+	c.JSON(http.StatusOK, HealthResponse{Status: "ok"})
 }

@@ -10,6 +10,7 @@ tags:
   - node-red
   - mosquitto
   - esphome
+release: 2024-03-18T14:29:00.000Z
 listed: true
 ---
 
@@ -22,6 +23,7 @@ One of the main reasons I decided to build my own home automation system is priv
 I use a [Raspberry Pi 4](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/) as the main server for my home automation setup. It's a small and affordable computer that's powerful enough to run all the different services and applications I need. I also use a few ESP8266 and ESP32 microcontrollers to build custom sensors and actuators.
 
 **Specifications:**
+
 - Raspberry Pi 4 Model B
 - 4GB RAM
 - 64GB microSD card flashed with Debian
@@ -44,6 +46,7 @@ I use docker to run all the different services and applications on my Raspberry 
 In my opinion, Home Assistant is the best open-source home automation platform out there. It's easy to use, highly customizable, and has a large and active community. It supports a wide range of different devices and services, and it's easy to extend and customize with custom scripts and automations.
 
 In addition to the core Home Assistant server, I also use a few add-ons to extend its functionality:
+
 - [Node-RED](https://nodered.org/)
 - [Mosquitto](https://mosquitto.org/)
 - [ESPHome](https://esphome.io/)
@@ -76,7 +79,7 @@ Node-RED is a visual programming tool that I use to create automations and scrip
 
 Mosquitto is an open source MQTT broker that I use to connect all my IoT devices together. It's an efficient way to send messages between different devices and services. I use it to send sensor data from my custom sensors to Home Assistant.
 
-*MQTT ([Message Queuing Telemetry Transport](https://en.wikipedia.org/wiki/MQTT)) is a lightweight, publish-subscribe, machine to machine network protocol for message queue/message queuing service. It is designed for connections with remote locations that have devices with resource constraints or limited network bandwidth, such as in the Internet of Things (IoT).*
+_MQTT ([Message Queuing Telemetry Transport](https://en.wikipedia.org/wiki/MQTT)) is a lightweight, publish-subscribe, machine to machine network protocol for message queue/message queuing service. It is designed for connections with remote locations that have devices with resource constraints or limited network bandwidth, such as in the Internet of Things (IoT)._
 
 </div>
 <div class="clear-left">

@@ -27,14 +27,20 @@ func InitRouter() *gin.Engine {
 	contact := new(controllers.ContactController)
 	heatlh := new(controllers.HealthController)
 	hipparcos := new(controllers.HipparcosController)
+	wordCloud := new(controllers.WordCloudController)
+	imgConvert := new(controllers.ImgConvertController)
+	imgRemoveBg := new(controllers.ImgRemoveBgController)
 	microprocessor := new(controllers.MicroprocessorController)
 	user := new(controllers.UserController)
 
 	apiGroup := r.Group("/api")
 	{
+		apiGroup.Use(middlewares.RequestIdMiddleware())
 		apiGroup.GET("/doc/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 		apiGroup.GET("/health", heatlh.GetHealth)
 		apiGroup.POST("/contact", contact.PostContact)
+		apiGroup.POST("/img-convert", imgConvert.PostImgConvert)
+		apiGroup.POST("/img-removebg", imgRemoveBg.PostImgRemoveBg)
 		authGroup := apiGroup.Group("/auth")
 		{
 			authGroup.POST("/login", auth.PostLogin)
@@ -47,6 +53,15 @@ func InitRouter() *gin.Engine {
 		{
 			hipparcosGroup.GET("", hipparcos.GetHipparcosHR)
 			hipparcosGroup.GET("/:hip", hipparcos.GetHipparcosHRByHIP)
+		}
+		wordCloudGroup := apiGroup.Group("/word-cloud")
+		{
+			wordCloudGroup.GET("", wordCloud.GetWordCloud)
+			wordCloudGroup.GET("/:id", wordCloud.GetWordCloudById)
+			wordCloudGroup.GET("/:id/ws", wordCloud.WSWordCloud)
+			wordCloudGroup.POST("/:id/word", wordCloud.PostWordCloudWord)
+			wordCloudGroup.POST("", middlewares.JwtAuthMiddleware(), wordCloud.PostWordCloud)
+			wordCloudGroup.DELETE("/:id", middlewares.JwtAuthMiddleware(), wordCloud.DeleteWordCloud)
 		}
 		microprocessorGroup := apiGroup.Group("/microprocessors")
 		{

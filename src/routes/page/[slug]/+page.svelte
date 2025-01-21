@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';  
+	import { page } from '$app/stores';
 	import type { PageData } from './$types';
 
 	export let data: PageData;
@@ -24,6 +24,15 @@
 			</h1>
 		</hgroup>
 
+		<div class="flex gap-2 justify-center">
+			<p class="text-ctp-overlay2">
+				{new Date(data.meta.release).toLocaleString('en-US', {
+					year: 'numeric',
+					month: 'long',
+					day: 'numeric'
+				})}
+			</p>
+		</div>
 		<div class="flex gap-2 justify-center">
 			{#each data.meta.tags as tag}
 				<a href="/page?tag={tag}" class="font-semibold text-ctp-lavender">

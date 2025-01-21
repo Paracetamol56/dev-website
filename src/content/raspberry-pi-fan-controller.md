@@ -4,6 +4,7 @@ description: A simple python script to control a fan connected to a Raspberry Pi
 tags:
   - raspberry-pi
   - self-hosting
+release: 2023-11-07T19:14:00.000Z
 listed: true
 ---
 

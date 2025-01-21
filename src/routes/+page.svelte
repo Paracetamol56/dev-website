@@ -31,7 +31,7 @@
 
 <section class="relative container mx-auto mb-32" bind:this={section1}>
 	<span
-		class="absolute top-0 left-1/2 transform -translate-x-1/2
+		class="pointer-events-none absolute top-0 left-1/2 transform -translate-x-1/2
 					text-9xl font-black text-transparent text-outline-2 opacity-20 z-0"
 		style="transform: translate(-50%, {(scrollY - section1?.offsetTop + 300) / 5}px);"
 	>
@@ -60,7 +60,7 @@
 
 <section class="relative container mx-auto" bind:this={section2}>
 	<span
-		class="absolute top-0 left-1/2 transform -translate-x-1/2
+		class="pointer-events-none absolute top-0 left-1/2 transform -translate-x-1/2
 					text-9xl font-black text-transparent text-outline-2 opacity-20 z-0"
 		style="transform: translate(-50%, {(scrollY - section2?.offsetTop + 300) / 5}px);"
 	>

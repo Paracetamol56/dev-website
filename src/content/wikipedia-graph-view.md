@@ -4,6 +4,7 @@ description: A graph view of Wikipedia pages and their links
 tags:
   - computer-science
   - data-visualization
+release: 2024-01-29T22:11:00.000Z
 listed: true
 ---
 

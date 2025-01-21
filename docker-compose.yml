@@ -22,5 +22,12 @@ services:
     depends_on:
       - db
 
+  rembg:
+    image: danielgatis/rembg:latest
+    restart: unless-stopped
+    command: ["s"]
+    ports:
+      - 7000:7000
+
 volumes:
   mongodata:

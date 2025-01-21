@@ -11,6 +11,7 @@ tags:
   - radarr
   - deluge
   - jackett
+release: 2024-03-18T14:29:00.000Z
 listed: true
 ---
 
@@ -31,6 +32,7 @@ After home automation and 3D printing, let's talk about media services. I've bee
 ## Upgrading Plex
 
 Without any upgrade, Plex requires you to manually manage the content to your library. I have been doing this for a few years, and it's a tedious process. I've been looking for a way to automate this process, and I found the following services:
+
 - [Overseerr](https://overseerr.dev/)
 - [Sonarr](https://sonarr.tv/)
 - [Radarr](https://radarr.video/)
@@ -87,4 +89,3 @@ The process to request, download and stream new content is as follows:
 5. Once the download is complete, Sonarr or Radarr moves the content to the appropriate folder
 6. Plex scans this folder and adds the content to the library
 7. Plex handles the streaming to any device
-

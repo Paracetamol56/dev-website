@@ -1,6 +1,8 @@
 module github.com/Paracetamol56/dev-website
 
-go 1.21.5
+go 1.22
+
+toolchain go1.22.5
 
 require (
 	github.com/gin-contrib/cors v1.6.0
@@ -10,10 +12,12 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/joho/godotenv v1.5.1
 	github.com/sendgrid/sendgrid-go v3.14.0+incompatible
+	github.com/stretchr/testify v1.8.4
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
 	github.com/swaggo/swag v1.16.3
 	go.mongodb.org/mongo-driver v1.13.1
+	golang.org/x/image v0.19.0
 )
 
 require (
@@ -34,6 +38,7 @@ require (
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/uuid v1.4.0 // indirect
+	github.com/gorilla/websocket v1.5.1 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect

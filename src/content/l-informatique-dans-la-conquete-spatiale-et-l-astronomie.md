@@ -1,10 +1,11 @@
 ---
 title: L'informatique dans la conquête spatiale et l'astronomie
-description: Annex to the talk "Computers in Space and Astronomy" given by Mathéo Galuba on the 19th of July 2024 at the observatory of Orion Astronomie du velay. 
+description: Annex to the talk "Computers in Space and Astronomy" given by Mathéo Galuba on the 19th of July 2024 at the observatory of Orion Astronomie du velay.
 tags:
   - computer-science
   - astronomy
   - talk
+release: 2024-07-17T14:07:00.000Z
 listed: false
 ---
 
@@ -143,8 +144,6 @@ int main(int argc, char *argv[]) {
 
 ## 1. Informatique et astronomie
 
-
-
 ### Observer l'Univers
 
 Image très haute résolution de la galaxie d'Andromède :
@@ -178,11 +177,10 @@ Vidéo d'une simulation moderne de formation d'une galaxie massive :
 
 ## 2. Informatique et exploration spatiale
 
-### 2.1. L'histoire conjointe de l'informatique et de la course à l'espace 
+### 2.1. L'histoire conjointe de l'informatique et de la course à l'espace
 
 <SyncVSAsync />
 
 <MarsMissions />
 
 ### 2.2. Perspectives futures
-

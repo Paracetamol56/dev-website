@@ -16,7 +16,7 @@ type UserController struct {
 
 // SendDeletionEmail godoc
 // Sends a notification email to the user when their account is deleted
-func SendDeletionEmail(c *gin.Context, user *models.FullUser) error {
+func SendDeletionEmail(c *gin.Context, user *models.User) error {
 	from := mail.NewEmail("Matheo Galuba", os.Getenv("ADMIN_EMAIL"))
 	subject := "Your account has been deleted"
 	to := mail.NewEmail(user.Name, user.Email)

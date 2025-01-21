@@ -5,16 +5,18 @@ tags:
   - computer-science
   - data-science
   - data-visualization
+release: 2024-05-15T14:48:00.000Z
 listed: true
 ---
 
-<script> 
+<script>
   import Chart from './moore-s-law/Chart.svelte';
 </script>
 
 The Moore's Law is an observation made by Gordon Moore, co-founder of Intel, in 1965 :
+
 > The number of transistors in a dense integrated circuit doubles approximately every two years.
-His observation has held true for decades and has been a driving force behind the exponential growth of computing power.
+> His observation has held true for decades and has been a driving force behind the exponential growth of computing power.
 
 The chart below shows how the number of transistors, the gate size, the frequency or TDP have evolved over the years from 2000 to 2024.
 
