@@ -4,6 +4,7 @@ description: Different algorithms for solving mazes and more generally search pr
 tags:
   - ai
   - computer-science
+release: 2023-10-09T18:35:00.000Z
 listed: true
 ---
 
@@ -45,14 +46,14 @@ class Node():
 
 ```js
 class Node {
-	constructor(state, parent, action, g, h) {
-		this.state = state; // for example, an object {x, y} representing the position in a maze
-		this.parent = parent;
-		this.action = action;
-		this.g = g; // cost to reach this node
-		this.h = h; // heuristic value of this node
-		this.f = g + h; // priority of this node
-	}
+ constructor(state, parent, action, g, h) {
+  this.state = state; // for example, an object {x, y} representing the position in a maze
+  this.parent = parent;
+  this.action = action;
+  this.g = g; // cost to reach this node
+  this.h = h; // heuristic value of this node
+  this.f = g + h; // priority of this node
+ }
 }
 ```
 
@@ -180,29 +181,29 @@ class StackFontier():
 
 ```js
 class StackFrontier {
-	constructor() {
-		this.frontier = [];
-	}
+ constructor() {
+  this.frontier = [];
+ }
 
-	add(node) {
-		this.frontier.push(node);
-	}
+ add(node) {
+  this.frontier.push(node);
+ }
 
-	containsState(state) {
-		return this.frontier.some((node) => node.state === state);
-	}
+ containsState(state) {
+  return this.frontier.some((node) => node.state === state);
+ }
 
-	isEmpty() {
-		return this.frontier.length === 0;
-	}
+ isEmpty() {
+  return this.frontier.length === 0;
+ }
 
-	remove() {
-		if (this.isEmpty()) {
-			throw new Error('Empty Frontier');
-		} else {
-			return this.frontier.pop();
-		}
-	}
+ remove() {
+  if (this.isEmpty()) {
+   throw new Error('Empty Frontier');
+  } else {
+   return this.frontier.pop();
+  }
+ }
 }
 ```
 
@@ -308,15 +309,15 @@ class QueueFontier():
 
 ```js
 class QueueFrontier {
-	/* ... */
+ /* ... */
 
-	remove() {
-		if (this.isEmpty()) {
-			throw new Error('Empty Frontier');
-		} else {
-			return this.frontier.shift();
-		}
-	}
+ remove() {
+  if (this.isEmpty()) {
+   throw new Error('Empty Frontier');
+  } else {
+   return this.frontier.shift();
+  }
+ }
 }
 ```
 
@@ -409,20 +410,20 @@ class PriorityQueueFontier():
 
 ```js
 class PriorityQueueFontier {
-	/* ... */
+ /* ... */
 
-	add(node) {
-		this.frontier.push(node);
-		this.frontier.sort((a, b) => a.h - b.h); // or a.f - b.f for A\* search
-	}
+ add(node) {
+  this.frontier.push(node);
+  this.frontier.sort((a, b) => a.h - b.h); // or a.f - b.f for A\* search
+ }
 
-	remove() {
-		if (this.isEmpty()) {
-			throw new Error('Empty Frontier');
-		} else {
-			return this.frontier.shift();
-		}
-	}
+ remove() {
+  if (this.isEmpty()) {
+   throw new Error('Empty Frontier');
+  } else {
+   return this.frontier.shift();
+  }
+ }
 }
 ```
 

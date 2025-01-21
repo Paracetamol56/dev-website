@@ -6,6 +6,7 @@ tags:
   - raylib
   - graphics
   - creative-coding
+release: 2024-12-08T23:31:00.000Z
 listed: true
 ---
 
@@ -83,7 +84,7 @@ The first thing we need is a struct to represent a star.
 
 Each star will have a position that will be randomly generated. I chose to define the position as a 3D vector, `x` and `y` are the initial position of the star and will not change until the star leaves the screen, `z` is the depth of the star and will continuously decrease to simulate the star moving towards the screen.
 
-Next I added `sx` and `sy` to store the screen position of the star, 
+Next I added `sx` and `sy` to store the screen position of the star,
 
 Optionally, I added `prevX`, `prevY`, and `prevZ` to store the previous position of the star. This is useful to draw a line from the previous position to the current position of the star.
 
@@ -98,18 +99,18 @@ Finally, I added a `radius` to store the size of the star.
 #define STAR_H
 typedef struct Star
 {
-	int x;
-	int y;
-	int z;
+ int x;
+ int y;
+ int z;
 
-	int sx;
-	int sy;
+ int sx;
+ int sy;
 
-	int prevX;
-	int prevY;
-	int prevZ;
+ int prevX;
+ int prevY;
+ int prevZ;
 
-	float radius;
+ float radius;
 } Star;
 
 #endif // STAR_H
@@ -132,10 +133,10 @@ For example the radius of the star will evolve from 0 to a maximum (4 in this ca
 
 void updateStar(Star* star, const int screenWidth, const int screenHeight, float deltaTime)
 {
-	if (screenWidth == 0 || screenHeight == 0)
-		return;
+ if (screenWidth == 0 || screenHeight == 0)
+  return;
 
-	star->z -= (int)(600.0f * deltaTime); // Decrease the z position of the star (we use a multiplier to control the speed of the animation)
+ star->z -= (int)(600.0f * deltaTime); // Decrease the z position of the star (we use a multiplier to control the speed of the animation)
 
     if (star->z < 1)
     {
@@ -156,7 +157,7 @@ void updateStar(Star* star, const int screenWidth, const int screenHeight, float
 
     // Calculate the previous screen position of the star based on its previous z position
     star->prevX = lerp(0.0f, screenWidth, (float)star->x / (float)star->prevZ);
-	  star->prevY = lerp(0.0f, screenHeight, (float)star->y / (float)star->prevZ);
+   star->prevY = lerp(0.0f, screenHeight, (float)star->y / (float)star->prevZ);
     star->prevZ = star->z;
 }
 ```
@@ -174,23 +175,23 @@ Obviously, we need to write a few helper functions to make this code work:
 
 int getRandInt(int min, int max)
 {
-	return min + rand() / (RAND_MAX / (max - min));
+ return min + rand() / (RAND_MAX / (max - min));
 }
 
 float lerp(float a, float b, float t)
 {
-	return a + t * (b - a);
+ return a + t * (b - a);
 }
 
 float map(float value, float x1, float y1, float x2, float y2)
 {
-	return x2 + (value - x1) * (y2 - x2) / (y1 - x1);
+ return x2 + (value - x1) * (y2 - x2) / (y1 - x1);
 }
 
 #ifndef max // Some compilers already have a max function
 int max(int a, int b)
 {
-	return a > b ? a : b;
+ return a > b ? a : b;
 }
 #endif
 ```
@@ -230,17 +231,17 @@ We also probably want a function to initialize the star struct with random value
 
 void initStar(Star* star)
 {
-	star->x = getRandInt(-GetScreenWidth(), GetScreenWidth());
-	star->y = getRandInt(-GetScreenHeight(), GetScreenHeight());
-	star->z = getRandInt(0, max(GetScreenWidth(), GetScreenHeight()));
+ star->x = getRandInt(-GetScreenWidth(), GetScreenWidth());
+ star->y = getRandInt(-GetScreenHeight(), GetScreenHeight());
+ star->z = getRandInt(0, max(GetScreenWidth(), GetScreenHeight()));
 
-	star->sx = 0;
-	star->sy = 0;
+ star->sx = 0;
+ star->sy = 0;
 
-	star->prevX = 0;
-	star->prevY = 0;
+ star->prevX = 0;
+ star->prevY = 0;
 
-	star->radius = 0.0f;
+ star->radius = 0.0f;
 }
 ```
 
@@ -299,7 +300,7 @@ static void UpdateDrawFrame(void)
   // Draw
   //----------------------------------------------------------------------------------
   BeginDrawing();
-	ClearBackground(BLACK);
+ ClearBackground(BLACK);
 
   for (int i = 0; i < STAR_COUNT; i++)
   {
@@ -307,7 +308,7 @@ static void UpdateDrawFrame(void)
     DrawLineEx((Vector2){stars[i].prevX, stars[i].prevY}, (Vector2){stars[i].sx, stars[i].sy}, stars[i].radius, WHITE);
   }
 
-	// DrawFPS(10, 10);
+ // DrawFPS(10, 10);
   EndDrawing();
   //----------------------------------------------------------------------------------
 }
@@ -329,7 +330,7 @@ The simpler way to center the starfield is to use a Raylib 2D camera and offset 
 
 ```c
 Camera2D camera = {
-	{WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f},
+ {WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f},
     {0.0f, 0.0f},
     0.0f,
     1.0f
@@ -366,7 +367,10 @@ And voilà! The starfield is now centered:
 <CodeBlock>
 
 ```html
-<iframe src="https://dev.matheo-galuba.com/files/starfield-animation/starfield-animaiton.html" title="Starfield simulation"></iframe>
+<iframe
+ src="https://dev.matheo-galuba.com/files/starfield-animation/starfield-animaiton.html"
+ title="Starfield simulation"
+></iframe>
 ```
 
 </CodeBlock>
@@ -390,4 +394,7 @@ I hope you enjoyed this tutorial and that you learned something new.
 - [Raylib game template](https://github.com/raylib-extras/game-premake)
 - My implementation of the starfield animation on [Itch.io](https://paracetamol56.itch.io/starfield-animation)
 - My implementation [source code](https://git.matheo-galuba.com/mga/starfield-animaiton)
+
+```
+
 ```

@@ -5,22 +5,23 @@ tags:
   - ai
   - computer-science
   - machine-learning
+release: 2023-10-19T17:29:00.000Z
 listed: true
 ---
 
 <script>
   import { writable } from 'svelte/store';
-	import EvaluateModel from './mnist-classification/EvaluateModel.svelte';
-	import InitModel from './mnist-classification/InitModel.svelte';
-	import LoadDataset from './mnist-classification/LoadDataset.svelte';
-	import SaveLoadModel from './mnist-classification/SaveLoadModel.svelte';
-	import TestModel from './mnist-classification/TestModel.svelte';
-	import TrainModel from './mnist-classification/TrainModel.svelte';
-	import { MnistData } from './mnist-classification/mnistData';
-	import * as tf from '@tensorflow/tfjs';
+ import EvaluateModel from './mnist-classification/EvaluateModel.svelte';
+ import InitModel from './mnist-classification/InitModel.svelte';
+ import LoadDataset from './mnist-classification/LoadDataset.svelte';
+ import SaveLoadModel from './mnist-classification/SaveLoadModel.svelte';
+ import TestModel from './mnist-classification/TestModel.svelte';
+ import TrainModel from './mnist-classification/TrainModel.svelte';
+ import { MnistData } from './mnist-classification/mnistData';
+ import * as tf from '@tensorflow/tfjs';
 
-	const data = writable(new MnistData());
-	const model = writable(tf.sequential());
+ const data = writable(new MnistData());
+ const model = writable(tf.sequential());
 </script>
 
 ## What is MNIST?
@@ -29,7 +30,7 @@ MNIST is a dataset of handwritten digits. It is a popular dataset for machine le
 
 ![MNIST Classification](/img/mnist-examples.png)
 
-## Let's build a model !
+## Let's build a model
 
 To build this page, I followed the steps explained in this [Medium article](https://medium.com/ailab-telu/learn-and-play-with-tensorflow-js-part-3-dd31fcab4c4b) by [Ari Pratama](https://medium.com/@undeed).
 

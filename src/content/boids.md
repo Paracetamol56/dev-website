@@ -4,6 +4,7 @@ description: A simulation of flocking birds
 tags:
   - computer-science
   - simulation
+release: 2024-01-02T14:03:00.000Z
 listed: true
 ---
 
@@ -42,47 +43,47 @@ The first rule is cohesion. A boid will try to move towards the center of mass o
 
 ```cpp
 std::array<float, 2> cohesionRule(Boid &boid, std::vector<Boid*> &otherBoids) {
-	std::array<float, 2> centerOfMass = {0, 0};
-	int numNeighbors = 0;
+ std::array<float, 2> centerOfMass = {0, 0};
+ int numNeighbors = 0;
 
-	for (int i = 0; i < otherBoids.size(); i++) {
-		if (rayDistance(boid, *otherBoids[i]) < COHESION_RADIUS) {
-			centerOfMass[0] += otherBoids[i]->x;
-			centerOfMass[1] += otherBoids[i]->y;
-			numNeighbors++;
-		}
-	}
+ for (int i = 0; i < otherBoids.size(); i++) {
+  if (rayDistance(boid, *otherBoids[i]) < COHESION_RADIUS) {
+   centerOfMass[0] += otherBoids[i]->x;
+   centerOfMass[1] += otherBoids[i]->y;
+   numNeighbors++;
+  }
+ }
 
-	if (numNeighbors == 0) {
-		return {0, 0};
-	}
-	centerOfMass[0] /= numNeighbors;
-	centerOfMass[1] /= numNeighbors;
+ if (numNeighbors == 0) {
+  return {0, 0};
+ }
+ centerOfMass[0] /= numNeighbors;
+ centerOfMass[1] /= numNeighbors;
 
-	return {centerOfMass[0] - boid.x, centerOfMass[1] - boid.y};
+ return {centerOfMass[0] - boid.x, centerOfMass[1] - boid.y};
 }
 ```
 
 ```ts
 function cohesionRule(boid: Boid, otherBoids: Boid[]): number[] {
-	const centerOfMass: number[] = [0, 0];
-	let numNeighbors: number = 0;
+ const centerOfMass: number[] = [0, 0];
+ let numNeighbors: number = 0;
 
-	for (let i = 0; i < otherBoids.length; i++) {
-		if (rayDistance(boid, otherBoids[i]) < COHESION_RADIUS) {
-			centerOfMass[0] += otherBoids[i].x;
-			centerOfMass[1] += otherBoids[i].y;
-			numNeighbors++;
-		}
-	}
+ for (let i = 0; i < otherBoids.length; i++) {
+  if (rayDistance(boid, otherBoids[i]) < COHESION_RADIUS) {
+   centerOfMass[0] += otherBoids[i].x;
+   centerOfMass[1] += otherBoids[i].y;
+   numNeighbors++;
+  }
+ }
 
-	if (numNeighbors === 0) {
-		return [0, 0];
-	}
-	centerOfMass[0] /= numNeighbors;
-	centerOfMass[1] /= numNeighbors;
+ if (numNeighbors === 0) {
+  return [0, 0];
+ }
+ centerOfMass[0] /= numNeighbors;
+ centerOfMass[1] /= numNeighbors;
 
-	return [centerOfMass[0] - boid.x, centerOfMass[1] - boid.y];
+ return [centerOfMass[0] - boid.x, centerOfMass[1] - boid.y];
 }
 ```
 
@@ -96,45 +97,45 @@ Then there is alignment. A boid will try to match the average direction of its n
 
 ```cpp
 std::array<float, 2> alignmentRule(Boid &boid, std::vector<Boid*> &otherBoids) {
-	std::array<float, 2> avgDir = {0, 0};
-	int numNeighbors = 0;
+ std::array<float, 2> avgDir = {0, 0};
+ int numNeighbors = 0;
 
-	for (int i = 0; i < otherBoids.size(); i++) {
-		if (rayDistance(boid, *otherBoids[i]) < ALIGNMENT_RADIUS) {
-			avgDir[0] += otherBoids[i]->vx;
-			avgDir[1] += otherBoids[i]->vy;
-			numNeighbors++;
-		}
-	}
+ for (int i = 0; i < otherBoids.size(); i++) {
+  if (rayDistance(boid, *otherBoids[i]) < ALIGNMENT_RADIUS) {
+   avgDir[0] += otherBoids[i]->vx;
+   avgDir[1] += otherBoids[i]->vy;
+   numNeighbors++;
+  }
+ }
 
-	if (numNeighbors == 0) {
-		return {0, 0};
-	}
-	avgDir[0] /= numNeighbors;
-	avgDir[1] /= numNeighbors;
-	return {avgDir[0] - boid.vx, avgDir[1] - boid.vy};
+ if (numNeighbors == 0) {
+  return {0, 0};
+ }
+ avgDir[0] /= numNeighbors;
+ avgDir[1] /= numNeighbors;
+ return {avgDir[0] - boid.vx, avgDir[1] - boid.vy};
 }
 ```
 
 ```ts
 function alignmentRule(boid: Boid, otherBoids: Boid[]): number[] {
-	const avgDir: number[] = [0, 0];
-	let numNeighbors: number = 0;
+ const avgDir: number[] = [0, 0];
+ let numNeighbors: number = 0;
 
-	for (let i = 0; i < otherBoids.length; i++) {
-		if (rayDistance(boid, otherBoids[i]) < ALIGNMENT_RADIUS) {
-			avgDir[0] += otherBoids[i].vx;
-			avgDir[1] += otherBoids[i].vy;
-			numNeighbors++;
-		}
-	}
+ for (let i = 0; i < otherBoids.length; i++) {
+  if (rayDistance(boid, otherBoids[i]) < ALIGNMENT_RADIUS) {
+   avgDir[0] += otherBoids[i].vx;
+   avgDir[1] += otherBoids[i].vy;
+   numNeighbors++;
+  }
+ }
 
-	if (numNeighbors === 0) {
-		return [0, 0];
-	}
-	avgDir[0] /= numNeighbors;
-	avgDir[1] /= numNeighbors;
-	return [avgDir[0] - boid.vx, avgDir[1] - boid.vy];
+ if (numNeighbors === 0) {
+  return [0, 0];
+ }
+ avgDir[0] /= numNeighbors;
+ avgDir[1] /= numNeighbors;
+ return [avgDir[0] - boid.vx, avgDir[1] - boid.vy];
 }
 ```
 
@@ -149,35 +150,35 @@ Its influence is inversely proportional to the distance between the boid and its
 
 ```cpp
 std::array<float, 2> separationRule(Boid &boid, std::vector<Boid*> &otherBoids) {
-	std::array<float, 2> v = {0, 0};
-	for (int i = 0; i < otherBoids.size(); i++) {
-		float distance = rayDistance(boid, *otherBoids[i]);
-		if (distance == 0) {
-			continue;
-		}
-		if (distance < SEPARATION_VISION) {
-			v[0] += (boid.x - otherBoids[i]->x) / distance;
-			v[1] += (boid.y - otherBoids[i]->y) / distance;
-		}
-	}
-	return v;
+ std::array<float, 2> v = {0, 0};
+ for (int i = 0; i < otherBoids.size(); i++) {
+  float distance = rayDistance(boid, *otherBoids[i]);
+  if (distance == 0) {
+   continue;
+  }
+  if (distance < SEPARATION_VISION) {
+   v[0] += (boid.x - otherBoids[i]->x) / distance;
+   v[1] += (boid.y - otherBoids[i]->y) / distance;
+  }
+ }
+ return v;
 }
 ```
 
 ```ts
 function separationRule(boid: Boid, otherBoids: Boid[]): number[] {
-	const v: number[] = [0, 0];
-	for (let i = 0; i < otherBoids.length; i++) {
-		const distance: number = rayDistance(boid, otherBoids[i]);
-		if (distance === 0) {
-			continue;
-		}
-		if (distance < SEPARATION_VISION) {
-			v[0] += (boid.x - otherBoids[i].x) / distance;
-			v[1] += (boid.y - otherBoids[i].y) / distance;
-		}
-	}
-	return v;
+ const v: number[] = [0, 0];
+ for (let i = 0; i < otherBoids.length; i++) {
+  const distance: number = rayDistance(boid, otherBoids[i]);
+  if (distance === 0) {
+   continue;
+  }
+  if (distance < SEPARATION_VISION) {
+   v[0] += (boid.x - otherBoids[i].x) / distance;
+   v[1] += (boid.y - otherBoids[i].y) / distance;
+  }
+ }
+ return v;
 }
 ```
 
@@ -193,45 +194,45 @@ I also added 3 constants to tweak the simulation: `COHESION_WEIGHT`, `SEPARATION
 
 ```cpp
 void update(boid &boid, std::vector<boid*> &otherBoids) {
-	std::array<float, 2> cohesion = cohesionRule(boid, otherBoids);
-	std::array<float, 2> separation = separationRule(boid, otherBoids);
-	std::array<float, 2> alignment = alignmentRule(boid, otherBoids);
+ std::array<float, 2> cohesion = cohesionRule(boid, otherBoids);
+ std::array<float, 2> separation = separationRule(boid, otherBoids);
+ std::array<float, 2> alignment = alignmentRule(boid, otherBoids);
 
-	boid.vx += cohesion[0] + alignment[0]; separation[0] +
-	boid.vy += cohesion[1] + separation[1] + alignment[1];
+ boid.vx += cohesion[0] + alignment[0]; separation[0] +
+ boid.vy += cohesion[1] + separation[1] + alignment[1];
 
-	boid.x += boid.vx;
-	boid.y += boid.vy;
+ boid.x += boid.vx;
+ boid.y += boid.vy;
 
-	// Normalize velocity
-	float norm = sqrt(boid.vx * boid.vx + boid.vy * boid.vy);
-	boid.vx = (boid.vx / norm) * SPEED;
-	boid.vy = (boid.vy / norm) * SPEED;
+ // Normalize velocity
+ float norm = sqrt(boid.vx * boid.vx + boid.vy * boid.vy);
+ boid.vx = (boid.vx / norm) * SPEED;
+ boid.vy = (boid.vy / norm) * SPEED;
 
-	// Draw the boid
-	// [...]
+ // Draw the boid
+ // [...]
 }
 ```
 
 ```ts
 function update(boid: Boid, otherBoids: Boid[]): void {
-	const cohesion: number[] = cohesionRule(boid, otherBoids);
-	const separation: number[] = separationRule(boid, otherBoids);
-	const alignment: number[] = alignmentRule(boid, otherBoids);
+ const cohesion: number[] = cohesionRule(boid, otherBoids);
+ const separation: number[] = separationRule(boid, otherBoids);
+ const alignment: number[] = alignmentRule(boid, otherBoids);
 
-	boid.vx += cohesion[0] + alignment[0] + separation[0];
-	boid.vy += cohesion[1] + alignment[1] + separation[1];
+ boid.vx += cohesion[0] + alignment[0] + separation[0];
+ boid.vy += cohesion[1] + alignment[1] + separation[1];
 
-	boid.x += boid.vx;
-	boid.y += boid.vy;
+ boid.x += boid.vx;
+ boid.y += boid.vy;
 
-	// Normalize velocity
-	const norm: number = Math.sqrt(boid.vx * boid.vx + boid.vy * boid.vy);
-	boid.vx = (boid.vx / norm) * SPEED;
-	boid.vy = (boid.vy / norm) * SPEED;
+ // Normalize velocity
+ const norm: number = Math.sqrt(boid.vx * boid.vx + boid.vy * boid.vy);
+ boid.vx = (boid.vx / norm) * SPEED;
+ boid.vy = (boid.vy / norm) * SPEED;
 
-	// Draw the boid
-	// [...]
+ // Draw the boid
+ // [...]
 }
 ```
 

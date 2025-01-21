@@ -5,11 +5,12 @@ tags:
   - ai
   - computer-science
   - computer-vision
+release: 2024-02-13T15:43:00.000Z
 listed: true
 ---
 
 <script>
-	import { ExternalLink, ArrowRight } from 'lucide-svelte';
+ import { ExternalLink, ArrowRight } from 'lucide-svelte';
   import Convolution from './convolution/Convolution.svelte';
   import MaxPooling from './convolution/MaxPooling.svelte';
 </script>

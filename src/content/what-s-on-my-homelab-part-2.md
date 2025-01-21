@@ -9,6 +9,7 @@ tags:
   - klipper
   - moonraker
   - mainsail
+release: 2024-03-18T14:29:00.000Z
 listed: true
 ---
 
@@ -23,6 +24,7 @@ Again, I use a [Raspberry Pi 3 B+](https://www.raspberrypi.com/products/raspberr
 ## Software
 
 The software stack is pretty straightforward, I used [Mainsail OS](https://docs-os.mainsail.xyz/) as the operating system for the Raspberry Pi, which comes with a few pre-installed services:
+
 - [Klipper](https://www.klipper3d.org/)
 - [Moonraker](https://moonraker.readthedocs.io/en/latest/)
 - [Mainsail](https://mainsail.xyz/)
