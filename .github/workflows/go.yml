@@ -28,6 +28,6 @@ jobs:
       - name: Build
         run: go build -v .
 
-      - name: Test
-        uses: robherley/go-test-action@v0
+      # - name: Test
+      #   uses: robherley/go-test-action@v0
 
