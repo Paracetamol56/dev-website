@@ -59,7 +59,7 @@ func SendDeletionEmail(c *gin.Context, user *models.User) error {
 //	@Tags			user
 //	@Produce		json
 //	@Param			id	path		string	true	"User ID"
-//	@Success		200	{object}	models.FullUser
+//	@Success		200	{object}	models.User
 //	@Failure		400
 //	@Failure		404
 //	@Security		Bearer
@@ -103,7 +103,7 @@ type PatchUserBody struct {
 //	@Produce		json
 //	@Param			id			path		string			true	"User ID"
 //	@Param			patchUser	body		PatchUserBody	true	"User data"
-//	@Success		200			{object}	models.FullUser
+//	@Success		200			{object}	models.User
 //	@Failure		400
 //	@Failure		403
 //	@Failure		404
@@ -215,7 +215,7 @@ func (controller *UserController) DeleteUser(c *gin.Context) {
 //	@Tags			user
 //	@Produce		json
 //	@Param			id	path		string	true	"User ID"
-//	@Success		200	{object}	models.FullUser
+//	@Success		200	{object}	models.User
 //	@Failure		400
 //	@Failure		403
 //	@Failure		404

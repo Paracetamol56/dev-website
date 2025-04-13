@@ -4,7 +4,7 @@ import (
 	"dev/internal/db"
 	"dev/internal/server"
 
-	_ "dev/doc"
+	_ "dev/docs"
 
 	"github.com/joho/godotenv"
 )

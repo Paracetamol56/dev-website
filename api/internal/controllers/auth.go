@@ -108,7 +108,7 @@ type LoginBody struct {
 //	@Accept			json
 //	@Produce		json
 //	@Param			body	body		LoginBody	true	"Email"
-//	@Success		200		{object}	models.FullUser
+//	@Success		204
 //	@Failure		400
 //	@Router			/auth/login [post]
 func (controller *AuthController) PostLogin(c *gin.Context) {
@@ -163,7 +163,7 @@ type VerifyBody struct {
 //	@Accept			json
 //	@Produce		json
 //	@Param			body	body		VerifyBody	true	"Token"
-//	@Success		200		{object}	models.FullUser
+//	@Success		200		{object}	models.User
 //	@Failure		400
 //	@Router			/auth/verify [post]
 func (controller *AuthController) PostVerify(c *gin.Context) {

@@ -62,29 +62,6 @@ definitions:
     required:
     - token
     type: object
-  models.FullUser:
-    properties:
-      createdAt:
-        type: string
-      email:
-        type: string
-      flavour:
-        type: string
-      github:
-        $ref: '#/definitions/models.GitHubUser'
-      githubAccessToken:
-        type: string
-      id:
-        type: string
-      lastLogin:
-        type: string
-      lastRefresh:
-        type: string
-      name:
-        type: string
-      profilePicture:
-        type: string
-    type: object
   models.GitHubUser:
     properties:
       avatar_url:
@@ -161,6 +138,29 @@ definitions:
       hip:
         type: integer
     type: object
+  models.User:
+    properties:
+      createdAt:
+        type: string
+      email:
+        type: string
+      flavour:
+        type: string
+      github:
+        $ref: '#/definitions/models.GitHubUser'
+      githubAccessToken:
+        type: string
+      id:
+        type: string
+      lastLogin:
+        type: string
+      lastRefresh:
+        type: string
+      name:
+        type: string
+      profilePicture:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact:
@@ -215,10 +215,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.FullUser'
+        "204":
+          description: No Content
         "400":
           description: Bad Request
       summary: Login or register a user
@@ -268,7 +266,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.FullUser'
+            $ref: '#/definitions/models.User'
         "400":
           description: Bad Request
       summary: Verify a user's email
@@ -347,7 +345,7 @@ paths:
       summary: Get one Hipparcos HR star
       tags:
       - hipparcos
-  /user/{id}:
+  /users/{id}:
     delete:
       description: Delete a user by id
       parameters:
@@ -386,7 +384,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.FullUser'
+            $ref: '#/definitions/models.User'
         "400":
           description: Bad Request
         "404":
@@ -418,7 +416,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.FullUser'
+            $ref: '#/definitions/models.User'
         "400":
           description: Bad Request
         "403":
@@ -430,7 +428,7 @@ paths:
       summary: Update a user
       tags:
       - user
-  /user/{id}/export:
+  /users/{id}/export:
     get:
       description: Get user export by id
       parameters:
@@ -445,7 +443,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.FullUser'
+            $ref: '#/definitions/models.User'
         "400":
           description: Bad Request
         "403":
