@@ -1,8 +1,9 @@
 package server
 
 import (
-	"github.com/Paracetamol56/dev-website/api/controllers"
-	"github.com/Paracetamol56/dev-website/api/middlewares"
+	"dev/internal/controllers"
+	"dev/internal/middlewares"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"

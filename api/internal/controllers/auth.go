@@ -1,21 +1,20 @@
 package controllers
 
 import (
+	"dev/internal/models"
+	"dev/internal/utils"
 	"log"
 	"net/http"
 	"os"
 	"time"
 
-	"github.com/Paracetamol56/dev-website/api/models"
-	"github.com/Paracetamol56/dev-website/api/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type AuthController struct {
-}
+type AuthController struct{}
 
 // SendVerificationEmail godoc
 // Sends a verification email to the user with the provided url
@@ -148,6 +147,8 @@ func (controller *AuthController) PostLogin(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
+	c.Status(http.StatusNoContent)
 }
 
 type VerifyBody struct {

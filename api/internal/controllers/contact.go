@@ -1,19 +1,18 @@
 package controllers
 
 import (
+	"dev/internal/models"
 	"net/http"
 	"os"
 	"time"
 
-	"github.com/Paracetamol56/dev-website/api/models"
 	"github.com/gin-gonic/gin"
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type ContactController struct {
-}
+type ContactController struct{}
 
 type ContactBody struct {
 	UserId  primitive.ObjectID `json:"userId" binding:""`
@@ -23,6 +22,7 @@ type ContactBody struct {
 }
 
 // PostContact godoc
+//
 //	@Summary		Send a contact message
 //	@Description	Send a contact message
 //	@Tags			contact

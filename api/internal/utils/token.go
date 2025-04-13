@@ -87,7 +87,6 @@ func ExtractID(requestToken string, secret string) (primitive.ObjectID, error) {
 		}
 		return []byte(secret), nil
 	})
-
 	if err != nil {
 		return primitive.NilObjectID, err
 	}

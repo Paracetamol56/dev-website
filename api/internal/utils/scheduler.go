@@ -2,9 +2,9 @@ package utils
 
 import (
 	"context"
+	"dev/internal/models"
 	"time"
 
-	"github.com/Paracetamol56/dev-website/api/models"
 	"github.com/go-co-op/gocron"
 )
 

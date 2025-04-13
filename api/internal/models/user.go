@@ -2,9 +2,9 @@ package models
 
 import (
 	"context"
+	"dev/internal/db"
 	"time"
 
-	"github.com/Paracetamol56/dev-website/api/db"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -156,9 +156,10 @@ func UpdateUser(c *gin.Context, id primitive.ObjectID, user *User) (*mongo.Updat
 func DeleteUser(c *gin.Context, id primitive.ObjectID) (*mongo.UpdateResult, error) {
 	db := db.GetDB()
 	collection := db.Collection("users")
-	result, err := collection.UpdateOne(c, bson.M{"_id": id}, bson.M{"$set": bson.M{
-		"deletedAt": time.Now(),
-	},
+	result, err := collection.UpdateOne(c, bson.M{"_id": id}, bson.M{
+		"$set": bson.M{
+			"deletedAt": time.Now(),
+		},
 	})
 	return result, err
 }

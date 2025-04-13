@@ -1,7 +1,8 @@
 package models
 
 import (
-	"github.com/Paracetamol56/dev-website/api/db"
+	"dev/internal/db"
+
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -25,16 +26,21 @@ func GetAllHipparcosHR(c *gin.Context) ([]HipparcosHR, error) {
 	projectStage := bson.D{{Key: "$project", Value: bson.D{
 		{Key: "_id", Value: 0},
 		{Key: "HIP", Value: 1},
-		{Key: "Amag", Value: bson.D{{Key: "$subtract", Value: bson.A{
-			"$Vmag",
-			bson.D{{Key: "$multiply", Value: bson.A{
-				5,
-				bson.D{{Key: "$log10", Value: bson.D{{Key: "$divide", Value: bson.A{
-					bson.D{{Key: "$divide", Value: bson.A{1000, "$Plx"}}},
-					10,
-				}}}},
-				}}},
-			}}},
+		{Key: "Amag", Value: bson.D{
+			{Key: "$subtract", Value: bson.A{
+				"$Vmag",
+				bson.D{
+					{Key: "$multiply", Value: bson.A{
+						5,
+						bson.D{
+							{Key: "$log10", Value: bson.D{{Key: "$divide", Value: bson.A{
+								bson.D{{Key: "$divide", Value: bson.A{1000, "$Plx"}}},
+								10,
+							}}}},
+						},
+					}},
+				},
+			}},
 		}},
 		{Key: "BV", Value: "$B-V"},
 	}}}
@@ -65,16 +71,21 @@ func GetHipparcosHRByHIP(c *gin.Context, hip int) ([]HipparcosHR, error) {
 	projectStage := bson.D{{Key: "$project", Value: bson.D{
 		{Key: "_id", Value: 0},
 		{Key: "HIP", Value: 1},
-		{Key: "Amag", Value: bson.D{{Key: "$subtract", Value: bson.A{
-			"$Vmag",
-			bson.D{{Key: "$multiply", Value: bson.A{
-				5,
-				bson.D{{Key: "$log10", Value: bson.D{{Key: "$divide", Value: bson.A{
-					bson.D{{Key: "$divide", Value: bson.A{1000, "$Plx"}}},
-					10,
-				}}}},
-				}}},
-			}}},
+		{Key: "Amag", Value: bson.D{
+			{Key: "$subtract", Value: bson.A{
+				"$Vmag",
+				bson.D{
+					{Key: "$multiply", Value: bson.A{
+						5,
+						bson.D{
+							{Key: "$log10", Value: bson.D{{Key: "$divide", Value: bson.A{
+								bson.D{{Key: "$divide", Value: bson.A{1000, "$Plx"}}},
+								10,
+							}}}},
+						},
+					}},
+				},
+			}},
 		}},
 		{Key: "BV", Value: "$B-V"},
 	}}}

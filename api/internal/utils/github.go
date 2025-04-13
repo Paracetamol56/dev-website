@@ -1,14 +1,13 @@
 package utils
 
 import (
+	"dev/internal/models"
 	"encoding/json"
 	"io"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
-
-	"github.com/Paracetamol56/dev-website/api/models"
 )
 
 func GetGithubAccessToken(code string) (string, error) {
