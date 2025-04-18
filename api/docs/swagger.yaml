@@ -39,6 +39,15 @@ definitions:
     required:
     - email
     type: object
+  controllers.PatchCodeCarbonProjectBody:
+    properties:
+      description:
+        maxLength: 1000
+        type: string
+      name:
+        maxLength: 100
+        type: string
+    type: object
   controllers.PatchUserBody:
     properties:
       flavour:
@@ -55,12 +64,66 @@ definitions:
       profilePicture:
         type: string
     type: object
+  controllers.PostCodeCarbonProjectBody:
+    properties:
+      description:
+        maxLength: 1000
+        type: string
+      name:
+        maxLength: 100
+        type: string
+    required:
+    - name
+    type: object
   controllers.VerifyBody:
     properties:
       token:
         type: string
     required:
     - token
+    type: object
+  models.CodeCarbonProject:
+    properties:
+      closedAt:
+        type: string
+      createdAt:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      runs:
+        items:
+          $ref: '#/definitions/models.CodeCarbonRun'
+        type: array
+      tokens:
+        items:
+          $ref: '#/definitions/models.CodeCarbonToken'
+        type: array
+      updatedAt:
+        type: string
+    type: object
+  models.CodeCarbonRun:
+    properties:
+      id:
+        type: string
+    type: object
+  models.CodeCarbonToken:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: string
+      lastUsedAt:
+        type: string
+      name:
+        type: string
+      revokedAt:
+        type: string
+      token:
+        type: string
     type: object
   models.GitHubUser:
     properties:
@@ -272,6 +335,216 @@ paths:
       summary: Verify a user's email
       tags:
       - auth
+  /codecarbon/projects:
+    get:
+      description: Get all codecarbon projects of the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.CodeCarbonProject'
+            type: array
+        "403":
+          description: Forbidden
+      security:
+      - Bearer: []
+      summary: Get codecarbon projects
+      tags:
+      - codecarbon
+    post:
+      consumes:
+      - application/json
+      description: Create a new codecarbon project
+      parameters:
+      - description: Project data
+        in: body
+        name: postProject
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.PostCodeCarbonProjectBody'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.CodeCarbonProject'
+        "400":
+          description: Bad Request
+        "403":
+          description: Forbidden
+      security:
+      - Bearer: []
+      summary: Create codecarbon project
+      tags:
+      - codecarbon
+  /codecarbon/projects/{id}:
+    delete:
+      description: Delete a codecarbon project by id
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+      security:
+      - Bearer: []
+      summary: Delete codecarbon project
+      tags:
+      - codecarbon
+    get:
+      description: Get codecarbon project by id
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.CodeCarbonProject'
+        "400":
+          description: Bad Request
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+      security:
+      - Bearer: []
+      summary: Get codecarbon project by id
+      tags:
+      - codecarbon
+    patch:
+      consumes:
+      - application/json
+      description: Update a codecarbon project by id
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Project data
+        in: body
+        name: patchProject
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.PatchCodeCarbonProjectBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.CodeCarbonProject'
+        "400":
+          description: Bad Request
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+      security:
+      - Bearer: []
+      summary: Update codecarbon project
+      tags:
+      - codecarbon
+  /codecarbon/projects/{id}/tokens:
+    get:
+      description: Get all codecarbon project tokens of the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.CodeCarbonToken'
+            type: array
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+      summary: Get codecarbon project tokens
+      tags:
+      - codecarbon token
+    post:
+      consumes:
+      - application/json
+      description: Create codecarbon project token
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Token object
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.CodeCarbonToken'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.CodeCarbonToken'
+        "400":
+          description: Bad Request
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+      summary: Create codecarbon project token
+      tags:
+      - codecarbon token
+  /codecarbon/projects/{id}/tokens/{tokenId}:
+    delete:
+      description: Delete codecarbon project token
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Token ID
+        in: path
+        name: tokenId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.CodeCarbonToken'
+        "400":
+          description: Bad Request
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+      summary: Delete codecarbon project token
+      tags:
+      - codecarbon token
   /contact:
     post:
       consumes:
