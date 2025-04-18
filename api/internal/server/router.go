@@ -25,6 +25,7 @@ func InitRouter() *gin.Engine {
 
 	// Init controllers
 	auth := new(controllers.AuthController)
+	codecarbon := new(controllers.CodeCarbonController)
 	contact := new(controllers.ContactController)
 	heatlh := new(controllers.HealthController)
 	hipparcos := new(controllers.HipparcosController)
@@ -37,6 +38,21 @@ func InitRouter() *gin.Engine {
 		apiGroup.Use(middlewares.RequestIdMiddleware())
 		apiGroup.GET("/doc/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 		apiGroup.GET("/health", heatlh.GetHealth)
+		codecarbonGroup := apiGroup.Group("/codecarbon")
+		{
+			codecarbonGroup.Use(middlewares.JwtAuthMiddleware())
+			codecarbonGroup.GET("/projects", codecarbon.GetCodeCarbonProjects)
+			codecarbonGroup.GET("/projects/:id", codecarbon.GetCodeCarbonProjectById)
+			codecarbonGroup.POST("/projects", codecarbon.PostCodeCarbonProject)
+			codecarbonGroup.PATCH("/projects/:id", codecarbon.PatchCodeCarbonProject)
+			codecarbonGroup.DELETE("/projects/:id", codecarbon.DeleteCodeCarbonProject)
+			tokenGroup := codecarbonGroup.Group("/projects/:id/tokens")
+			{
+				tokenGroup.GET("", codecarbon.GetCodeCarbonProjectTokens)
+				tokenGroup.POST("", codecarbon.PostCodeCarbonProjectToken)
+				tokenGroup.DELETE("/:token_id", codecarbon.DeleteCodeCarbonProjectToken)
+			}
+		}
 		apiGroup.POST("/contact", contact.PostContact)
 		authGroup := apiGroup.Group("/auth")
 		{

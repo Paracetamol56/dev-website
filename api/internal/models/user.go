@@ -9,6 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // GitHubUser represents a user from GitHub.
@@ -104,7 +105,11 @@ func GetFullUserById(c *gin.Context, id primitive.ObjectID) (*User, error) {
 	db := db.GetDB()
 	collection := db.Collection("users")
 	var user User
-	if err := collection.FindOne(c, bson.M{"_id": id, "deletedAt": bson.M{"$exists": false}}).Decode(&user); err != nil {
+	if err := collection.FindOne(
+		c,
+		bson.M{"_id": id, "deletedAt": bson.M{"$exists": false}},
+		options.FindOne().SetProjection(bson.M{"codecarbon_projects": 0}),
+	).Decode(&user); err != nil {
 		return nil, err
 	}
 	return &user, nil
@@ -119,7 +124,11 @@ func GetFullUserByEmail(c *gin.Context, email string) (*User, error) {
 	db := db.GetDB()
 	collection := db.Collection("users")
 	var user User
-	if err := collection.FindOne(c, bson.M{"email": email, "deletedAt": bson.M{"$exists": false}}).Decode(&user); err != nil {
+	if err := collection.FindOne(
+		c,
+		bson.M{"email": email, "deletedAt": bson.M{"$exists": false}},
+		options.FindOne().SetProjection(bson.M{"codecarbon_projects": 0}),
+	).Decode(&user); err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, nil
 		}
