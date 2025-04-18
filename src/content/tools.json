@@ -1,1 +1,13 @@
-[]
+[
+  {
+    "title": "CodeCarbon dashboard",
+    "slug": "codecarbon-dashboard",
+    "description": "A place for you to track the carbon emissions of your algorithms.",
+    "tags": [
+      "dashboard",
+      "carbon-footprint"
+    ],
+    "listed": true,
+    "requiresAuth": true
+  }
+]
