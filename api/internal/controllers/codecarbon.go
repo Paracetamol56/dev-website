@@ -101,8 +101,8 @@ func (controller *CodeCarbonController) PostCodeCarbonProject(c *gin.Context) {
 		Id:          primitive.NewObjectID(),
 		Name:        body.Name,
 		Description: body.Description,
-		Runs:        []models.CodeCarbonRun{},
-		Tokens:      []models.CodeCarbonToken{},
+		Experiments: make([]models.CodeCarbonExperiment, 0),
+		Tokens:      make([]models.CodeCarbonToken, 0),
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
 	}
@@ -201,7 +201,8 @@ func (controller *CodeCarbonController) DeleteCodeCarbonProject(c *gin.Context) 
 
 	userId := c.MustGet("x-user-id").(primitive.ObjectID)
 
-	if _, err = models.DeleteCodeCarbonProject(c, userId, projectId); err != nil {
+	_, err = models.DeleteCodeCarbonProject(c, userId, projectId)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete codecarbon project"})
 		return
 	}

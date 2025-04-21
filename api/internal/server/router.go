@@ -52,6 +52,26 @@ func InitRouter() *gin.Engine {
 				tokenGroup.POST("", codecarbon.PostCodeCarbonProjectToken)
 				tokenGroup.DELETE("/:token_id", codecarbon.DeleteCodeCarbonProjectToken)
 			}
+			experimentGroup := codecarbonGroup.Group("/projects/:id/experiments")
+			{
+				experimentGroup.GET("", codecarbon.GetCodeCarbonProjectExperiments)
+				experimentGroup.POST("", codecarbon.PostCodeCarbonProjectExperiment)
+				experimentGroup.PATCH("/:experiment_id", codecarbon.PatchCodeCarbonProjectExperiment)
+				experimentGroup.DELETE("/:experiment_id", codecarbon.DeleteCodeCarbonProjectExperiment)
+			}
+			/*
+				runGroup := codecarbonGroup.Group("/projects/:id/experiments/:experiment_id/runs")
+				{
+					runGroup.GET("", codecarbon.GetCodeCarbonProjectExperimentRuns)
+					runGroup.GET("/:run_id", codecarbon.GetCodeCarbonProjectExperimentRunById)
+					runGroup.POST("", codecarbon.PostCodeCarbonProjectExperimentRun)
+					runGroup.DELETE("/:run_id", codecarbon.DeleteCodeCarbonProjectExperimentRun)
+				}
+				codecarbonGroup.GET("/experiments", codecarbon.GetCodeCarbonExperiments)
+				codeCarbonGroup.GET("/experiments/:id", codecarbon.GetCodeCarbonExperimentById)
+				codecarbonGroup.GET("/runs", controllers.GetCodeCarbonRuns)
+				codecarbonGroup.GET("/runs/:id", controllers.GetCodeCarbonRunById)
+			*/
 		}
 		apiGroup.POST("/contact", contact.PostContact)
 		authGroup := apiGroup.Group("/auth")
@@ -88,6 +108,17 @@ func InitRouter() *gin.Engine {
 			userGroup.PATCH("/:id", user.PatchUser)
 			userGroup.DELETE("/:id", user.DeleteUser)
 			userGroup.GET("/:id/export", user.GetExport)
+			// integrationGroup := userGroup.Group("/:id/integrations")
+			/*
+				{
+					integrationGroup.GET("", user.GetUserIntegrations)
+					integrationGroup.GET("/github", user.GetUserGithubIntegration)
+					integrationGroup.DELETE("/github", user.DeleteUserGithubIntegration)
+					integrationGroup.GET("/electricitymaps", user.GetUserElectricityMapsIntegration)
+					integrationGroup.POST("/electricitymaps", user.PostUserElectricityMapsIntegration)
+					integrationGroup.DELETE("/electricitymaps", user.DeleteUserElectricityMapsIntegration)
+				}
+			*/
 		}
 	}
 

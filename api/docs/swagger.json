@@ -372,8 +372,219 @@
                 }
             }
         },
+        "/codecarbon/projects/{id}/experiments": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get all codecarbon project experiments of the authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "codecarbon experiment"
+                ],
+                "summary": "Get codecarbon project experiments",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.CodeCarbonExperiment"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Create a new codecarbon project experiment for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "codecarbon experiment"
+                ],
+                "summary": "Create a new codecarbon project experiment",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Project ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Experiment object",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CodeCarbonExperiment"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.CodeCarbonExperiment"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/codecarbon/projects/{id}/experiments/{experiment_id}": {
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Delete a codecarbon project experiment for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "codecarbon experiment"
+                ],
+                "summary": "Delete a codecarbon project experiment",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Project ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Experiment ID",
+                        "name": "experiment_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Experiment object",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CodeCarbonExperiment"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Update a codecarbon project experiment for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "codecarbon experiment"
+                ],
+                "summary": "Update a codecarbon project experiment",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Project ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Experiment ID",
+                        "name": "experiment_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Experiment object",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CodeCarbonExperiment"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.CodeCarbonExperiment"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
         "/codecarbon/projects/{id}/tokens": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Get all codecarbon project tokens of the authenticated user",
                 "produces": [
                     "application/json"
@@ -401,6 +612,11 @@
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Create codecarbon project token",
                 "consumes": [
                     "application/json"
@@ -451,6 +667,11 @@
         },
         "/codecarbon/projects/{id}/tokens/{tokenId}": {
             "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Delete codecarbon project token",
                 "produces": [
                     "application/json"
@@ -487,9 +708,6 @@
                     },
                     "403": {
                         "description": "Forbidden"
-                    },
-                    "404": {
-                        "description": "Not Found"
                     }
                 }
             }
@@ -901,13 +1119,63 @@
                 }
             }
         },
-        "models.CodeCarbonProject": {
+        "models.CodeCarbonEmissions": {
             "type": "object",
             "properties": {
-                "closedAt": {
+                "cpu_energy": {
+                    "type": "number"
+                },
+                "cpu_power": {
+                    "type": "number"
+                },
+                "created_at": {
                     "type": "string"
                 },
-                "createdAt": {
+                "duration": {
+                    "type": "integer"
+                },
+                "emissions_rate": {
+                    "type": "number"
+                },
+                "emissions_sum": {
+                    "type": "number"
+                },
+                "energy_consumption": {
+                    "type": "number"
+                },
+                "gpu_energy": {
+                    "type": "number"
+                },
+                "gpu_power": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "ram_energy": {
+                    "type": "number"
+                },
+                "ram_power": {
+                    "type": "number"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CodeCarbonExperiment": {
+            "type": "object",
+            "properties": {
+                "cloud_provider": {
+                    "type": "string"
+                },
+                "cloud_region": {
+                    "type": "string"
+                },
+                "country_iso_code": {
+                    "type": "string"
+                },
+                "created_at": {
                     "type": "string"
                 },
                 "description": {
@@ -919,11 +1187,43 @@
                 "name": {
                     "type": "string"
                 },
+                "on_cloud": {
+                    "type": "boolean"
+                },
+                "region": {
+                    "type": "string"
+                },
                 "runs": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/models.CodeCarbonRun"
                     }
+                }
+            }
+        },
+        "models.CodeCarbonProject": {
+            "type": "object",
+            "properties": {
+                "closed_at": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "experiments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.CodeCarbonExperiment"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
                 },
                 "tokens": {
                     "type": "array",
@@ -931,7 +1231,7 @@
                         "$ref": "#/definitions/models.CodeCarbonToken"
                     }
                 },
-                "updatedAt": {
+                "updated_at": {
                     "type": "string"
                 }
             }
@@ -939,7 +1239,52 @@
         "models.CodeCarbonRun": {
             "type": "object",
             "properties": {
+                "codecarbon_version": {
+                    "type": "string"
+                },
+                "cpu_count": {
+                    "type": "integer"
+                },
+                "cpu_model": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "emissions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.CodeCarbonEmissions"
+                    }
+                },
+                "gpu_model": {
+                    "type": "string"
+                },
                 "id": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "os": {
+                    "type": "string"
+                },
+                "provider": {
+                    "type": "string"
+                },
+                "python_version": {
+                    "type": "string"
+                },
+                "ram_total_size": {
+                    "type": "number"
+                },
+                "region": {
+                    "type": "string"
+                },
+                "tracking_mode": {
                     "type": "string"
                 }
             }
@@ -947,19 +1292,19 @@
         "models.CodeCarbonToken": {
             "type": "object",
             "properties": {
-                "createdAt": {
+                "created_at": {
                     "type": "string"
                 },
                 "id": {
                     "type": "string"
                 },
-                "lastUsedAt": {
+                "lastUsed_at": {
                     "type": "string"
                 },
                 "name": {
                     "type": "string"
                 },
-                "revokedAt": {
+                "revoked_at": {
                     "type": "string"
                 },
                 "token": {

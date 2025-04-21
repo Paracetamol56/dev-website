@@ -30,6 +30,7 @@ func generateToken() string {
 // @Failure	403
 // @Failure	404
 // @Router	/codecarbon/projects/{id}/tokens [get]
+// @Security	Bearer
 func (controller *CodeCarbonController) GetCodeCarbonProjectTokens(c *gin.Context) {
 	projectId, err := primitive.ObjectIDFromHex(c.Param("id"))
 	if err != nil {
@@ -48,7 +49,7 @@ func (controller *CodeCarbonController) GetCodeCarbonProjectTokens(c *gin.Contex
 		return
 	}
 
-	projectTokens, err := models.GetCodeCarbonProjectTokensByProject(c, userId, projectId)
+	projectTokens, err := models.GetCodeCarbonTokensByProject(c, userId, projectId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get codecarbon project tokens"})
 		return
@@ -75,6 +76,7 @@ type PostCodeCarbonProjectTokenBody struct {
 // @Failure	403
 // @Failure	404
 // @Router	/codecarbon/projects/{id}/tokens [post]
+// @Security	Bearer
 func (controller *CodeCarbonController) PostCodeCarbonProjectToken(c *gin.Context) {
 	projectId, err := primitive.ObjectIDFromHex(c.Param("id"))
 	if err != nil {
@@ -90,6 +92,12 @@ func (controller *CodeCarbonController) PostCodeCarbonProjectToken(c *gin.Contex
 		return
 	}
 
+	project, err := models.GetCodeCarbonProjectById(c, userId, projectId)
+	if err != nil || project == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Project not found"})
+		return
+	}
+
 	token := models.CodeCarbonToken{
 		Id:        primitive.NewObjectID(),
 		Name:      body.Name,
@@ -97,7 +105,7 @@ func (controller *CodeCarbonController) PostCodeCarbonProjectToken(c *gin.Contex
 		CreatedAt: time.Now(),
 	}
 
-	_, err = models.CreateCodeCarbonProjectToken(c, userId, projectId, &token)
+	_, err = models.CreateCodeCarbonToken(c, userId, projectId, &token)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create codecarbon project token"})
 		return
@@ -117,8 +125,8 @@ func (controller *CodeCarbonController) PostCodeCarbonProjectToken(c *gin.Contex
 // @Success	200	{object}	models.CodeCarbonToken
 // @Failure	400
 // @Failure	403
-// @Failure	404
 // @Router	/codecarbon/projects/{id}/tokens/{tokenId} [delete]
+// @Security	Bearer
 func (controller *CodeCarbonController) DeleteCodeCarbonProjectToken(c *gin.Context) {
 	projectId, err := primitive.ObjectIDFromHex(c.Param("id"))
 	if err != nil {
@@ -134,7 +142,7 @@ func (controller *CodeCarbonController) DeleteCodeCarbonProjectToken(c *gin.Cont
 		return
 	}
 
-	_, err = models.RevokeProjectToken(c, userId, projectId, tokenId)
+	_, err = models.RevokeToken(c, userId, projectId, tokenId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete codecarbon project token"})
 		return
