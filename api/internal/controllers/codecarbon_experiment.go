@@ -30,7 +30,7 @@ func (controller *CodeCarbonController) GetCodeCarbonProjectExperiments(c *gin.C
 
 	userId := c.MustGet("x-user-id").(primitive.ObjectID)
 
-	if _, err := models.GetCodeCarbonProjectById(c, userId, projectId); err != nil {
+	if _, err := controller.projectRepo.GetCodeCarbonProjectById(c, userId, projectId); err != nil {
 		if err == mongo.ErrNoDocuments {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Project not found"})
 		} else {
@@ -82,7 +82,7 @@ func (controller *CodeCarbonController) PostCodeCarbonProjectExperiment(c *gin.C
 
 	userId := c.MustGet("x-user-id").(primitive.ObjectID)
 
-	if _, err := models.GetCodeCarbonProjectById(c, userId, projectId); err != nil {
+	if _, err := controller.projectRepo.GetCodeCarbonProjectById(c, userId, projectId); err != nil {
 		if err == mongo.ErrNoDocuments {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Project not found"})
 		} else {
@@ -154,7 +154,7 @@ func (controller *CodeCarbonController) PatchCodeCarbonProjectExperiment(c *gin.
 
 	userId := c.MustGet("x-user-id").(primitive.ObjectID)
 
-	if _, err := models.GetCodeCarbonProjectById(c, userId, projectId); err != nil {
+	if _, err := controller.projectRepo.GetCodeCarbonProjectById(c, userId, projectId); err != nil {
 		if err == mongo.ErrNoDocuments {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Project not found"})
 		} else {
@@ -215,7 +215,7 @@ func (controller *CodeCarbonController) DeleteCodeCarbonProjectExperiment(c *gin
 
 	userId := c.MustGet("x-user-id").(primitive.ObjectID)
 
-	if _, err := models.GetCodeCarbonProjectById(c, userId, projectId); err != nil {
+	if _, err := controller.projectRepo.GetCodeCarbonProjectById(c, userId, projectId); err != nil {
 		if err == mongo.ErrNoDocuments {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Project not found"})
 		} else {

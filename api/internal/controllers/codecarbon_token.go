@@ -40,7 +40,7 @@ func (controller *CodeCarbonController) GetCodeCarbonProjectTokens(c *gin.Contex
 
 	userId := c.MustGet("x-user-id").(primitive.ObjectID)
 
-	if _, err := models.GetCodeCarbonProjectById(c, userId, projectId); err != nil {
+	if _, err := controller.projectRepo.GetCodeCarbonProjectById(c, userId, projectId); err != nil {
 		if err == mongo.ErrNoDocuments {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Project not found"})
 		} else {
@@ -92,7 +92,7 @@ func (controller *CodeCarbonController) PostCodeCarbonProjectToken(c *gin.Contex
 		return
 	}
 
-	project, err := models.GetCodeCarbonProjectById(c, userId, projectId)
+	project, err := controller.projectRepo.GetCodeCarbonProjectById(c, userId, projectId)
 	if err != nil || project == nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Project not found"})
 		return

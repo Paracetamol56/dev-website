@@ -25,7 +25,7 @@ func InitRouter() *gin.Engine {
 
 	// Init controllers
 	auth := new(controllers.AuthController)
-	codecarbon := new(controllers.CodeCarbonController)
+	codecarbon := controllers.NewCodeCarbonController()
 	contact := new(controllers.ContactController)
 	heatlh := new(controllers.HealthController)
 	hipparcos := new(controllers.HipparcosController)
