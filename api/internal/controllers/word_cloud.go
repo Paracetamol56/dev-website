@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"dev/internal/models"
+	"dev/internal/utils"
 	"fmt"
 	"log"
 	"math/rand"
@@ -12,8 +14,6 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/Paracetamol56/dev-website/api/models"
-	"github.com/Paracetamol56/dev-website/api/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	uuid "github.com/satori/go.uuid"

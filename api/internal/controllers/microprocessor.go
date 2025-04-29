@@ -1,15 +1,14 @@
 package controllers
 
 import (
+	"dev/internal/models"
 	"net/http"
 
-	"github.com/Paracetamol56/dev-website/api/models"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type MicroprocessorController struct {
-}
+type MicroprocessorController struct{}
 
 func (controller *MicroprocessorController) GetMicroprocessor(c *gin.Context) {
 	// Apply optional filters to the query

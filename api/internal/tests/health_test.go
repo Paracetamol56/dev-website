@@ -1,13 +1,12 @@
 package controllers_test
 
 import (
+	"dev/internal/controllers"
 	"net/http/httptest"
+	"testing"
 
-	"github.com/Paracetamol56/dev-website/api/controllers"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
-
-	"testing"
 )
 
 func TestGetHealth(t *testing.T) {

@@ -1,17 +1,17 @@
 package controllers
 
 import (
+	"dev/internal/models"
 	"net/http"
 	"strconv"
 
-	"github.com/Paracetamol56/dev-website/api/models"
 	"github.com/gin-gonic/gin"
 )
 
-type HipparcosController struct {
-}
+type HipparcosController struct{}
 
 // GetHipparcosHR godoc
+//
 //	@Summary		Get all Hipparcos HR stars
 //	@Description	Get all Hipparcos HR stars
 //	@Tags			hipparcos
@@ -29,6 +29,7 @@ func (controller *HipparcosController) GetHipparcosHR(c *gin.Context) {
 }
 
 // GetHipparcosHRByHIP godoc
+//
 //	@Summary		Get one Hipparcos HR star
 //	@Description	Get one Hipparcos HR star by HIP number
 //	@Tags			hipparcos

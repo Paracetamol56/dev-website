@@ -1,9 +1,11 @@
 package main
 
 import (
-	"github.com/Paracetamol56/dev-website/api/db"
-	"github.com/Paracetamol56/dev-website/api/server"
-	_ "github.com/Paracetamol56/dev-website/docs"
+	"dev/internal/db"
+	"dev/internal/server"
+
+	_ "dev/docs"
+
 	"github.com/joho/godotenv"
 )
 

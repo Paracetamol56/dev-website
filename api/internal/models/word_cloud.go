@@ -1,10 +1,10 @@
 package models
 
 import (
+	"dev/internal/db"
 	"fmt"
 	"time"
 
-	"github.com/Paracetamol56/dev-website/api/db"
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
 	"go.mongodb.org/mongo-driver/bson"

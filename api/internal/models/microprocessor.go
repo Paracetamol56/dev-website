@@ -1,7 +1,8 @@
 package models
 
 import (
-	"github.com/Paracetamol56/dev-website/api/db"
+	"dev/internal/db"
+
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"

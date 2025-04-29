@@ -1,11 +1,11 @@
 package middlewares
 
 import (
+	"dev/internal/utils"
 	"net/http"
 	"os"
 	"strings"
 
-	"github.com/Paracetamol56/dev-website/api/utils"
 	"github.com/gin-gonic/gin"
 )
 

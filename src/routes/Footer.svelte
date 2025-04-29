@@ -14,7 +14,6 @@
 			>
 				GitHub
 			</a>
-			.
 		</p>
 		<div class="flex gap-2">
 			<SocialButton href="https://github.com/Paracetamol56" tooltip="GitHub">
@@ -187,7 +186,7 @@
 			</SocialButton>
 		</div>
 		<small>
-			© 2024 Matheo Galuba. All rights reserved. <a
+			© 2025 Matheo Galuba. All rights reserved. <a
 				class="text-ctp-blue"
 				href="/page/privacy-policy">Privacy policy</a
 			></small

@@ -1,18 +1,17 @@
 package controllers
 
 import (
+	"dev/internal/models"
 	"net/http"
 	"os"
 
-	"github.com/Paracetamol56/dev-website/api/models"
 	"github.com/gin-gonic/gin"
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type UserController struct {
-}
+type UserController struct{}
 
 // SendDeletionEmail godoc
 // Sends a notification email to the user when their account is deleted
@@ -60,11 +59,11 @@ func SendDeletionEmail(c *gin.Context, user *models.User) error {
 //	@Tags			user
 //	@Produce		json
 //	@Param			id	path		string	true	"User ID"
-//	@Success		200	{object}	models.FullUser
+//	@Success		200	{object}	models.User
 //	@Failure		400
 //	@Failure		404
 //	@Security		Bearer
-//	@Router			/user/{id} [get]
+//	@Router			/users/{id} [get]
 func (controller *UserController) GetUser(c *gin.Context) {
 	userId, err := primitive.ObjectIDFromHex(c.Param("id"))
 	if err != nil {
@@ -104,12 +103,12 @@ type PatchUserBody struct {
 //	@Produce		json
 //	@Param			id			path		string			true	"User ID"
 //	@Param			patchUser	body		PatchUserBody	true	"User data"
-//	@Success		200			{object}	models.FullUser
+//	@Success		200			{object}	models.User
 //	@Failure		400
 //	@Failure		403
 //	@Failure		404
 //	@Security		Bearer
-//	@Router			/user/{id} [patch]
+//	@Router			/users/{id} [patch]
 func (controller *UserController) PatchUser(c *gin.Context) {
 	userId, err := primitive.ObjectIDFromHex(c.Param("id"))
 	if err != nil {
@@ -165,7 +164,7 @@ func (controller *UserController) PatchUser(c *gin.Context) {
 //	@Failure		403
 //	@Failure		404
 //	@Security		Bearer
-//	@Router			/user/{id} [delete]
+//	@Router			/users/{id} [delete]
 func (controller *UserController) DeleteUser(c *gin.Context) {
 	userIdString := c.Param("id")
 	userId, err := primitive.ObjectIDFromHex(userIdString)
@@ -216,12 +215,12 @@ func (controller *UserController) DeleteUser(c *gin.Context) {
 //	@Tags			user
 //	@Produce		json
 //	@Param			id	path		string	true	"User ID"
-//	@Success		200	{object}	models.FullUser
+//	@Success		200	{object}	models.User
 //	@Failure		400
 //	@Failure		403
 //	@Failure		404
 //	@Security		Bearer
-//	@Router			/user/{id}/export [get]
+//	@Router			/users/{id}/export [get]
 func (controller *UserController) GetExport(c *gin.Context) {
 	userIdString := c.Param("id")
 	userId, err := primitive.ObjectIDFromHex(userIdString)
