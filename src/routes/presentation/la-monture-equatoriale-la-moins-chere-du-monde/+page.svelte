@@ -36,34 +36,40 @@
 		<section>
 			<h3>Présentation</h3>
 			<section>
-				<div>
+				<div class="flex justify-around">
 					<img
-						height="450"
-						data-src="/img/la-monture-la-moins-chere/20250509_192917.jpg"
+						class="h-[450px]"
+						data-src="/img/la-monture-equatoriale-la-moins-chere-du-monde/20250509_192917.jpg"
+						alt="Présentation de la monture 1"
 						data-preload
 						data-preview-image
 					/>
 					<img
-						height="450"
-						data-src="/img/la-monture-la-moins-chere/20250510_0009.jpg"
+						class="h-[450px]"
+						data-src="/img/la-monture-equatoriale-la-moins-chere-du-monde/20250510_0009.jpg"
+						alt="Présentation de la monture 2"
 						data-preload
 						data-preview-image
 					/>
 					<img
-						height="450"
-						data-src="/img/la-monture-la-moins-chere/20250510_0010.jpg"
+						class="h-[450px]"
+						data-src="/img/la-monture-equatoriale-la-moins-chere-du-monde/20250510_0010.jpg"
+						alt="Présentation de la monture 3"
 						data-preload
 						data-preview-image
 					/>
 				</div>
 			</section>
 			<section>
-				<img
-					height="450"
-					data-src="/img/la-monture-la-moins-chere/20250510_0011.jpg"
-					data-preload
-					data-preview-image
-				/>
+				<div class="flex justify-around">
+					<img
+						class="h-[450px] mx-auto"
+						data-src="/img/la-monture-equatoriale-la-moins-chere-du-monde/20250510_0011.jpg"
+						alt="Présentation de la monture 4"
+						data-preload
+						data-preview-image
+					/>
+				</div>
 			</section>
 		</section>
 		<section>
@@ -92,12 +98,15 @@
 		</section>
 		<section>
 			<h2>Impression 3D</h2>
-			<img
-				height="450"
-				data-src="/img/la-monture-la-moins-chere/20250509_143753.png"
-				data-preload
-				data-preview-image
-			/>
+			<div class="flex justify-around">
+				<img
+					class="h-[450px]"
+					data-src="/img/la-monture-equatoriale-la-moins-chere-du-monde/20250509_143753.png"
+					alt="Modèle 3D de la monture"
+					data-preload
+					data-preview-image
+				/>
+			</div>
 			<p>Source : <a href="https://cults3d.com/:283396">https://cults3d.com/:283396</a></p>
 		</section>
 		<section>
