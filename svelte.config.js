@@ -51,7 +51,7 @@ const config = {
         '/embed/mars-missions',
         '/embed/moore-s-law',
         '/embed/sync-vs-async',
-        '/presentation/la-monture-la-moins-cher',
+        '/presentation/la-monture-equatoriale-la-moins-chere-du-monde',
         '/page',
         '/page/ai-activation-functions',
         '/page/ai-activation-functions/og.png',
