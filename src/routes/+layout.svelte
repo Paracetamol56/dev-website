@@ -25,7 +25,7 @@
 	<meta name="description" content="A showcase of my little dev projects" />
 </svelte:head>
 
-{#if data.url.includes('/embed') || data.url.includes('/presentation')}
+{#if data.url.includes('/embed') || data.url.includes('/tool/slides')}
 	<slot />
 {:else}
 	<!-- Toast list -->
