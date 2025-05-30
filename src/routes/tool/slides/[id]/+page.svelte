@@ -11,9 +11,11 @@
 	import { onDestroy } from 'svelte';
 	import { DebouncedOutlineGenerator } from './outlineGenerator';
 	import SlidePreview from './SlidePreview.svelte';
+	import { type Writable, writable } from 'svelte/store';
 
 	export let data: PageData;
 	let value: string = data.deck?.html || '<!-- Your slides go here -->';
+	let currentSlide: Writable<{ h: number; v: number; f?: number }> = writable({ h: 0, v: 0 });
 
 	// Dynamically change CodeMirror theme based on the current theme
 	let currentTheme: any = null;
@@ -110,12 +112,14 @@
 	<div
 		class="row-span-2 col-start-2 row-start-1 rounded-md overflow-hidden bg-ctp-base shadow-md shadow-ctp-crust"
 	>
-		<Slides>
+		<Slides slide={currentSlide}>
 			{@html value}
 		</Slides>
 	</div>
 	<div class="col-span-2 row-start-3 rounded-md shadow-md shadow-ctp-crust bg-ctp-crust/50">
-		<SlidePreview outline={outlineGenerator.store} />
+		{#if outlineGenerator.store !== null}
+			<SlidePreview outline={outlineGenerator.store} current={currentSlide} />
+		{/if}
 	</div>
 </div>
 
