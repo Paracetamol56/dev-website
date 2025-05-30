@@ -25,14 +25,14 @@
 	<meta name="description" content="A showcase of my little dev projects" />
 </svelte:head>
 
-{#if data.url.includes('/embed') || data.url.includes('/tool/slides')}
+{#if data.url.includes('/embed')}
 	<slot />
 {:else}
 	<!-- Toast list -->
 	<div
 		class="fixed right-0 top-0 z-50 m-4
-					flex flex-col items-end gap-2
-					md:bottom-0 md:top-auto"
+          flex flex-col items-end gap-2
+          md:bottom-0 md:top-auto"
 		use:portal
 	>
 		{#each $toasts as toast (toast.id)}
@@ -44,11 +44,19 @@
 
 	<Navbar />
 
-	<main class="relative isolate py-32 mb-auto">
-		<Transition url={data.url}>
-			<slot />
-		</Transition>
-	</main>
+	{#if data.url.includes('/tool/slides')}
+		<main class="pt-[4.25rem] mb-auto">
+			<Transition url={data.url}>
+				<slot />
+			</Transition>
+		</main>
+	{:else}
+		<main class="py-32 mb-auto">
+			<Transition url={data.url}>
+				<slot />
+			</Transition>
+		</main>
 
-	<Footer />
+		<Footer />
+	{/if}
 {/if}
