@@ -4,7 +4,7 @@
 	import LoginDialog from './LoginDialog.svelte';
 	import { user } from '$lib/store';
 	import ProfilePopover from './ProfilePopover.svelte';
-	import { ExternalLink } from 'lucide-svelte';
+	import { SquareArrowOutUpRight } from 'lucide-svelte';
 
 	const {
 		elements: { root, link }
@@ -69,7 +69,7 @@
 				class="hover:text-ctp-blue transition-colors hidden sm:flex items-center gap-1"
 				href="https://matheo-galuba.com"
 				target="_blank"
-				use:melt={$link}>Portfolio <ExternalLink size="16" stroke-width="3" /></a
+				use:melt={$link}>Portfolio <SquareArrowOutUpRight size="16" stroke-width="3" /></a
 			>
 		</div>
 		<div class="ml-auto flex items-center gap-2">

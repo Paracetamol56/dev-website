@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as d3 from 'd3';
 	import { onMount } from 'svelte';
-	import { Cog, Expand, ExternalLink, RotateCcw, Search, X } from 'lucide-svelte';
+	import { Cog, Expand, SquareArrowOutUpRight, RotateCcw, Search, X } from 'lucide-svelte';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import axios from 'axios';
@@ -413,7 +413,7 @@
 									window.open(`https://en.wikipedia.org/wiki/${hover?.title}`);
 								}}
 							>
-								<ExternalLink size="18" />
+								<SquareArrowOutUpRight size="18" />
 							</button>
 						</Tooltip>
 					</div>

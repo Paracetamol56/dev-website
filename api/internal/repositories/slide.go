@@ -5,7 +5,6 @@ import (
 	"dev/internal/db"
 	"dev/internal/models"
 	"dev/internal/utils"
-	"fmt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -47,9 +46,7 @@ func (r *SlideRepository) GetById(c context.Context, id primitive.ObjectID) (*mo
 	err := r.collection.FindOne(
 		c,
 		bson.M{
-			"_id":         id,
-			"archived_at": bson.M{"$exists": false},
-			"status":      models.StatusPublished,
+			"_id": id,
 		}).Decode(&slide)
 	if err != nil {
 		return nil, err
@@ -98,15 +95,12 @@ func (r *SlideRepository) GetByUser(c context.Context, userId primitive.ObjectID
 	if err := cursor.Decode(&result); err != nil {
 		return nil, err
 	}
-	fmt.Println(result)
 	return &result, nil
 }
 
-func (r *SlideRepository) Update(c context.Context, userId primitive.ObjectID, slide *models.SlideDeck) (*mongo.UpdateResult, error) {
-	slide.UpdatedAt = time.Now()
+func (r *SlideRepository) Update(c context.Context, slide *models.SlideDeck) (*mongo.UpdateResult, error) {
 	filter := bson.M{
-		"_id":     slide.Id,
-		"user_id": userId,
+		"_id": slide.Id,
 	}
 
 	result, err := r.collection.UpdateOne(
@@ -122,19 +116,16 @@ func (r *SlideRepository) Update(c context.Context, userId primitive.ObjectID, s
 	return result, nil
 }
 
-func (r *SlideRepository) UpdateContent(c context.Context, userId primitive.ObjectID, id primitive.ObjectID, content string) (*mongo.UpdateResult, error) {
+func (r *SlideRepository) UpdateContent(c context.Context, id primitive.ObjectID, content string, revision int64) (*mongo.UpdateResult, error) {
 	filter := bson.M{
-		"_id":     id,
-		"user_id": userId,
+		"_id": id,
 	}
 
 	update := bson.M{
 		"$set": bson.M{
 			"content":   content,
+			"revision":  revision,
 			"updatedAt": time.Now(),
-		},
-		"$inc": bson.M{
-			"revision": 1,
 		},
 	}
 
@@ -149,7 +140,7 @@ func (r *SlideRepository) UpdateContent(c context.Context, userId primitive.Obje
 	return result, nil
 }
 
-func (r *SlideRepository) AddOperation(c context.Context, userId primitive.ObjectID, id primitive.ObjectID, operation *models.SlideOperation) (*mongo.UpdateResult, error) {
+func (r *SlideRepository) AddOperation(c context.Context, userId primitive.ObjectID, id primitive.ObjectID, operation *models.SlideUpdate) (*mongo.UpdateResult, error) {
 	filter := bson.M{
 		"_id":     id,
 		"user_id": userId,
@@ -158,7 +149,7 @@ func (r *SlideRepository) AddOperation(c context.Context, userId primitive.Objec
 	update := bson.M{
 		"$push": bson.M{
 			"operations": bson.M{
-				"$each":     []models.SlideOperation{*operation},
+				"$each":     []models.SlideUpdate{*operation},
 				"$position": 0,
 				"$slice":    -100,
 			},

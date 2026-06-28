@@ -1,5 +1,9 @@
 <script lang="ts">
-	import CodeMirror from 'svelte-codemirror-editor';
+	import { basicSetup } from 'codemirror';
+	import { indentWithTab } from '@codemirror/commands';
+	import { EditorView, keymap } from '@codemirror/view';
+	import { ChangeSet, EditorState, type Extension, StateEffect } from '@codemirror/state';
+	import { collab, receiveUpdates, type Update } from '@codemirror/collab';
 	import { html } from '@codemirror/lang-html';
 	import { melt, createScrollArea, createToolbar } from '@melt-ui/svelte';
 	import type { PageData } from './$types';
@@ -8,60 +12,79 @@
 	import { variants } from '@catppuccin/palette';
 	import Button from '$lib/components/Button.svelte';
 	import { Presentation } from 'lucide-svelte';
-	import { onDestroy } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { DebouncedOutlineGenerator } from './outlineGenerator';
 	import SlidePreview from './SlidePreview.svelte';
 	import { type Writable, writable } from 'svelte/store';
+	import peerExtension from './peerExtension';
 
 	export let data: PageData;
-	let value: string = data.deck?.html || '<!-- Your slides go here -->';
+	let value: string = data.slideDeck?.content || '<!-- Your slides go here -->';
+	let editorView: EditorView;
 	let currentSlide: Writable<{ h: number; v: number; f?: number }> = writable({ h: 0, v: 0 });
 
+	const ws = new WebSocket(`ws://localhost:8080/api/slides/${data.slideDeck?.id}/ws`);
+	ws.onopen = () => {
+		console.log('Connected to WebSocket');
+	};
+	ws.onclose = () => {
+		console.log('Disconnected from WebSocket');
+	};
+
 	// Dynamically change CodeMirror theme based on the current theme
-	let currentTheme: any = null;
-	$: {
-		loadTheme($user.flavour);
-	}
+	$: loadTheme($user.flavour);
 
 	async function loadTheme(flavor: keyof typeof variants) {
 		try {
-			let themeModule;
-
+			let newTheme: any;
+			const themeModule = await import('@catppuccin/codemirror');
 			switch (flavor) {
 				case 'latte':
-					themeModule = await import('@catppuccin/codemirror');
-					currentTheme = themeModule.catppuccinLatte;
+					newTheme = themeModule.catppuccinLatte;
 					break;
 				case 'frappe':
-					themeModule = await import('@catppuccin/codemirror');
-					currentTheme = themeModule.catppuccinFrappe;
+					newTheme = themeModule.catppuccinFrappe;
 					break;
 				case 'macchiato':
-					themeModule = await import('@catppuccin/codemirror');
-					currentTheme = themeModule.catppuccinMacchiato;
+					newTheme = themeModule.catppuccinMacchiato;
 					break;
 				case 'mocha':
 				default:
-					themeModule = await import('@catppuccin/codemirror');
-					currentTheme = themeModule.catppuccinMocha;
+					newTheme = themeModule.catppuccinMocha;
 					break;
 			}
+
+			if (!editorView) return;
+			editorView.dispatch({
+				effects: StateEffect.reconfigure.of(getExtensions(ws, newTheme))
+			});
 		} catch (error) {
 			console.error('Failed to load theme:', error);
-			// Fallback to mocha theme
-			const fallbackModule = await import('@catppuccin/codemirror');
-			currentTheme = fallbackModule.catppuccinMocha;
 		}
 	}
 
-	// Get the AST from the editor
-	const outlineGenerator = new DebouncedOutlineGenerator(2000);
+	function getExtensions(ws: WebSocket, theme?: Extension): Extension[] {
+		const ext: Extension[] = [
+			basicSetup,
+			EditorView.lineWrapping,
+			keymap.of([indentWithTab]),
+			html(),
+			peerExtension(data.slideDeck.revision, ws),
+		];
+
+		if (theme) ext.push(theme);
+
+		return ext;
+	}
+
+	/* const outlineGenerator = new DebouncedOutlineGenerator(300);
 	$: outlineGenerator.execute(value);
 	outlineGenerator.store?.subscribe((value) => {
 		if (value) {
 			console.log('Outline generated:', value);
 		}
 	});
+  */
 
 	const {
 		elements: { root, content, viewport, corner, scrollbarY, thumbY, thumbX, scrollbarX }
@@ -75,8 +98,22 @@
 		builders: { createToolbarGroup }
 	} = createToolbar();
 
+	onMount(() => {
+		editorView = new EditorView({
+			parent: document.getElementById('editor')!,
+			state: EditorState.create({
+				doc: value,
+				extensions: getExtensions(ws)
+			}),
+			dispatch(tr) {
+				editorView.update([tr]);
+			}
+		});
+	});
+
 	onDestroy(() => {
-		outlineGenerator.cleanup();
+		// outlineGenerator.cleanup();
+    ws.close();
 	});
 </script>
 
@@ -92,7 +129,9 @@
 	>
 		<div use:melt={$viewport} class="h-full">
 			<div use:melt={$content} class="h-full">
-				<CodeMirror bind:value lang={html()} theme={currentTheme} class="h-full" />
+				<div id="editor">
+					<!-- CodeMirror editor will be mounted here -->
+				</div>
 			</div>
 		</div>
 		<div
@@ -117,9 +156,9 @@
 		</Slides>
 	</div>
 	<div class="col-span-2 row-start-3 rounded-md shadow-md shadow-ctp-crust bg-ctp-crust/50">
-		{#if outlineGenerator.store !== null}
+		<!-- {#if outlineGenerator.store !== null}
 			<SlidePreview outline={outlineGenerator.store} current={currentSlide} />
-		{/if}
+		{/if} -->
 	</div>
 </div>
 

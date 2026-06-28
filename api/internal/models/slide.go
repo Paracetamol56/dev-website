@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -13,8 +14,8 @@ type SlideDeck struct {
 	UserId  primitive.ObjectID `json:"user_id" bson:"user_id" validate:"required"`
 
 	// Document versioning and OT support
-	Revision   int64            `json:"revision" bson:"revision"`
-	Operations []SlideOperation `json:"operations,omitempty" bson:"operations,omitempty"`
+	Revision   int64         `json:"revision" bson:"revision"`
+	Operations []SlideUpdate `json:"operations,omitempty" bson:"operations,omitempty"`
 
 	// Asset management
 	Assets []Asset `json:"assets,omitempty" bson:"assets,omitempty"`
@@ -28,14 +29,10 @@ type SlideDeck struct {
 }
 
 // Operation represents an operational transform operation
-type SlideOperation struct {
-	Type      string    `json:"type" bson:"type"`                           // insert, delete, retain
-	Position  int       `json:"position" bson:"position"`                   // character position
-	Content   string    `json:"content,omitempty" bson:"content,omitempty"` // for insert operations
-	Length    int       `json:"length,omitempty" bson:"length,omitempty"`   // for delete/retain operations
-	ClientId  string    `json:"client_id" bson:"client_id"`
-	Timestamp time.Time `json:"timestamp" bson:"timestamp"`
-	Revision  int64     `json:"revision" bson:"revision"`
+type SlideUpdate struct {
+	ClientID string          `json:"clientID" bson:"client_id"`
+	Changes  json.RawMessage `json:"changes" bson:"changes"`
+	Effects  json.RawMessage `json:"effects,omitempty" bson:"effects,omitempty"`
 }
 
 // Asset represents uploaded files (images, etc.)
