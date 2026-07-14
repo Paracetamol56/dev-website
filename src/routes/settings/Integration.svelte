@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { Check, Github } from 'lucide-svelte';
+	import { Check } from 'lucide-svelte';
 	import type { Writable } from 'svelte/store';
 	import type { UserSettings } from './userSettings';
+	import GitHub from '$lib/components/GitHub.svelte';
 
 	const GITHUB_CLIENT_ID = '566de517d2c2d47ad218';
 
@@ -9,7 +10,7 @@
 </script>
 
 <h4 class="flex items-center gap-1 text-base font-semibold mb-2">
-	<Github size="18" /> GitHub integration
+	<GitHub size="18" /> GitHub integration
 </h4>
 <p class="mb-2">
 	Connect your GitHub account to enable features such as activity feed and repositories
