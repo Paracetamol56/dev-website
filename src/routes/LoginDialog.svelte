@@ -2,11 +2,12 @@
 	import '../app.postcss';
 	import Button from '$lib/components/Button.svelte';
 	import { createDialog, melt } from '@melt-ui/svelte';
-	import { Github, Send, X } from 'lucide-svelte';
+	import { Send, X } from 'lucide-svelte';
 	import { addToast } from './+layout.svelte';
 	import { writable, type Writable } from 'svelte/store';
 	import { fade, fly } from 'svelte/transition';
 	import api from '$lib/api';
+	import GitHub from '$lib/components/GitHub.svelte';
 
 	const dialogOpen: Writable<boolean> = writable(false);
 	const {
@@ -90,7 +91,7 @@
 					data-umami-event-properties={`{ "provider": "GitHub" }`}
 				>
 					<span>Continue with GitHub</span>
-					<Github size="16" />
+					<GitHub size="16" />
 				</Button>
 			</div>
 			<div class="my-4 flex justify-between items-center">
@@ -124,7 +125,7 @@
 					<Button
 						type="submit"
 						data={{
-							"umami-event":"login-email",
+							'umami-event': 'login-email'
 						}}
 					>
 						<span>Send the magic link</span>

@@ -1,1 +1,13 @@
-[]
+[
+  {
+    "title": "PDF printing marks",
+    "slug": "pdf-printing-marks",
+    "description": "Easily add printing marks to your PDF files for professional printing.",
+    "tags": [
+      "pdf",
+      "printing"
+    ],
+    "listed": true,
+    "requiresAuth": false
+  }
+]
