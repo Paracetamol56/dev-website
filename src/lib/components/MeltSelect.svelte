@@ -44,7 +44,7 @@
 			use:melt={$menu}
 			transition:fade={{ duration: 150 }}
 		>
-			<div>
+			<div class="flex flex-col gap-1">
 				{#each options as item}
 					<div
 						class="relative cursor-pointer rounded-md py-1 pl-8 pr-4
