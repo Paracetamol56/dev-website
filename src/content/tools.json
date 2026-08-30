@@ -1,13 +1,18 @@
 [
-  {
-    "title": "PDF printing marks",
-    "slug": "pdf-printing-marks",
-    "description": "Easily add printing marks to your PDF files for professional printing.",
-    "tags": [
-      "pdf",
-      "printing"
-    ],
-    "listed": true,
-    "requiresAuth": false
-  }
+	{
+		"title": "PDF printing marks",
+		"slug": "pdf-printing-marks",
+		"description": "Easily add printing marks to your PDF files for professional printing.",
+		"tags": ["pdf", "printing"],
+		"listed": true,
+		"requiresAuth": false
+	},
+	{
+		"title": "Icon tile generator",
+		"slug": "icon-tile-generator",
+		"description": "Generate icon tiles for your projects with ease.",
+		"tags": ["icon"],
+		"listed": true,
+		"requiresAuth": false
+	}
 ]
