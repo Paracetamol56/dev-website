@@ -22,7 +22,7 @@
 	{href}
 	target="_blank"
 	rel="noopener noreferrer"
-	use:melt={$trigger} 
+	use:melt={$trigger}
 	data-umami-event="social-button"
 	data-umami-event-properties={`{ "href": "${href}" }`}
 >

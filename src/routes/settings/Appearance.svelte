@@ -130,7 +130,7 @@
 			type="submit"
 			data={{
 				'umami-event': 'save-theme',
-				'umami-event-properties': "{ \"data-umami-event\"=\"Signup button\" }"
+				'umami-event-properties': '{ "data-umami-event"="Signup button" }'
 			}}
 		>
 			<span>Save</span>

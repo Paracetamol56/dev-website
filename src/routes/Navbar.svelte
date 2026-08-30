@@ -45,13 +45,19 @@
 						<use xlink:href="#SVGID_1_" style="overflow:visible;" />
 					</clipPath>
 					<g style="clip-path:url(#SVGID_00000043451981554379318190000013841271621363195293_);">
-						<path class="fill-ctp-text" d="M259.7,193.7L375,0h394.3v121.2H447.2L331.8,314.9L259.7,193.7z" />
+						<path
+							class="fill-ctp-text"
+							d="M259.7,193.7L375,0h394.3v121.2H447.2L331.8,314.9L259.7,193.7z"
+						/>
 						<path class="fill-ctp-text" d="M331.8,436L144.3,121.2h-125H0l259.7,436.1L331.8,436z" />
 						<path
 							class="fill-ctp-text"
 							d="M769.3,181.7V606H456.8l62.5-121.2h125V302.9l-89,0.1l72.2-121.2L769.3,181.7z"
 						/>
-						<path class="fill-ctp-subtext0" d="M483.2,181.8L259.7,557.3l29,48.7H375l252.6-424.2L483.2,181.8z" />
+						<path
+							class="fill-ctp-subtext0"
+							d="M483.2,181.8L259.7,557.3l29,48.7H375l252.6-424.2L483.2,181.8z"
+						/>
 						<path class="fill-ctp-subtext0" d="M0,606h125V331.1L0,121.2V606z" />
 					</g>
 				</g>

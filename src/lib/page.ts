@@ -1,14 +1,14 @@
 interface Page {
-  title: string;
-  slug: string;
-  description: string;
-  tags: string[];
-  release: Date;
-  listed: boolean;
-};
+	title: string;
+	slug: string;
+	description: string;
+	tags: string[];
+	release: Date;
+	listed: boolean;
+}
 
 interface Tool extends Page {
-  needsAuth: boolean;
-};
+	needsAuth: boolean;
+}
 
 export type { Page, Tool };

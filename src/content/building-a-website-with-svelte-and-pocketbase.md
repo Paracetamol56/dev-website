@@ -67,16 +67,16 @@ The site’s content is managed using a file-based CMS with Markdown files, allo
 import { error } from '@sveltejs/kit';
 
 export async function load({ params }) {
- try {
-  const page = await import(`../../../content/${params.lang}/${params.slug}.md`);
-  return {
-   content: page.default, // The actual Markdown content
-   meta: page.metadata // Any frontmatter metadata
-  };
- } catch (e) {
-  console.error(e);
-  throw error(404, `Page not found`);
- }
+	try {
+		const page = await import(`../../../content/${params.lang}/${params.slug}.md`);
+		return {
+			content: page.default, // The actual Markdown content
+			meta: page.metadata // Any frontmatter metadata
+		};
+	} catch (e) {
+		console.error(e);
+		throw error(404, `Page not found`);
+	}
 }
 ```
 
@@ -134,43 +134,43 @@ Here’s the `FormState` abstract class:
 
 ```ts
 export default abstract class FormState<T> {
- data: T;
- loading: boolean;
- error: Error | null;
- success: boolean;
+	data: T;
+	loading: boolean;
+	error: Error | null;
+	success: boolean;
 
- constructor(data: T) {
-  this.data = data;
-  this.loading = false;
-  this.error = null;
-  this.success = false;
- }
+	constructor(data: T) {
+		this.data = data;
+		this.loading = false;
+		this.error = null;
+		this.success = false;
+	}
 
- reset(): void {
-  this.loading = false;
-  this.error = null;
-  this.success = false;
- }
+	reset(): void {
+		this.loading = false;
+		this.error = null;
+		this.success = false;
+	}
 
- async submit(): Promise<void> {
-  this.loading = true;
-  this.error = null;
-  try {
-   await this.post();
-   this.success = true;
-  } catch (error: any) {
-   console.error('Error while submitting form', error);
-   this.success = false;
-   if (error instanceof Error) {
-    this.error = error;
-   }
-   this.handleError();
-  }
-  this.loading = false;
- }
+	async submit(): Promise<void> {
+		this.loading = true;
+		this.error = null;
+		try {
+			await this.post();
+			this.success = true;
+		} catch (error: any) {
+			console.error('Error while submitting form', error);
+			this.success = false;
+			if (error instanceof Error) {
+				this.error = error;
+			}
+			this.handleError();
+		}
+		this.loading = false;
+	}
 
- abstract post(): Promise<void>;
- handleError(): Promise<void> | void {}
+	abstract post(): Promise<void>;
+	handleError(): Promise<void> | void {}
 }
 ```
 

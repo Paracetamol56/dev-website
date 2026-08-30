@@ -16,6 +16,7 @@ A website to showcase my small side projects and blog posts.
 ### Local development
 
 #### Requirements
+
 - [Node.js](https://nodejs.org/)
 - [Go](https://golang.org/)
 - [Docker](https://www.docker.com/)
@@ -24,11 +25,13 @@ A website to showcase my small side projects and blog posts.
 #### Steps
 
 1. Clone the repository
+
 ```sh
 git clone git@github.com:Paracetamol56/dev-website.git
 ```
 
 2. Install dependencies
+
 ```sh
 # Go
 go mod download
@@ -37,15 +40,19 @@ npm install
 ```
 
 3. Start the DB in a container
+
 ```sh
 docker-compose up -d db
 ```
 
 3. Start the development server
+
 ```sh
 npm run dev
 ```
+
 in another terminal
+
 ```sh
 go run main.go
 ```
@@ -55,4 +62,3 @@ go run main.go
 ### Production
 
 Docker images are automatically built and pushed to [GitHub Container Registry](https://github.com/Paracetamol56/dev-website/pkgs/container/dev-website) on every push to the master branch.
-

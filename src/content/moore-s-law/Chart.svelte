@@ -128,7 +128,9 @@
 	}
 </script>
 
-<form class="mb-2 p-4 bg-ctp-mantle shadow-md shadow-ctp-crust rounded-md flex justify-center gap-4">
+<form
+	class="mb-2 p-4 bg-ctp-mantle shadow-md shadow-ctp-crust rounded-md flex justify-center gap-4"
+>
 	<div class="flex flex-col">
 		<h4 class="content-ignore mb-2 text-lg font-bold">Features</h4>
 		<MeltRadioGroup options={features} value={selectedFeature} orientation="vertical" />

@@ -70,7 +70,7 @@
 	<div
 		class="my-4 p-4 rounded-md bg-ctp-mantle flex flex-col md:flex-row gap-4 justify-between items-center"
 	>
-		<MeltRadioGroup options={modelOptions} value={value} orientation="horizontal" />
+		<MeltRadioGroup options={modelOptions} {value} orientation="horizontal" />
 		<Button on:click={initModel}>
 			<span>Initialize Model</span>
 			<BrainCog size="18" stroke-width="3" />

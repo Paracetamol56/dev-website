@@ -368,8 +368,8 @@ And voilà! The starfield is now centered:
 
 ```html
 <iframe
- src="https://dev.matheo-galuba.com/files/starfield-animation/starfield-animaiton.html"
- title="Starfield simulation"
+	src="https://dev.matheo-galuba.com/files/starfield-animation/starfield-animaiton.html"
+	title="Starfield simulation"
 ></iframe>
 ```
 

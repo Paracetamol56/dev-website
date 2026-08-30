@@ -19,4 +19,3 @@
 		class="h-8 min-w-8 w-full rounded-md bg-ctp-surface0 px-3 focus:outline-none focus:ring-2 focus:ring-ctp-mauve shadow-md shadow-ctp-crust"
 	/>
 </div>
-

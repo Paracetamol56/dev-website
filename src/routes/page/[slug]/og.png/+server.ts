@@ -2,16 +2,18 @@ import { ImageResponse } from '@ethercorps/sveltekit-og';
 import { RequestHandler } from '@sveltejs/kit';
 
 export const GET: RequestHandler = async ({ params, fetch }) => {
-  const post = await import(`../../../../content/${params.slug}.md`);
+	const post = await import(`../../../../content/${params.slug}.md`);
 
-  const template = `
+	const template = `
   <div
     tw="flex flex-col w-full h-full items-center justify-between px-16 py-8"
     style="background: #1e1e2e; color: #cdd6f4; font-family: 'Inter SemiBold', sans-serif;"
   >
     <div tw="flex-1 flex flex-row w-full items-center justify-between">
       <div tw="flex flex-col items-start justify-center w-2/3">
-        <h1 tw="text-6xl text-transparent bg-clip-text leading-1.15" style="background-clip: text; background-image: linear-gradient(to right, rgb(203, 166, 247), rgb(180, 190, 254)); font-family: 'Inter SemiBold', sans-serif;">${post.metadata.title}</h1>
+        <h1 tw="text-6xl text-transparent bg-clip-text leading-1.15" style="background-clip: text; background-image: linear-gradient(to right, rgb(203, 166, 247), rgb(180, 190, 254)); font-family: 'Inter SemiBold', sans-serif;">${
+					post.metadata.title
+				}</h1>
         <h2 tw="text-4xl">${post.metadata.description}</h2>
         <p tw="text-2xl" style="color: #b4befe;">
           ${post.metadata.tags.map((tag: string) => `<span tw="mr-2">#${tag}</span>`).join('')}
@@ -24,33 +26,33 @@ export const GET: RequestHandler = async ({ params, fetch }) => {
   </div>
   `;
 
-  const regularFile = await fetch('/fonts/Inter/static/Inter-Regular.ttf');
-  const semiBoldFile = await fetch('/fonts/Inter/static/Inter-SemiBold.ttf');
-  const boldFile = await fetch('/fonts/Inter/static/Inter-Bold.ttf');
+	const regularFile = await fetch('/fonts/Inter/static/Inter-Regular.ttf');
+	const semiBoldFile = await fetch('/fonts/Inter/static/Inter-SemiBold.ttf');
+	const boldFile = await fetch('/fonts/Inter/static/Inter-Bold.ttf');
 	const regularData = await regularFile.arrayBuffer();
-  const semiBoldData = await semiBoldFile.arrayBuffer();
-  const boldData = await boldFile.arrayBuffer();
+	const semiBoldData = await semiBoldFile.arrayBuffer();
+	const boldData = await boldFile.arrayBuffer();
 
 	return await new ImageResponse(template, {
 		height: 630,
 		width: 1200,
-    fonts: [
-      {
-        name: 'Inter Regular',
-        data: regularData,
-        weight: 400,
-      },
-      {
-        name: 'Inter SemiBold',
-        data: semiBoldData,
-        weight: 600,
-      },
-      {
-        name: 'Inter Bold',
-        data: boldData,
-        weight: 700,
-      },
-    ],
+		fonts: [
+			{
+				name: 'Inter Regular',
+				data: regularData,
+				weight: 400
+			},
+			{
+				name: 'Inter SemiBold',
+				data: semiBoldData,
+				weight: 600
+			},
+			{
+				name: 'Inter Bold',
+				data: boldData,
+				weight: 700
+			}
+		]
 	});
 };
 

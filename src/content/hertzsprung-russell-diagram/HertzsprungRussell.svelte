@@ -12,7 +12,7 @@
 	import api from '$lib/api';
 
 	let data: StarHR[] = [];
-	let search: string
+	let search: string;
 
 	let searchError: string = '';
 	let selectedStar: StarHR | null = null;

@@ -6,7 +6,10 @@
 	export let disabled: boolean = false;
 	export let link: string | null = null;
 	export let data: Record<string, any> = {};
-	$: dataProps = Object.entries(data).reduce((acc, [key, value]) => ({...acc, [`data-${key}`]: value}), {});
+	$: dataProps = Object.entries(data).reduce(
+		(acc, [key, value]) => ({ ...acc, [`data-${key}`]: value }),
+		{}
+	);
 
 	const dispatch = createEventDispatcher();
 

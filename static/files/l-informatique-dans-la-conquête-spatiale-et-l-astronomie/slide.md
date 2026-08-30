@@ -4,9 +4,10 @@ _class: lead
 paginate: true
 marp: true
 header: L'informatique dans la conquête spatiale et l'astronomie
-backgroundColor: "#1e1e2e"
-color: "#cdd6f4"
+backgroundColor: '#1e1e2e'
+color: '#cdd6f4'
 ---
+
 <style>
 h1, h2, h3, h4, h5, h6 {
   color: #b4befe
@@ -20,6 +21,7 @@ h1, h2, h3, h4, h5, h6 {
 # L'informatique dans la conquête spatiale et l'astronomie
 
 ---
+
 <!-- _class: lead -->
 <!--
 Pour introduire cette conférence, j'aimerai nous faire prendre à tous un peu de recul sur l'époque qu'on est en train de vivre.
@@ -27,10 +29,10 @@ En très peu de temps à l'échelle de l'histoire de l'humanité, les machines o
 -->
 
 ## Introduction :
+
 ## La puissance incontestée des machines
 
-![](assets/2.gif
-)
+![](assets/2.gif)
 
 ---
 
@@ -45,6 +47,7 @@ En 1965, Gordon Moore, cofondateur d'Intel, a énoncé :
 ![bg](assets/4.webp)
 
 ---
+
 <!-- _class: lead -->
 
 ![bg brightness:0.5](assets/4.webp)
@@ -52,6 +55,7 @@ En 1965, Gordon Moore, cofondateur d'Intel, a énoncé :
 ![h:500](assets/5.jpg)
 
 ---
+
 <!-- _class: lead -->
 
 ![bg brightness:0.5](assets/4.webp)
@@ -67,23 +71,24 @@ En 1965, Gordon Moore, cofondateur d'Intel, a énoncé :
 ## Plan
 
 1. Informatique et astronomie
-    - Observer l'Univers
-    - Comprendre l'Univers
+   - Observer l'Univers
+   - Comprendre l'Univers
 2. Informatique et exploration spatiale
-    - L'histoire conjointe de l'informatique et de la course à l'espace 
-    - Perspectives futures
+   - L'histoire conjointe de l'informatique et de la course à l'espace
+   - Perspectives futures
 
 ---
+
 <!-- _class: lead -->
 
 ![bg brightness:0.5](assets/9_0.webp)
 ![bg brightness:0.5](assets/9_1.webp)
 ![bg brightness:0.5](assets/9_2.jpeg)
 
-
 # 1. Informatique et astronomie
 
 ---
+
 <!--
 Comme toutes les sciences, l'astronomie a été révolutionnée par l'informatique.
 Aujourd'hui, c'est l'une des sciences la plus génératrice et utilisatrice de données.
@@ -96,16 +101,18 @@ Aujourd'hui, c'est l'une des sciences la plus génératrice et utilisatrice de d
 ---
 
 L'astronomie c'est :
+
 - environ 100To/jour dans le monde
 - des dizaines de Po par ans
 
 <br>
 
-- *1To = 2 000 000 de livres*
-- *1To = 1000Go*
-- *1Po = 1000To*
+- _1To = 2 000 000 de livres_
+- _1To = 1000Go_
+- _1Po = 1000To_
 
 ---
+
 <!-- _class: lead -->
 
 Le volume de données double environ tous les 2 ans.
@@ -113,12 +120,15 @@ Le volume de données double environ tous les 2 ans.
 ![](assets/12.gif)
 
 ---
+
 <!-- _class: lead -->
 
 "Plus ça augmente, plus ça augmente."
+
 <p style="text-align: right;">- Moi</p>
 
 ---
+
 <style>
   footer {
     color: #cdd6f4;
@@ -140,6 +150,7 @@ Une augmentation de la complexité induit une augmentation de la quantité de ca
 -->
 
 ---
+
 <!--
 En plus de la complexité des données, nous avons affaire à des données qui évoluent dans le temps. Ce qui nous intéresse, ce sont à la fois les choses "fixes" mais aussi les événements, les choses qui bougent.
 Donc, on n'analyse pas l'univers à un instant T, mais un flux constant de données.
@@ -148,6 +159,7 @@ Donc, on n'analyse pas l'univers à un instant T, mais un flux constant de donn�
 <img src="assets/15.jpg" style="width: 100%; height: 85%; object-fit: contain;">
 
 ---
+
 <!--
 Avoir des To de base de données, c'est bien, mais ça ne sert à rien si on ne peut pas en extraire les connaissances.
 C'est largement impossible pour des humains, donc on utilise des logiciels. Mais même les logiciels classiques ont des limites, c'est qu'ils sont créés par des humains...
@@ -171,6 +183,7 @@ Données brutes, abondantes et hétérogènes vers des connaissances exploitable
 ![bg](assets/17_1.jpg)
 
 ---
+
 <!--
 Donc, on est passé d'une science où l'humain était au centre à une science extrêmement informatisée, où l'humain est là pour superviser les machines et extraire les conclusions d'un volume de données qui dépasse l'entendement.
 -->
@@ -183,6 +196,7 @@ Pour finir cette partie, l'astronomie, c'est l'une des sciences la plus informat
 -->
 
 ---
+
 <!--
 Avec toutes ces données, le défi est d'en extraire de la connaissance.
 J'entends par là comprendre les phénomènes et les lois qui régissent l'univers.
@@ -193,6 +207,7 @@ J'entends par là comprendre les phénomènes et les lois qui régissent l'unive
 <img src="assets/19.jpeg" style="width: 100%; height: 85%; object-fit: contain;">
 
 ---
+
 <!--
 Depuis des siècles, en science, on utilise la méthode scientifique.
 C'est-à-dire qu'on émet des hypothèses pour tenter de répondre à une question scientifique. Puis, on valide ou invalide ces hypothèses par l'expérience jusqu'à ce que la théorie colle à la réalité.
@@ -209,6 +224,7 @@ C'est-à-dire qu'on émet des hypothèses pour tenter de répondre à une questi
 </div>
 
 ---
+
 <!-- _class: lead -->
 
 <!--
@@ -218,6 +234,7 @@ Grâce à cette méthode, on a pu comprendre pas mal de choses sur les lois fond
 <img src="assets/21.gif" style="width: 100%; height: 85%; object-fit: contain;">
 
 ---
+
 <style>
   footer {
     color: #cdd6f4;
@@ -227,12 +244,13 @@ Grâce à cette méthode, on a pu comprendre pas mal de choses sur les lois fond
 <!-- _footer: "Galaxy d'Andromède (Photo Orion)" -->
 
 <!--
-Mais cette méthode à ses limites. Par ce que quand on parle d'étoiles, de trous noirs, de galaxies, etc. On n'a pas de formules. 
+Mais cette méthode à ses limites. Par ce que quand on parle d'étoiles, de trous noirs, de galaxies, etc. On n'a pas de formules.
 -->
 
 ![bg](assets/22.jpg)
 
 ---
+
 <!--
 Donc, aujourd'hui, on utilise l'informatique pour créer des clones numériques de galaxies, d'étoiles, de systèmes solaires, etc. Et on utilise ces clones pour faire des expériences virtuelles en contrôlant tous les paramètres.
 -->
@@ -254,6 +272,7 @@ Donc, aujourd'hui, on utilise l'informatique pour créer des clones numériques 
 </video>
 
 ---
+
 <!--
 Pour résumer, l'informatique est un outil indispensable à la recherche en astronomie. Parce que nous ne pouvons pas faire de notre univers un laboratoire, nous utilisons des laboratoires virtuels. Donc, la théorie n'est plus validée par l'expérience, mais par des simulations informatiques, jusqu'à trouver les bons paramètres qui collent à la réalité.
 -->
@@ -268,8 +287,6 @@ Pour résumer, l'informatique est un outil indispensable à la recherche en astr
 </div>
 
 ---
-
-
 
 ---
 
@@ -290,6 +307,7 @@ Pour résumer, l'informatique est un outil indispensable à la recherche en astr
 ![bg brightness:0.8](assets/27_2.webp)
 
 ---
+
 <!--
 L'histoire de l'informatique est fortement liée à l'histoire de l'exploration spatiale.
 -->
@@ -305,23 +323,27 @@ L'histoire de l'informatique est fortement liée à l'histoire de l'exploration 
 </div>
 
 ---
+
 <!--
 Depuis les premiers satellites jusqu'à aujourd'hui, l'informatique a toujours été au cœur de l'exploration spatiale.
-Il faut savoir que n'importe quelle mission spatiale nécessite énormément de calculs pour fonctionner. 
+Il faut savoir que n'importe quelle mission spatiale nécessite énormément de calculs pour fonctionner.
 -->
 
 **Au sol :**
+
 - Calculs de trajectoires
 - Mécanique orbitale
 - Communication
 
 **En vol :**
+
 - Dynamique de vol
 - Navigation
 - Correction de trajectoire
 - Communication
 
 ---
+
 <!--
 Voici le missile balistique V2, qui a malheureusement été utilisé par la Wehrmacht pendant la Seconde Guerre mondiale. Mais c'est aussi le premier engin capable d'atteindre l'espace. On remonte donc aux prémisses de l'aérospatiale et voici l'équipement embarqué pour contrôler la fusée.
 Ça n'est pas ce que je considère d'ordinateur, c'est simplement un ensemble de composants qui effectue les opérations mathématiques nécessaires avec des signaux électriques.
@@ -337,6 +359,7 @@ Si la fusée dérive de sa trajectoire, l'électronique va envoyer le signal él
   <img height="500" src="assets/30_1.jpg">
 
 ---
+
 <!--
 S'il y a une mission spatiale qui a profondément marqué l'histoire de l'informatique, c'est le programme Apollo : le programme qui a permis à l'homme de marcher sur la Lune.
 Pour cette mission, on avait beaucoup plus de besoins et de contraintes parce que la vie de 3 astronautes était en jeu pendant plus de 8 jours.
@@ -352,6 +375,7 @@ Pour cette mission, on avait beaucoup plus de besoins et de contraintes parce qu
 </div>
 
 ---
+
 <!--
 Cet ordinateur est une révolution à plusieurs niveaux.
 - Il est extrêmement compact. À son époque, des ordinateurs équivalents prenaient la taille d'une pièce entière.
@@ -384,6 +408,7 @@ Cet ordinateur est une révolution à plusieurs niveaux.
 ![bg 33%](assets/34.gif)
 
 ---
+
 <!--
 
 -->
@@ -471,14 +496,15 @@ Cet ordinateur est une révolution à plusieurs niveaux.
 
 ![bg right:45%](assets/43.gif)
 
-
 ---
+
 <!-- _class: lead -->
 
 **Aucun humain n'a quitté l'orbite basse terrestre depuis 1972.**
 (dernière mission Apollo)
 
 ---
+
 <style>
   footer {
     color: #cdd6f4;
@@ -492,6 +518,7 @@ Cet ordinateur est une révolution à plusieurs niveaux.
 ![bg brightness:0.8](assets/45.jpg)
 
 ---
+
 <style>
   footer {
     color: #cdd6f4;
@@ -507,6 +534,7 @@ Pour envoyer et faire survivre des humains dans l'espace, c'est evidemment pas u
 ![bg brightness:0.8](assets/46.jpg)
 
 ---
+
 <!--
 A contrario, les machines, c'est beaucoup plus simple. Elles n'ont pas besoin d'air, de nourriture, d'eau, de sommeil, etc. Elles peuvent être exposées à des conditions extrêmes sans problème.
 Prenons l'exemple de Voyager 2, lancé en 1977, qui est toujours en service après 47 ans, il est à 24 milliards de km de la Terre sans intervention humaine.
@@ -520,6 +548,7 @@ Prenons l'exemple de Voyager 2, lancé en 1977, qui est toujours en service apr�
 </div>
 
 ---
+
 <!--
 A côté de ca, il faut bien avouer que les humains sont beaucoup plus polyvalents et intelligents que les robots. Certe, on ne fait pas autant de calculs à la seconde, mais on est capable de prendre des décisions, de s'adapter à des nouvelles situations inattendues, etc.
 -->
@@ -527,6 +556,7 @@ A côté de ca, il faut bien avouer que les humains sont beaucoup plus polyvalen
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="100%" viewBox="-0.5 -0.5 256 156" style="max-width:100%;max-height:600px;"><defs/><g><path d="M 7 147 L 7 13.37" fill="none" stroke="#cdd6f4" stroke-miterlimit="10" pointer-events="stroke"/><path d="M 7 8.12 L 10.5 15.12 L 7 13.37 L 3.5 15.12 Z" fill="#cdd6f4" stroke="#cdd6f4" stroke-miterlimit="10" pointer-events="all"/><path d="M 7 147 L 240.63 147" fill="none" stroke="#cdd6f4" stroke-miterlimit="10" pointer-events="stroke"/><path d="M 245.88 147 L 238.88 150.5 L 240.63 147 L 238.88 143.5 Z" fill="#cdd6f4" stroke="#cdd6f4" stroke-miterlimit="10" pointer-events="all"/><path d="M 7 107 L 37 97 L 77 107 L 127 87 L 157 97 L 207 87 L 247 97" fill="none" stroke="#f38ba8" stroke-miterlimit="10" pointer-events="stroke"/><rect x="47" y="87" width="5" height="60" fill="#89b4fa" stroke="none" pointer-events="all"/><rect x="67" y="57" width="5" height="90" fill="#89b4fa" stroke="none" pointer-events="all"/><rect x="117" y="97" width="5" height="50" fill="#89b4fa" stroke="none" pointer-events="all"/><rect x="187" y="27" width="5" height="120" fill="#89b4fa" stroke="none" pointer-events="all"/><rect x="147" y="87" width="5" height="60" fill="#89b4fa" stroke="none" pointer-events="all"/><rect x="107" y="117" width="5" height="30" fill="#89b4fa" stroke="none" pointer-events="all"/></g></svg>
 
 ---
+
 <style>
   footer {
     color: #cdd6f4;
@@ -542,6 +572,7 @@ Donc dans un futur relativement proche, il me parrait assez évident que l'explo
 ![bg](assets/49.webp)
 
 ---
+
 <style>
   footer {
     color: #cdd6f4;
@@ -557,11 +588,13 @@ Par contre pour ce qui est du futur lointain, lorsque l'humanité aura envi de q
 ![bg brightness:0.7](assets/50.webp)
 
 ---
+
 <!-- _class: lead -->
 
 ## Merci pour votre attention !
 
 ---
+
 <!-- _class: lead -->
 
 ### Sources & infos pour aller plus loin

@@ -2,7 +2,7 @@
 	import type { Page } from '$lib/page';
 
 	export let page: Page;
-	export let path: string = "/page";
+	export let path: string = '/page';
 </script>
 
 <div class="p-8 bg-ctp-crust/50 backdrop-blur-sm rounded-md shadow-md shadow-ctp-crust z-10">

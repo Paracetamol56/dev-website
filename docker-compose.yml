@@ -25,7 +25,7 @@ services:
   rembg:
     image: danielgatis/rembg:latest
     restart: unless-stopped
-    command: ["s"]
+    command: ['s']
     ports:
       - 7000:7000
 

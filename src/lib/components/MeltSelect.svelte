@@ -5,7 +5,7 @@
 	import { fade } from 'svelte/transition';
 
 	export let name: string;
-	export let options: string[];
+	export let options: SelectOption<string>[];
 	export let value: Writable<SelectOption<string>> = writable({ value: '', label: '' });
 	export let disabled: boolean = false;
 
@@ -51,7 +51,7 @@
               focus:z-10
               data-[highlighted]:bg-ctp-mauve/25 data-[selected]:bg-ctp-mauve/25
               data-[highlighted]:text-ctp-mauve data-[selected]:text-ctp-mauve"
-						use:melt={$option({ value: item, label: item })}
+						use:melt={$option(item)}
 					>
 						<div
 							class="absolute left-[0.5rem] top-1/2 transform -translate-y-1/2 z-20 text-ctp-mauve {$isSelected(
@@ -63,7 +63,7 @@
 							<Check class="square-4" />
 						</div>
 
-						{item}
+						{item.label}
 					</div>
 				{/each}
 			</div>

@@ -121,7 +121,7 @@
 			<Button
 				on:click={handleExport}
 				data={{
-					"umami-event": "export-data"
+					'umami-event': 'export-data'
 				}}
 			>
 				<span>Export</span>
