@@ -3,6 +3,7 @@ package main
 import (
 	"dev/internal/db"
 	"dev/internal/server"
+	"dev/internal/utils"
 
 	_ "dev/docs"
 
@@ -32,5 +33,6 @@ import (
 func main() {
 	godotenv.Load()
 	db.Init()
+	utils.ScheduleIconRefresh()
 	server.Run()
 }

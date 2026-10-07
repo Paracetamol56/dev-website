@@ -1,8 +1,9 @@
 import { sveltekit } from '@sveltejs/kit/vite';
+import { sveltekitOG } from '@ethercorps/sveltekit-og/plugin';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-	plugins: [sveltekit()],
+	plugins: [sveltekit(), sveltekitOG()],
 	server: {
 		proxy:
 			process.env.NODE_ENV === 'production'
