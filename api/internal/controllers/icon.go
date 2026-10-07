@@ -44,7 +44,7 @@ func (controller *IconController) GetIcons(c *gin.Context) {
 //	@Tags			icons
 //	@Produce		json
 //	@Param			q		query		string	false	"Text to search for"
-//	@Param			source	query		string	false	"Only return icons from this source"	Enums(lucide, simpleicons)
+//	@Param			source	query		[]string	false	"Only return icons from these sources (repeat the parameter for several)"	Enums(lucide, simpleicons)	collectionFormat(multi)
 //	@Param			tag		query		string	false	"Only return icons having this tag (case-insensitive)"
 //	@Param			limit	query		int		false	"Maximum number of results"	default(50)	minimum(1)	maximum(500)
 //	@Param			offset	query		int		false	"Number of results to skip"	default(0)	minimum(0)

@@ -81,11 +81,11 @@ func ReplaceIcons(ctx context.Context, source string, icons []Icon) error {
 }
 
 type IconSearch struct {
-	Query  string `form:"q" binding:"max=100"`
-	Source string `form:"source,omitempty" binding:"omitempty,oneof=lucide simpleicons"`
-	Tag    string `form:"tag,omitempty" binding:"max=100"`
-	Limit  int    `form:"limit,default=50" binding:"min=1,max=500"`
-	Offset int    `form:"offset,default=0" binding:"min=0"`
+	Query   string   `form:"q" binding:"max=100"`
+	Sources []string `form:"source" binding:"dive,oneof=lucide simpleicons"`
+	Tag     string   `form:"tag,omitempty" binding:"max=100"`
+	Limit   int      `form:"limit,default=50" binding:"min=1,max=500"`
+	Offset  int      `form:"offset,default=0" binding:"min=0"`
 }
 
 type IconSearchResult struct {
@@ -100,8 +100,8 @@ func SearchIcons(ctx context.Context, search *IconSearch) (*IconSearchResult, er
 
 	terms := strings.Fields(strings.ToLower(search.Query))
 	conditions := bson.A{}
-	if search.Source != "" {
-		conditions = append(conditions, bson.M{"source": search.Source})
+	if len(search.Sources) > 0 {
+		conditions = append(conditions, bson.M{"source": bson.M{"$in": search.Sources}})
 	}
 	if search.Tag != "" {
 		conditions = append(conditions, bson.M{"tags": bson.M{"$regex": "^" + regexp.QuoteMeta(search.Tag) + "$", "$options": "i"}})
