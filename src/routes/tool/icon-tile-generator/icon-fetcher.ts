@@ -1,6 +1,17 @@
+import type { Icon, IconSource } from './types';
+
+const ICON_BASE_URLS: Record<IconSource, string> = {
+  lucide: 'https://unpkg.com/lucide-static@latest/icons/',
+  simpleicons: 'https://unpkg.com/simple-icons@latest/icons/'
+};
+
+export function iconUrl(icon: Pick<Icon, 'name' | 'source'>) {
+  return `${ICON_BASE_URLS[icon.source]}${encodeURIComponent(icon.name)}.svg`;
+}
+
 async function fetchLucideIcon(iconName: string) {
   try {
-    const response = await fetch(`https://unpkg.com/lucide-static@latest/icons/${iconName}.svg`);
+    const response = await fetch(iconUrl({ name: iconName, source: 'lucide' }));
     if (response.ok) {
       return {
         svg: await response.text(),
@@ -19,7 +30,7 @@ async function fetchLucideIcon(iconName: string) {
 
 async function fetchSimpleIcon(iconName: string) {
   try {
-    const response = await fetch(`https://unpkg.com/simple-icons@latest/icons/${iconName}.svg`);
+    const response = await fetch(iconUrl({ name: iconName, source: 'simpleicons' }));
     if (response.ok) {
       return {
         svg: await response.text(),
@@ -36,8 +47,11 @@ async function fetchSimpleIcon(iconName: string) {
   }
 }
 
-// Function to fetch icon based on source
-export async function fetchIcon(iconName: string) {
+// Fetch an icon from the given source, or try Lucide then Simple Icons when the source is unknown
+export async function fetchIcon(iconName: string, source: IconSource | '' = '') {
+  if (source === 'lucide') return fetchLucideIcon(iconName);
+  if (source === 'simpleicons') return fetchSimpleIcon(iconName);
+
   let iconResult = null;
   iconResult = await fetchLucideIcon(iconName);
   if (iconResult) { return iconResult };
