@@ -28,6 +28,7 @@ func InitRouter() *gin.Engine {
 	contact := new(controllers.ContactController)
 	heatlh := new(controllers.HealthController)
 	hipparcos := new(controllers.HipparcosController)
+	icon := new(controllers.IconController)
 	wordCloud := new(controllers.WordCloudController)
 	microprocessor := new(controllers.MicroprocessorController)
 	user := new(controllers.UserController)
@@ -59,6 +60,11 @@ func InitRouter() *gin.Engine {
 			wordCloudGroup.POST("/:id/word", wordCloud.PostWordCloudWord)
 			wordCloudGroup.POST("", middlewares.JwtAuthMiddleware(), wordCloud.PostWordCloud)
 			wordCloudGroup.DELETE("/:id", middlewares.JwtAuthMiddleware(), wordCloud.DeleteWordCloud)
+		}
+		iconGroup := apiGroup.Group("/icons")
+		{
+			iconGroup.GET("", icon.GetIcons)
+			iconGroup.GET("/search", icon.SearchIcons)
 		}
 		microprocessorGroup := apiGroup.Group("/microprocessors")
 		{

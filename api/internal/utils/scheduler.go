@@ -15,3 +15,14 @@ func ScheduleAccountDeletion() {
 	})
 	s.StartAsync()
 }
+
+// ScheduleIconRefresh seeds the icons collection if it is empty, then refreshes it every Sunday at 00:00 UTC.
+func ScheduleIconRefresh() {
+	go SeedIcons(context.Background())
+
+	s := gocron.NewScheduler(time.UTC)
+	s.Every(1).Week().Sunday().At("00:00").Do(func() {
+		RefreshIcons(context.Background())
+	})
+	s.StartAsync()
+}
