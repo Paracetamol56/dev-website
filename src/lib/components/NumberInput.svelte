@@ -1,3 +1,7 @@
+<script lang="ts" context="module">
+	let count = 0;
+</script>
+
 <script lang="ts">
 	import { writable, type Writable } from 'svelte/store';
 
@@ -7,13 +11,15 @@
 	export let max: number = 100;
 	export let step: number = 1;
 	export let disabled: boolean = false;
+	const id = `number-input-${++count}`;
 </script>
 
 <div class="flex flex-col gap-1">
 	{#if label}
-		<label class="block text-ctp-text font-semibold text-sm">{label}</label>
+		<label for={id} class="block text-ctp-text font-semibold text-sm">{label}</label>
 	{/if}
 	<input
+		{id}
 		type="number"
 		{min}
 		{max}

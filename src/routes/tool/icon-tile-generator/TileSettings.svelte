@@ -18,10 +18,6 @@
 	export let strokeWidth: Writable<number>;
 	export let iconSource: IconSource | '';
 
-	const shapeOptions = SHAPES.map((name) => ({
-		name,
-		label: name.charAt(0).toUpperCase() + name.slice(1)
-	}));
 	const formatOptions = FORMATS.map((value) => ({ value, label: value.toUpperCase() }));
 
 	// MeltRadioGroup works on plain strings
@@ -49,7 +45,7 @@
 		<fieldset class="flex flex-col gap-1">
 			<legend class="text-sm font-semibold text-ctp-text mb-1">Shape</legend>
 			<div class="flex h-8 items-center">
-				<MeltRadioGroup options={shapeOptions} value={shapeValue} />
+				<MeltRadioGroup name="shape" options={[...SHAPES]} value={shapeValue} />
 			</div>
 		</fieldset>
 		<NumberInput label="Resolution (px)" value={resolution} min={16} max={4096} step={16} />

@@ -1,3 +1,7 @@
+<script lang="ts" context="module">
+	let count = 0;
+</script>
+
 <script lang="ts">
 	import { writable, type Writable } from 'svelte/store';
 
@@ -6,14 +10,16 @@
 	export let placeholder: string = '';
 	export let disabled: boolean = false;
 	let className = '';
+	const id = `text-input-${++count}`;
 	export { className as class };
 </script>
 
 <div class="flex flex-col gap-1">
 	{#if label}
-		<label class="block text-ctp-text font-semibold text-sm">{label}</label>
+		<label for={id} class="block text-ctp-text font-semibold text-sm">{label}</label>
 	{/if}
 	<input
+		{id}
 		type="text"
 		bind:value={$value}
 		{placeholder}
