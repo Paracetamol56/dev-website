@@ -14,5 +14,13 @@
 		"tags": ["icon"],
 		"listed": true,
 		"requiresAuth": false
+	},
+	{
+		"title": "Topographic map",
+		"slug": "topographic-map",
+		"description": "Create topographic maps with contour lines.",
+		"tags": ["map", "geography"],
+		"listed": false,
+		"requiresAuth": false
 	}
 ]
