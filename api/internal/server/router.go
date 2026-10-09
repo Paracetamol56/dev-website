@@ -18,7 +18,7 @@ func InitRouter() *gin.Engine {
 	r.Use(gin.Recovery())
 	r.Use(cors.New(cors.Config{
 		AllowOrigins: []string{"http://localhost:8000", "http://localhost:5173", "https://dev.matheo-galuba.com", "https://dev-uat.matheo-galuba.com"},
-		AllowMethods: []string{"GET", "POST", "PATCH", "DELETE", "OPTIONS"},
+		AllowMethods: []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders: []string{"Origin", "Content-Type", "Authorization"},
 	}))
 	r.Use(middlewares.CORPMiddleware())
@@ -71,13 +71,17 @@ func InitRouter() *gin.Engine {
 		{
 			microprocessorGroup.GET("", microprocessor.GetMicroprocessor)
 			microprocessorGroup.GET("/:id", microprocessor.GetMicroprocessorById)
+		}
 		ormiGroup := apiGroup.Group("/ormi")
 		{
 			ormiGroup.Use(middlewares.JwtAuthMiddleware())
 			ormiGroup.GET("", ormi.GetTodos)
+			ormiGroup.GET("/stats", ormi.GetTodoStats)
+			ormiGroup.PUT("/order", ormi.PutTodoOrder)
 			ormiGroup.GET("/:id", ormi.GetTodo)
 			ormiGroup.POST("", ormi.PostTodo)
 			ormiGroup.PATCH("/:id", ormi.PatchTodo)
+			ormiGroup.DELETE("/:id", ormi.DeleteTodo)
 		}
 		userGroup := apiGroup.Group("/users")
 		{
