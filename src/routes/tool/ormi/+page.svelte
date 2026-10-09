@@ -1,12 +1,13 @@
 <script lang="ts">
-	import { writable, type Writable } from "svelte/store";
-	import type { PageData } from "./$types";
-	import Calendar from "./Calendar.svelte";
-	import TodoList from "./TodoList.svelte";
+	import { invalidateAll } from '$app/navigation';
+	import { user } from '$lib/store';
+	import type { PageData } from './$types';
+	import Calendar from './Calendar.svelte';
+	import TodoList from './TodoList.svelte';
 
 	export let data: PageData;
-	const focusedTodoId: Writable<string | null> = writable(null)
-	$: focusedTodo = $focusedTodoId === null ? null : data.todos!.find(todo => todo.id === $focusedTodoId)
+
+	$: if ($user.id && !data.loggedIn) invalidateAll();
 </script>
 
 <svelte:head>
@@ -25,15 +26,19 @@
 
 <section class="container mx-auto mb-16">
 	<p class="text-justify max-w-xl mx-auto mb-16">
-		Okay so as a developer, I have to make a todo app at some point...<br>
-		<strong>Ορμή</strong> means "momentum" in greek, this is because when you dive into a project,
-		you have a sudden burst of energy and motivation comming from nowhere, Ormi 
-		aims to help you keep that momentum going. The github like calendar below and
-		the streak counter are here to motivate you to keep working on your project.
+		Okay so as a developer, I have to make a todo app at some point...<br />
+		<strong>Ορμή</strong> means "momentum" in greek, this is because when you dive into a project, you
+		have a sudden burst of energy and motivation comming from nowhere, Ormi aims to help you keep that
+		momentum going. The github like calendar below and the streak counter are here to motivate you to
+		keep working on your project.
 	</p>
 </section>
 
 <section class="container mx-auto">
-	<TodoList todos={data.todos ?? []} {focusedTodoId} />
-	<!--<Calendar />-->
+	{#if data.loggedIn}
+		<TodoList todos={data.todos} />
+		<Calendar stats={data.stats} />
+	{:else}
+		<p class="text-center font-semibold">Log in to start using Ormi.</p>
+	{/if}
 </section>

@@ -1,34 +1,26 @@
 [
-  {
-    "title": "PDF printing marks",
-    "slug": "pdf-printing-marks",
-    "description": "Easily add printing marks to your PDF files for professional printing.",
-    "tags": [
-      "pdf",
-      "printing"
-    ],
-    "listed": true,
-    "requiresAuth": false
-  },
-  {
-    "title": "Icon tile generator",
-    "slug": "icon-tile-generator",
-    "description": "Generate icon tiles for your projects with ease.",
-    "tags": [
-      "icon"
-    ],
-    "listed": true,
-    "requiresAuth": false
-  },
-  {
-    "title": "Ormi",
-    "slug": "ormi",
-    "description": "Online polling tool to create word cloudsToDo app to encourage productivity take advantage of your momentum",
-    "tags": [
-      "polling",
-      "productivity"
-    ],
-    "listed": true,
-    "requiresAuth": true
-  }
+	{
+		"title": "PDF printing marks",
+		"slug": "pdf-printing-marks",
+		"description": "Easily add printing marks to your PDF files for professional printing.",
+		"tags": ["pdf", "printing"],
+		"listed": true,
+		"requiresAuth": false
+	},
+	{
+		"title": "Icon tile generator",
+		"slug": "icon-tile-generator",
+		"description": "Generate icon tiles for your projects with ease.",
+		"tags": ["icon"],
+		"listed": true,
+		"requiresAuth": false
+	},
+	{
+		"title": "Ormi",
+		"slug": "ormi",
+		"description": "Todo app to keep your momentum going on side projects.",
+		"tags": ["todo", "productivity"],
+		"listed": true,
+		"requiresAuth": true
+	}
 ]

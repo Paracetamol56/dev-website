@@ -1,8 +1,10 @@
 <script lang="ts">
 	import type { Page } from '$lib/page';
+	import { Lock } from 'lucide-svelte';
 
 	export let page: Page;
 	export let path: string = '/page';
+	export let requiresAuth: boolean = false;
 </script>
 
 <div class="p-8 bg-ctp-crust/50 backdrop-blur-sm rounded-md shadow-md shadow-ctp-crust z-10">
@@ -14,6 +16,12 @@
 		{/each}
 		{#if page.tags.length > 4}
 			<span class="text-sm font-semibold text-ctp-lavender">...</span>
+		{/if}
+		{#if requiresAuth}
+			<span class="ml-auto flex items-center gap-1 text-sm font-semibold text-ctp-subtext0">
+				<Lock size="14" />
+				Login required
+			</span>
 		{/if}
 	</div>
 	<a href="{path}/{page.slug}">

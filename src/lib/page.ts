@@ -8,7 +8,7 @@ interface Page {
 }
 
 interface Tool extends Page {
-	needsAuth: boolean;
+	requiresAuth: boolean;
 }
 
 export type { Page, Tool };
