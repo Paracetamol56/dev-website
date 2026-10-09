@@ -428,7 +428,7 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "List the todos of the authenticated user, in their custom order",
+                "description": "List a page of the todos of the authenticated user, filtered by state, labels and date of last state change, along with the total number of matches",
                 "produces": [
                     "application/json"
                 ],
@@ -438,15 +438,84 @@ const docTemplate = `{
                 "summary": "List todos",
                 "parameters": [
                     {
+                        "type": "array",
+                        "items": {
+                            "enum": [
+                                "TODO",
+                                "IN_PROGRESS",
+                                "STANDBY",
+                                "DONE",
+                                "CANCELLED"
+                            ],
+                            "type": "string"
+                        },
+                        "collectionFormat": "multi",
+                        "description": "Only return todos in these states (repeat the parameter for several)",
+                        "name": "state",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "multi",
+                        "description": "Only return todos having all these labels (repeat the parameter for several)",
+                        "name": "label",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Only return todos whose last state change is at or after this date",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Only return todos whose last state change is before this date",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
                         "enum": [
-                            "TODO",
-                            "IN_PROGRESS",
-                            "DONE",
-                            "CANCELLED"
+                            "position",
+                            "due",
+                            "created",
+                            "updated"
                         ],
                         "type": "string",
-                        "description": "Only return todos in this state",
-                        "name": "state",
+                        "default": "position",
+                        "description": "Custom order, due date (todos without one last), creation date or last state change",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
+                        "type": "string",
+                        "description": "Sort direction, defaults to desc for created and updated, asc otherwise",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "maximum": 200,
+                        "minimum": 1,
+                        "type": "integer",
+                        "default": 50,
+                        "description": "Maximum number of results",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 0,
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Number of results to skip",
+                        "name": "offset",
                         "in": "query"
                     }
                 ],
@@ -454,10 +523,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Todo"
-                            }
+                            "$ref": "#/definitions/models.TodoPage"
                         }
                     },
                     "400": {
@@ -522,6 +588,69 @@ const docTemplate = `{
                         "description": "Created",
                         "schema": {
                             "$ref": "#/definitions/models.Todo"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/ormi/labels": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "List the labels already used by the authenticated user, most used first, optionally restricted to those containing a text (case-insensitive)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ormi"
+                ],
+                "summary": "List used labels",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Text the labels must contain",
+                        "name": "q",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
                         }
                     },
                     "400": {
@@ -621,15 +750,83 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Count the todos completed per day over the last year, days without completion are omitted",
+                "description": "Todos completed per day over the last year (days without completion are omitted), completion streaks and counts of open todos",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "ormi"
                 ],
-                "summary": "Get completion stats",
+                "summary": "Get todo stats",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "default": "UTC",
+                        "description": "IANA timezone used to split days",
+                        "name": "tz",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TodoStats"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/ormi/stats/{year}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Count the todos completed per day of a calendar year, days without completion are omitted",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ormi"
+                ],
+                "summary": "Get completions of a year",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Calendar year",
+                        "name": "year",
+                        "in": "path",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "default": "UTC",
@@ -1152,6 +1349,7 @@ const docTemplate = `{
                     "enum": [
                         "TODO",
                         "IN_PROGRESS",
+                        "STANDBY",
                         "DONE",
                         "CANCELLED"
                     ]
@@ -1467,6 +1665,7 @@ const docTemplate = `{
                     "enum": [
                         "TODO",
                         "IN_PROGRESS",
+                        "STANDBY",
                         "DONE",
                         "CANCELLED"
                     ]
@@ -1488,6 +1687,54 @@ const docTemplate = `{
                 "date": {
                     "type": "string",
                     "example": "2026-10-09"
+                }
+            }
+        },
+        "models.TodoPage": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Todo"
+                    }
+                },
+                "total": {
+                    "type": "integer",
+                    "example": 42
+                }
+            }
+        },
+        "models.TodoStats": {
+            "type": "object",
+            "properties": {
+                "currentStreak": {
+                    "type": "integer"
+                },
+                "days": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.TodoDayCount"
+                    }
+                },
+                "firstYear": {
+                    "type": "integer",
+                    "example": 2024
+                },
+                "inProgress": {
+                    "type": "integer"
+                },
+                "longestStreak": {
+                    "type": "integer"
+                },
+                "overdue": {
+                    "type": "integer"
+                },
+                "standby": {
+                    "type": "integer"
+                },
+                "todo": {
+                    "type": "integer"
                 }
             }
         },

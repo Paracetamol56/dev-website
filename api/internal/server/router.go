@@ -77,6 +77,8 @@ func InitRouter() *gin.Engine {
 			ormiGroup.Use(middlewares.JwtAuthMiddleware())
 			ormiGroup.GET("", ormi.GetTodos)
 			ormiGroup.GET("/stats", ormi.GetTodoStats)
+			ormiGroup.GET("/stats/:year", ormi.GetTodoYearStats)
+			ormiGroup.GET("/labels", ormi.GetTodoLabels)
 			ormiGroup.PUT("/order", ormi.PutTodoOrder)
 			ormiGroup.GET("/:id", ormi.GetTodo)
 			ormiGroup.POST("", ormi.PostTodo)

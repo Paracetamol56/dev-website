@@ -60,6 +60,7 @@ definitions:
         enum:
         - TODO
         - IN_PROGRESS
+        - STANDBY
         - DONE
         - CANCELLED
         type: string
@@ -276,6 +277,7 @@ definitions:
         enum:
         - TODO
         - IN_PROGRESS
+        - STANDBY
         - DONE
         - CANCELLED
         type: string
@@ -291,6 +293,38 @@ definitions:
       date:
         example: "2026-10-09"
         type: string
+    type: object
+  models.TodoPage:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/models.Todo'
+        type: array
+      total:
+        example: 42
+        type: integer
+    type: object
+  models.TodoStats:
+    properties:
+      currentStreak:
+        type: integer
+      days:
+        items:
+          $ref: '#/definitions/models.TodoDayCount'
+        type: array
+      firstYear:
+        example: 2024
+        type: integer
+      inProgress:
+        type: integer
+      longestStreak:
+        type: integer
+      overdue:
+        type: integer
+      standby:
+        type: integer
+      todo:
+        type: integer
     type: object
   models.User:
     properties:
@@ -597,26 +631,81 @@ paths:
       - icons
   /ormi:
     get:
-      description: List the todos of the authenticated user, in their custom order
+      description: List a page of the todos of the authenticated user, filtered by
+        state, labels and date of last state change, along with the total number of
+        matches
       parameters:
-      - description: Only return todos in this state
-        enum:
-        - TODO
-        - IN_PROGRESS
-        - DONE
-        - CANCELLED
+      - collectionFormat: multi
+        description: Only return todos in these states (repeat the parameter for several)
         in: query
+        items:
+          enum:
+          - TODO
+          - IN_PROGRESS
+          - STANDBY
+          - DONE
+          - CANCELLED
+          type: string
         name: state
+        type: array
+      - collectionFormat: multi
+        description: Only return todos having all these labels (repeat the parameter
+          for several)
+        in: query
+        items:
+          type: string
+        name: label
+        type: array
+      - description: Only return todos whose last state change is at or after this
+          date
+        format: date-time
+        in: query
+        name: from
         type: string
+      - description: Only return todos whose last state change is before this date
+        format: date-time
+        in: query
+        name: to
+        type: string
+      - default: position
+        description: Custom order, due date (todos without one last), creation date
+          or last state change
+        enum:
+        - position
+        - due
+        - created
+        - updated
+        in: query
+        name: sort
+        type: string
+      - description: Sort direction, defaults to desc for created and updated, asc
+          otherwise
+        enum:
+        - asc
+        - desc
+        in: query
+        name: order
+        type: string
+      - default: 50
+        description: Maximum number of results
+        in: query
+        maximum: 200
+        minimum: 1
+        name: limit
+        type: integer
+      - default: 0
+        description: Number of results to skip
+        in: query
+        minimum: 0
+        name: offset
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/models.Todo'
-            type: array
+            $ref: '#/definitions/models.TodoPage'
         "400":
           description: Bad Request
           schema:
@@ -819,6 +908,47 @@ paths:
       summary: Update a todo
       tags:
       - ormi
+  /ormi/labels:
+    get:
+      description: List the labels already used by the authenticated user, most used
+        first, optionally restricted to those containing a text (case-insensitive)
+      parameters:
+      - description: Text the labels must contain
+        in: query
+        name: q
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: List used labels
+      tags:
+      - ormi
   /ormi/order:
     put:
       consumes:
@@ -859,9 +989,54 @@ paths:
       - ormi
   /ormi/stats:
     get:
-      description: Count the todos completed per day over the last year, days without
+      description: Todos completed per day over the last year (days without completion
+        are omitted), completion streaks and counts of open todos
+      parameters:
+      - default: UTC
+        description: IANA timezone used to split days
+        in: query
+        name: tz
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TodoStats'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get todo stats
+      tags:
+      - ormi
+  /ormi/stats/{year}:
+    get:
+      description: Count the todos completed per day of a calendar year, days without
         completion are omitted
       parameters:
+      - description: Calendar year
+        in: path
+        name: year
+        required: true
+        type: integer
       - default: UTC
         description: IANA timezone used to split days
         in: query
@@ -896,7 +1071,7 @@ paths:
             type: object
       security:
       - Bearer: []
-      summary: Get completion stats
+      summary: Get completions of a year
       tags:
       - ormi
   /users/{id}:

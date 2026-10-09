@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"time"
 
 	"dev/internal/models"
@@ -15,32 +16,35 @@ import (
 type OrmiController struct {
 }
 
-type GetTodoQuery struct {
-	State string `form:"state" binding:"omitempty,oneof=TODO IN_PROGRESS DONE CANCELLED"`
-}
-
 // GetTodos godoc
 //
 //	@Summary		List todos
-//	@Description	List the todos of the authenticated user, in their custom order
+//	@Description	List a page of the todos of the authenticated user, filtered by state, labels and date of last state change, along with the total number of matches
 //	@Tags			ormi
 //	@Produce		json
-//	@Param			state	query		string	false	"Only return todos in this state"	Enums(TODO, IN_PROGRESS, DONE, CANCELLED)
-//	@Success		200		{array}		models.Todo
+//	@Param			state	query		[]string	false	"Only return todos in these states (repeat the parameter for several)"	Enums(TODO, IN_PROGRESS, STANDBY, DONE, CANCELLED)	collectionFormat(multi)
+//	@Param			label	query		[]string	false	"Only return todos having all these labels (repeat the parameter for several)"	collectionFormat(multi)
+//	@Param			from	query		string		false	"Only return todos whose last state change is at or after this date"	Format(date-time)
+//	@Param			to		query		string		false	"Only return todos whose last state change is before this date"			Format(date-time)
+//	@Param			sort	query		string		false	"Custom order, due date (todos without one last), creation date or last state change"	Enums(position, due, created, updated)	default(position)
+//	@Param			order	query		string		false	"Sort direction, defaults to desc for created and updated, asc otherwise"	Enums(asc, desc)
+//	@Param			limit	query		int			false	"Maximum number of results"	default(50)	minimum(1)	maximum(200)
+//	@Param			offset	query		int			false	"Number of results to skip"	default(0)	minimum(0)
+//	@Success		200		{object}	models.TodoPage
 //	@Failure		400		{object}	map[string]string
 //	@Failure		401		{object}	map[string]string
 //	@Failure		500		{object}	map[string]string
 //	@Security		Bearer
 //	@Router			/ormi [get]
 func (controller *OrmiController) GetTodos(c *gin.Context) {
-	var query GetTodoQuery
-	if err := c.ShouldBindQuery(&query); err != nil {
+	var filter models.TodoFilter
+	if err := c.ShouldBindQuery(&filter); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	userId := c.MustGet("x-user-id").(primitive.ObjectID)
 
-	todos, err := models.GetTodosByUserId(c, userId, query.State)
+	todos, err := models.GetTodosByUserId(c, userId, &filter)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -183,7 +187,7 @@ type PatchTodoBody struct {
 	Labels      *[]string    `json:"labels" binding:"omitempty"`
 	GitURL      *string      `json:"gitURL" binding:"omitempty,url"`
 	GitIssue    *uint32      `json:"gitIssue" binding:"omitempty,numeric,min=1"`
-	State       *string      `json:"state" binding:"omitempty,oneof=TODO IN_PROGRESS DONE CANCELLED"`
+	State       *string      `json:"state" binding:"omitempty,oneof=TODO IN_PROGRESS STANDBY DONE CANCELLED"`
 }
 
 // PatchTodo godoc
@@ -350,12 +354,12 @@ type TodoStatsQuery struct {
 
 // GetTodoStats godoc
 //
-//	@Summary		Get completion stats
-//	@Description	Count the todos completed per day over the last year, days without completion are omitted
+//	@Summary		Get todo stats
+//	@Description	Todos completed per day over the last year (days without completion are omitted), completion streaks and counts of open todos
 //	@Tags			ormi
 //	@Produce		json
 //	@Param			tz	query		string	false	"IANA timezone used to split days"	default(UTC)
-//	@Success		200	{array}		models.TodoDayCount
+//	@Success		200	{object}	models.TodoStats
 //	@Failure		400	{object}	map[string]string
 //	@Failure		401	{object}	map[string]string
 //	@Failure		500	{object}	map[string]string
@@ -369,16 +373,95 @@ func (controller *OrmiController) GetTodoStats(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	if _, err := time.LoadLocation(query.Timezone); err != nil {
+	location, err := time.LoadLocation(query.Timezone)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid timezone"})
 		return
 	}
 
-	days, err := models.GetCompletedTodosPerDay(c, userId, time.Now().AddDate(-1, 0, -7), query.Timezone)
+	stats, err := models.GetTodoStats(c, userId, location)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, stats)
+}
+
+// GetTodoYearStats godoc
+//
+//	@Summary		Get completions of a year
+//	@Description	Count the todos completed per day of a calendar year, days without completion are omitted
+//	@Tags			ormi
+//	@Produce		json
+//	@Param			year	path		int		true	"Calendar year"
+//	@Param			tz		query		string	false	"IANA timezone used to split days"	default(UTC)
+//	@Success		200		{array}		models.TodoDayCount
+//	@Failure		400		{object}	map[string]string
+//	@Failure		401		{object}	map[string]string
+//	@Failure		500		{object}	map[string]string
+//	@Security		Bearer
+//	@Router			/ormi/stats/{year} [get]
+func (controller *OrmiController) GetTodoYearStats(c *gin.Context) {
+	userId := c.MustGet("x-user-id").(primitive.ObjectID)
+
+	year, err := strconv.Atoi(c.Param("year"))
+	if err != nil || year < 1970 || year > 9999 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid year"})
+		return
+	}
+	var query TodoStatsQuery
+	if err := c.ShouldBindQuery(&query); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	location, err := time.LoadLocation(query.Timezone)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid timezone"})
+		return
+	}
+
+	from := time.Date(year, time.January, 1, 0, 0, 0, 0, location)
+	days, err := models.GetCompletedTodosPerDay(c, userId, from, from.AddDate(1, 0, 0), query.Timezone)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	c.JSON(http.StatusOK, days)
+}
+
+type TodoLabelsQuery struct {
+	Search string `form:"q" binding:"omitempty,max=50"`
+}
+
+// GetTodoLabels godoc
+//
+//	@Summary		List used labels
+//	@Description	List the labels already used by the authenticated user, most used first, optionally restricted to those containing a text (case-insensitive)
+//	@Tags			ormi
+//	@Produce		json
+//	@Param			q	query		string	false	"Text the labels must contain"
+//	@Success		200	{array}		string
+//	@Failure		400	{object}	map[string]string
+//	@Failure		401	{object}	map[string]string
+//	@Failure		500	{object}	map[string]string
+//	@Security		Bearer
+//	@Router			/ormi/labels [get]
+func (controller *OrmiController) GetTodoLabels(c *gin.Context) {
+	userId := c.MustGet("x-user-id").(primitive.ObjectID)
+
+	var query TodoLabelsQuery
+	if err := c.ShouldBindQuery(&query); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	labels, err := models.GetTodoLabels(c, userId, query.Search, 10)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, labels)
 }
