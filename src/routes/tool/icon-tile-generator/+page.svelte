@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Button from '$lib/components/Button.svelte';
+	import { downloadBlob } from '$lib/download';
 	import IconSearch from './IconSearch.svelte';
 	import TileSettings from './TileSettings.svelte';
 	import { writable, type Writable } from 'svelte/store';
@@ -99,17 +100,6 @@
 	let previewSvg: string | null = null;
 	let previewError: string | null = null;
 	let isLoading = false;
-
-	function triggerDownload(blob: Blob, filename: string) {
-		const url = URL.createObjectURL(blob);
-		const a = document.createElement('a');
-		a.href = url;
-		a.download = filename;
-		document.body.appendChild(a);
-		a.click();
-		document.body.removeChild(a);
-		URL.revokeObjectURL(url);
-	}
 
 	async function generateAvatarSvg(iconName: string, source: IconSource | '', options) {
 		// Fetch the actual icon SVG
@@ -250,7 +240,7 @@
 
 		if (fmt === 'svg') {
 			const blob = new Blob([previewSvg], { type: 'image/svg+xml' });
-			triggerDownload(blob, `${$iconName}.svg`);
+			downloadBlob(blob, `${$iconName}.svg`);
 			return;
 		}
 
@@ -273,7 +263,7 @@
 			canvas.toBlob(
 				(blob) => {
 					if (blob) {
-						triggerDownload(blob, `${$iconName}.${fmt}`);
+						downloadBlob(blob, `${$iconName}.${fmt}`);
 					}
 				},
 				mime,
