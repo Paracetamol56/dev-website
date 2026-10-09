@@ -2,13 +2,12 @@ package controllers
 
 import (
 	"dev/internal/models"
+	"dev/internal/utils"
 	"net/http"
 	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sendgrid/sendgrid-go"
-	"github.com/sendgrid/sendgrid-go/helpers/mail"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -39,19 +38,13 @@ func (controller *ContactController) PostContact(c *gin.Context) {
 		return
 	}
 
-	from := mail.NewEmail(contact.Name, "matheo.galu56@gmail.com")
-	subject := "New message from dev.matheo-galuba.com"
-	to := mail.NewEmail("Admin", os.Getenv("ADMIN_EMAIL"))
-	plainTextContent := "User: " + contact.UserId.String() + "\nName: " + contact.Name + "\nEmail: " + contact.Email + "\nMessage: " + contact.Message
-
-	mail := mail.NewSingleEmail(from, subject, to, plainTextContent, "")
-	client := sendgrid.NewSendClient(os.Getenv("SENDGRID_API_KEY"))
-	response, err := client.Send(mail)
+	mailId, err := utils.SendEmail(c, utils.Email{
+		To:          utils.EmailAddress{Name: "Admin", Email: os.Getenv("ADMIN_EMAIL")},
+		ReplyTo:     &utils.EmailAddress{Name: contact.Name, Email: contact.Email},
+		Subject:     "New message from dev.matheo-galuba.com",
+		TextContent: "User: " + contact.UserId.String() + "\nName: " + contact.Name + "\nEmail: " + contact.Email + "\nMessage: " + contact.Message,
+	})
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	if response.StatusCode != http.StatusAccepted {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error while sending email"})
 		return
 	}
@@ -61,7 +54,7 @@ func (controller *ContactController) PostContact(c *gin.Context) {
 		Name:      contact.Name,
 		Email:     contact.Email,
 		Message:   contact.Message,
-		MailId:    response.Headers["X-Message-Id"][0],
+		MailId:    mailId,
 		CreatedAt: primitive.NewDateTimeFromTime(time.Now()),
 	}); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

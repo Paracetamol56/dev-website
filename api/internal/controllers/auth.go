@@ -9,8 +9,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sendgrid/sendgrid-go"
-	"github.com/sendgrid/sendgrid-go/helpers/mail"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -19,10 +17,10 @@ type AuthController struct{}
 // SendVerificationEmail godoc
 // Sends a verification email to the user with the provided url
 func SendVerificationEmail(c *gin.Context, user *models.User, url string) error {
-	from := mail.NewEmail("Matheo Galuba", os.Getenv("ADMIN_EMAIL"))
-	subject := "Verify your email address"
-	to := mail.NewEmail(user.Name, user.Email)
-	htmlContent := `
+	_, err := utils.SendEmail(c, utils.Email{
+		To:      utils.EmailAddress{Name: user.Name, Email: user.Email},
+		Subject: "Verify your email address",
+		HTMLContent: `
 		<h1>Verify your email address</h1>
 		<p>
 			👋 Hi,<br>
@@ -46,40 +44,9 @@ func SendVerificationEmail(c *gin.Context, user *models.User, url string) error 
 		</p>
 
 		<p><small>If you didn't sign up to my website, please ignore this email.</small></p>
-	`
-
-	mail := mail.NewSingleEmail(from, subject, to, "", htmlContent)
-	client := sendgrid.NewSendClient(os.Getenv("SENDGRID_API_KEY"))
-	response, err := client.Send(mail)
-	if err != nil || response.StatusCode != http.StatusAccepted {
-		return err
-	}
-	return nil
-}
-
-// AddContact godoc
-// Adds the user to the SendGrid contact list
-func AddContact(c *gin.Context, user *models.User) error {
-	host := "https://api.sendgrid.com"
-	request := sendgrid.GetRequest(os.Getenv("SENDGRID_API_KEY"), "/v3/marketing/contacts", host)
-	request.Method = "PUT"
-	request.Body = []byte(`{
-		"list_ids": [
-			"` + os.Getenv("SENDGRID_CONTACT_LIST_ID") + `"
-		],
-		"contacts": [
-			{
-				"email": "` + user.Email + `"
-			}
-		]
-	}`)
-
-	response, err := sendgrid.API(request)
-	if err != nil || response.StatusCode != http.StatusAccepted {
-		return err
-	}
-
-	return nil
+	`,
+	})
+	return err
 }
 
 // SignTokenPair godoc
@@ -191,7 +158,9 @@ func (controller *AuthController) PostVerify(c *gin.Context) {
 		return
 	}
 
-	AddContact(c, user)
+	if err := utils.AddEmailContact(c, user.Email); err != nil {
+		log.Printf("Failed to add %s to the contact list: %v", user.Email, err)
+	}
 
 	refreshtoken, accesstoken, err := SignTokenPair(c, userId.Hex())
 	if err != nil {

@@ -2,12 +2,10 @@ package controllers
 
 import (
 	"dev/internal/models"
+	"dev/internal/utils"
 	"net/http"
-	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sendgrid/sendgrid-go"
-	"github.com/sendgrid/sendgrid-go/helpers/mail"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -16,10 +14,10 @@ type UserController struct{}
 // SendDeletionEmail godoc
 // Sends a notification email to the user when their account is deleted
 func SendDeletionEmail(c *gin.Context, user *models.User) error {
-	from := mail.NewEmail("Matheo Galuba", os.Getenv("ADMIN_EMAIL"))
-	subject := "Your account has been deleted"
-	to := mail.NewEmail(user.Name, user.Email)
-	htmlContent := `
+	_, err := utils.SendEmail(c, utils.Email{
+		To:      utils.EmailAddress{Name: user.Name, Email: user.Email},
+		Subject: "Your account has been deleted",
+		HTMLContent: `
 		<h1>Your account has been deleted</h1>
 		<p>
 			Hi,<br>
@@ -40,15 +38,9 @@ func SendDeletionEmail(c *gin.Context, user *models.User) error {
 			This email is voluntarily ugly because it's lightweight, so the environment impact is reduced..<br>
 			By the way, this email is single-use, so you can delete it to avoid keeping it on someone's else hard drive 😎.
 		</p>
-	`
-
-	mail := mail.NewSingleEmail(from, subject, to, "", htmlContent)
-	client := sendgrid.NewSendClient(os.Getenv("SENDGRID_API_KEY"))
-	response, err := client.Send(mail)
-	if err != nil || response.StatusCode != http.StatusAccepted {
-		return err
-	}
-	return nil
+	`,
+	})
+	return err
 }
 
 // GetUsers godoc
