@@ -8,43 +8,38 @@
 	import QRCode from 'qrcode';
 	import type { PageData } from './$types';
 	import { addToast } from '../../../../+layout.svelte';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
+	import { user } from '$lib/store';
+	import { followSession } from '../../socket';
 	import type { WordCloudWord } from '../../utils';
 	import api from '$lib/api';
-	import { invalidateAll } from '$app/navigation';
 
 	export let data: PageData;
 
+	function addWord(word: WordCloudWord) {
+		data.session.words = [...data.session.words, word];
+		const found = data.distribution.find((entry) => entry.text === word.text);
+		if (found) found.occurence++;
+		else data.distribution.push({ text: word.text, occurence: 1 });
+		data.distribution = data.distribution.sort((a, b) => b.occurence - a.occurence);
+	}
+
+	let stopFollowing = () => {};
 	onMount(() => {
-		if (data.session.closedAt !== null) {
-			// Connect to a WebSocket to fetch new word submissions in real time
-			const ws = new WebSocket(`ws://${window.location.host}/api/word-cloud/${data.session.id}/ws`);
-
-			ws.onopen = () => {
-				console.log('Connected to WebSocket');
-			};
-
-			ws.onmessage = (event) => {
-				const message = JSON.parse(event.data) as WordCloudWord;
-				console.log(message);
-				// Update the session data with the new word
-				data.session.words = [...data.session.words, message];
-				// Udpate the distribution of words
-				const found = (data.distribution as { text: string; occurence: number }[]).find(
-					(word) => word.text === message.text
-				);
-				if (found !== undefined) {
-					found.occurence++;
-				} else {
-					data.distribution.push({ text: message.text, occurence: 1 });
+		if (!data.session.open) return;
+		stopFollowing = followSession(
+			data.session.id,
+			(event) => {
+				if (event.type === 'word') addWord(event.word);
+				else if (event.type === 'session' && !event.open) {
+					data.session.open = false;
+					data.session.closedAt ??= new Date();
 				}
-			};
-
-			ws.onclose = () => {
-				console.log('Disconnected from WebSocket');
-			};
-		}
+			},
+			$user.accessToken
+		);
 	});
+	onDestroy(() => stopFollowing());
 
 	let qrWidthAvailable: number;
 	let canvas: HTMLCanvasElement;
@@ -85,6 +80,7 @@
 							color: 'bg-ctp-green'
 						}
 					});
+					data.session.open = false;
 					data.session.closedAt = new Date();
 				}
 			})
@@ -127,10 +123,10 @@
 	{#if data.session}
 		<WordCloud data={data.distribution} />
 		<div class="mb-4 p-4 w-full bg-ctp-mantle rounded-md">
-			<p><strong>Submitions:</strong> {data.session.words.length}</p>
+			<p><strong>Submissions:</strong> {data.session.words.length}</p>
 			<p><strong>Unique words:</strong> {data.distribution.length}</p>
 			<p><strong>Created at:</strong> {humanReadableDate(new Date(data.session.createdAt))}</p>
-			{#if data.session.closedAt !== undefined}
+			{#if !data.session.open}
 				<p>
 					<strong>Closed at:</strong>
 					{humanReadableDate(data.session.closedAt ? new Date(data.session.closedAt) : null)}

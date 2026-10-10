@@ -87,7 +87,7 @@
 </script>
 
 <svelte:head>
-	<title>World cloud - Mathéo Galuba</title>
+	<title>Word cloud - Mathéo Galuba</title>
 </svelte:head>
 
 <section class="container mx-auto mb-32">

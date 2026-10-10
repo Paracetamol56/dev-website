@@ -13,9 +13,7 @@
 		api
 			.callWithAuth('GET', `/word-cloud?user=${$user.id}&status=closed`)
 			.then((res) => {
-				console.log(res);
-				archived = res.data as ManagePageData[] | [];
-				console.log(archived);
+				archived = res.data as ManagePageData[];
 			})
 			.catch((err) => {
 				console.error(err);
@@ -56,7 +54,7 @@
 						</div>
 						<p class="text-ctp-subtext0 text-sm">Open</p>
 						<p class="ml-auto text-ctp-subtext0 text-sm">
-							{session.submitions} submition{session.submitions == 0 ? '' : 's'}
+							{session.submissions} submission{session.submissions === 1 ? '' : 's'}
 						</p>
 					</div>
 					<a href="/tool/word-cloud/manage/{session.id}">
@@ -86,7 +84,7 @@
 						<div class="relative square-2 mr-2 bg-ctp-red rounded-full" />
 						<p class="text-ctp-subtext0 text-sm">Closed</p>
 						<p class="ml-auto text-ctp-subtext0 text-sm">
-							{session.submitions} submition{session.submitions == 0 ? '' : 's'}
+							{session.submissions} submission{session.submissions === 1 ? '' : 's'}
 						</p>
 					</div>
 					<a href="/tool/word-cloud/manage/{session.id}">
@@ -99,8 +97,6 @@
 			{/each}
 		</div>
 	{:else}
-		<div class="mb-8 grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
-			<p>You</p>
-		</div>
+		<p>You don't have any closed session</p>
 	{/if}
 </section>

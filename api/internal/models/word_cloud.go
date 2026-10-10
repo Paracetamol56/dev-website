@@ -2,6 +2,7 @@ package models
 
 import (
 	"dev/internal/db"
+	"errors"
 	"fmt"
 	"time"
 
@@ -10,7 +11,13 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
+
+var ErrWordNotAdded = errors.New("word not added")
+
+// Also matches old codes, created before codes were uppercase only
+var caseInsensitive = &options.Collation{Locale: "en", Strength: 2}
 
 // Word represents a word in a word cloud.
 type Word struct {
@@ -40,10 +47,18 @@ func GetWordCloudByCode(c *gin.Context, code string) (*WordCloud, error) {
 	db := db.GetDB()
 	collection := db.Collection("word_cloud_sessions")
 	var wordCloud WordCloud
-	if err := collection.FindOne(c, bson.M{"code": code, "closedAt": bson.M{"$exists": false}}).Decode(&wordCloud); err != nil {
+	filter := bson.M{"code": code, "closedAt": bson.M{"$exists": false}}
+	if err := collection.FindOne(c, filter, options.FindOne().SetCollation(caseInsensitive)).Decode(&wordCloud); err != nil {
 		return nil, err
 	}
 	return &wordCloud, nil
+}
+
+func IsCodeInUse(c *gin.Context, code string) (bool, error) {
+	collection := db.GetDB().Collection("word_cloud_sessions")
+	filter := bson.M{"code": code, "closedAt": bson.M{"$exists": false}}
+	count, err := collection.CountDocuments(c, filter, options.Count().SetCollation(caseInsensitive).SetLimit(1))
+	return count > 0, err
 }
 
 // GetWordCloudById retrieves a word cloud by its ID.
@@ -95,32 +110,23 @@ func CreateWordCloud(c *gin.Context, wordCloud *WordCloud) (*mongo.InsertOneResu
 	return result, err
 }
 
-// AddWordToWordCloud adds a word to a word cloud.
-// It takes a gin.Context, a pointer to a WordCloud object, and a pointer to a Word object as parameters.
-// It returns a pointer to a mongo.UpdateResult object and an error.
-func AddWordToWordCloud(c *gin.Context, sessionId primitive.ObjectID, word *Word) (*mongo.UpdateResult, error) {
-	db := db.GetDB()
-	collection := db.Collection("word_cloud_sessions")
-
-	// Check if the word already exists within this session
-	existingWord := collection.FindOne(c, bson.M{
-		"_id": sessionId,
-		"words": bson.M{
-			"$elemMatch": bson.M{
-				"text": word.Text,
-				"uuid": word.UUID,
-			},
-		},
-	})
-	if existingWord.Err() == nil {
-		// If a word with the same text and UUID exists, return an error
-		return nil, fmt.Errorf("word already submitted")
+// AddWordToWordCloud returns ErrWordNotAdded when the session is closed or the participant
+// already sent this word; both are checked within the update itself.
+func AddWordToWordCloud(c *gin.Context, sessionId primitive.ObjectID, word *Word) error {
+	collection := db.GetDB().Collection("word_cloud_sessions")
+	filter := bson.M{
+		"_id":      sessionId,
+		"closedAt": bson.M{"$exists": false},
+		"words":    bson.M{"$not": bson.M{"$elemMatch": bson.M{"text": word.Text, "uuid": word.UUID}}},
 	}
-
-	filter := bson.M{"_id": sessionId}
-	update := bson.M{"$push": bson.M{"words": word}}
-	result, err := collection.UpdateOne(c, filter, update)
-	return result, err
+	result, err := collection.UpdateOne(c, filter, bson.M{"$push": bson.M{"words": word}})
+	if err != nil {
+		return err
+	}
+	if result.MatchedCount == 0 {
+		return ErrWordNotAdded
+	}
+	return nil
 }
 
 // CloseWordCloud closes a word cloud session.

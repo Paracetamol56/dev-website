@@ -13,6 +13,7 @@ interface WordCloudSession {
 }
 
 interface WordCloudSessionAdmin extends WordCloudSession {
+	open: boolean;
 	user: string;
 	words: WordCloudWord[];
 	createdAt: Date;
@@ -20,11 +21,11 @@ interface WordCloudSessionAdmin extends WordCloudSession {
 }
 
 interface WordCloudSessionUser extends WordCloudSession {
-	uuid: string;
+	open: boolean;
 }
 
 interface ManagePageData extends WordCloudSession {
-	submitions: number;
+	submissions: number;
 }
 
 export type { WordCloudWord, WordCloudSessionAdmin, WordCloudSessionUser, ManagePageData };

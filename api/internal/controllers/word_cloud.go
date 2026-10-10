@@ -1,11 +1,14 @@
 package controllers
 
 import (
+	"crypto/rand"
+	"dev/internal/middlewares"
 	"dev/internal/models"
 	"dev/internal/utils"
+	"errors"
 	"fmt"
 	"log"
-	"math/rand"
+	"math/big"
 	"net/http"
 	"os"
 	"regexp"
@@ -18,32 +21,58 @@ import (
 	"github.com/gorilla/websocket"
 	uuid "github.com/satori/go.uuid"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/text/unicode/norm"
 )
 
 type WordCloudController struct{}
 
+const (
+	codeLength = 5
+	// No 0/O or 1/I/L, which are easily confused
+	codeAlphabet = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"
+	// Per participant rather than per IP: audiences often share one network
+	maxWordsPerParticipant = 20
+	wordCooldown           = time.Second
+	socketAuthTimeout      = 5 * time.Second
+)
+
+var (
+	codeRegex          = regexp.MustCompile("^[a-zA-Z0-9]+$")
+	wordRegex          = regexp.MustCompile(`[^\w-]+`)
+	participantLimiter = utils.NewRateLimiter(1, wordCooldown)
+)
+
 func GenerateCode() string {
-	// Create a 5 characters long alphanumeric code
-	code := ""
-	for i := 0; i < 5; i++ {
-		randInt := rand.Intn(62)
-		if randInt < 10 {
-			code += string(rune(randInt + 48)) // ASCII range for numbers: 48-57
-		} else if randInt < 36 {
-			code += string(rune(randInt + 55)) // ASCII range for uppercase letters: 65-90
-		} else {
-			code += string(rune(randInt + 61)) // ASCII range for lowercase letters: 97-122
+	code := make([]byte, codeLength)
+	for i := range code {
+		n, err := rand.Int(rand.Reader, big.NewInt(int64(len(codeAlphabet))))
+		if err != nil {
+			panic(err) // crypto/rand does not fail on supported platforms
+		}
+		code[i] = codeAlphabet[n.Int64()]
+	}
+	return string(code)
+}
+
+func newUniqueCode(c *gin.Context) (string, error) {
+	for range 10 {
+		code := GenerateCode()
+		inUse, err := models.IsCodeInUse(c, code)
+		if err != nil {
+			return "", err
+		}
+		if !inUse {
+			return code, nil
 		}
 	}
-	return code
+	return "", errors.New("could not generate a unique code")
 }
 
 func ValidateCode(code string) error {
-	if len(code) != 5 {
-		return fmt.Errorf("code must be 5 characters long")
+	if len(code) != codeLength {
+		return fmt.Errorf("code must be %d characters long", codeLength)
 	}
-	codeRegex := regexp.MustCompile("^[a-zA-Z0-9]*$")
 	if !codeRegex.MatchString(code) {
 		return fmt.Errorf("code must contain only letters and numbers")
 	}
@@ -52,79 +81,69 @@ func ValidateCode(code string) error {
 
 func removeDiacritics(text string) string {
 	t := norm.NFD.String(text)
-	result := strings.Map(func(r rune) rune {
+	return strings.Map(func(r rune) rune {
 		if unicode.Is(unicode.Mn, r) {
 			return -1
 		}
 		return r
 	}, t)
-	return result
 }
 
-func cleanText(text string) string {
+func CleanText(text string) string {
 	res := strings.TrimSpace(text)
 	res = strings.ToLower(res)
 	res = removeDiacritics(res)
-	re := regexp.MustCompile(`[^\w-]+`)
-	res = re.ReplaceAllString(res, "")
-
-	return res
+	return wordRegex.ReplaceAllString(res, "")
 }
 
-func broadcastToAdmins(sessionId primitive.ObjectID, data models.Word) {
-	connMutex.Lock()
-	defer connMutex.Unlock()
-
-	// Get connections for the specific session
-	connections, exists := adminConnections[sessionId]
-	if !exists {
-		return // No admins connected to this session
+func requestUserId(c *gin.Context) (primitive.ObjectID, bool) {
+	scheme, token, found := strings.Cut(c.GetHeader("Authorization"), " ")
+	if !found || scheme != "Bearer" {
+		return primitive.NilObjectID, false
 	}
-
-	// Broadcast message to all connections
-	for _, admin := range connections {
-		err := admin.Conn.WriteJSON(data)
-		if err != nil {
-			// Remove broken connections
-			log.Println("Error writing to admin connection:", err)
-			admin.Conn.Close()
-
-			// Remove the connection from the list
-			adminConnections[sessionId] = removeConnection(connections, admin)
-		}
-	}
+	return userIdFromAccessToken(token)
 }
 
-func removeConnection(connections []*AdminConnection, connectionToRemove *AdminConnection) []*AdminConnection {
-	for i, conn := range connections {
-		if conn == connectionToRemove {
-			return append(connections[:i], connections[i+1:]...)
-		}
+func userIdFromAccessToken(token string) (primitive.ObjectID, bool) {
+	secret := os.Getenv("ACCESS_TOKEN_SECRET")
+	if authorized, err := utils.IsAuthorized(token, secret); err != nil || !authorized {
+		return primitive.NilObjectID, false
 	}
-	return connections
+	userId, err := utils.ExtractID(token, secret)
+	return userId, err == nil
+}
+
+func isOpen(wordCloud *models.WordCloud) bool {
+	return wordCloud.ClosedAt == nil
+}
+
+func publicSession(wordCloud *models.WordCloud) gin.H {
+	return gin.H{
+		"id":          wordCloud.Id,
+		"name":        wordCloud.Name,
+		"description": wordCloud.Description,
+		"code":        wordCloud.Code,
+		"open":        isOpen(wordCloud),
+	}
 }
 
 func GetWordCloudByCode(c *gin.Context, code string) {
 	if err := ValidateCode(code); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
 	wordCloud, err := models.GetWordCloudByCode(c, code)
 	if err != nil {
-		if err.Error() == "mongo: no documents in result" {
+		if errors.Is(err, mongo.ErrNoDocuments) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "word cloud not found"})
 			return
 		}
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"id":          wordCloud.Id,
-		"name":        wordCloud.Name,
-		"description": wordCloud.Description,
-		"code":        wordCloud.Code,
-	})
+	c.JSON(http.StatusOK, publicSession(wordCloud))
 }
 
 func GetWordCloudByUser(c *gin.Context, userIdString string) {
@@ -135,18 +154,7 @@ func GetWordCloudByUser(c *gin.Context, userIdString string) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user id"})
 		return
 	}
-
-	// Extract the auth header and verify the token
-	authHeader := c.GetHeader("Authorization")
-	t := strings.Split(authHeader, " ")
-	if len(t) != 2 {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
-		return
-	}
-	authToken := t[1]
-	// Check if the token is authorized and if the user ID matches the token
-	authorized, _ := utils.IsAuthorized(authToken, os.Getenv("ACCESS_TOKEN_SECRET"))
-	tokenUserId, _ := utils.ExtractID(authToken, os.Getenv("ACCESS_TOKEN_SECRET"))
+	tokenUserId, authorized := requestUserId(c)
 	if !authorized || queryUserId != tokenUserId {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
@@ -155,103 +163,89 @@ func GetWordCloudByUser(c *gin.Context, userIdString string) {
 	wordClouds, err := models.GetWordCloudByUser(c, tokenUserId, status)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 
-	var response []gin.H
+	response := []gin.H{}
 	for _, wordCloud := range wordClouds {
 		response = append(response, gin.H{
 			"id":          wordCloud.Id,
 			"name":        wordCloud.Name,
 			"description": wordCloud.Description,
-			"submitions":  len(wordCloud.Words),
+			"submissions": len(wordCloud.Words),
 			"code":        wordCloud.Code,
 		})
 	}
-
 	c.JSON(http.StatusOK, response)
 }
 
 func (controller *WordCloudController) GetWordCloud(c *gin.Context) {
-	code := c.Query("code")
-	user := c.Query("user")
-
-	if code != "" {
+	if code := c.Query("code"); code != "" {
 		GetWordCloudByCode(c, code)
 		return
-	} else if user != "" {
+	}
+	if user := c.Query("user"); user != "" {
 		GetWordCloudByUser(c, user)
 		return
 	}
-
-	// Missing required query parameter
 	c.JSON(http.StatusBadRequest, gin.H{"error": "missing query parameter"})
 }
 
-func (controller *WordCloudController) GetWordCloudById(c *gin.Context) {
-	idString := c.Param("id")
-	id, err := primitive.ObjectIDFromHex(idString)
+func sessionFromParam(c *gin.Context) (*models.WordCloud, bool) {
+	id, err := primitive.ObjectIDFromHex(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
-		return
+		return nil, false
 	}
-
 	wordCloud, err := models.GetWordCloudById(c, id)
 	if err != nil {
-		if err.Error() == "mongo: no documents in result" {
+		if errors.Is(err, mongo.ErrNoDocuments) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "word cloud not found"})
-			return
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		}
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return nil, false
+	}
+	return wordCloud, true
+}
+
+func (controller *WordCloudController) GetWordCloudById(c *gin.Context) {
+	wordCloud, ok := sessionFromParam(c)
+	if !ok {
 		return
 	}
 
-	authHeader := c.GetHeader("Authorization")
-	if authHeader != "" {
-		t := strings.Split(authHeader, " ")
-		if len(t) != 2 {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
-			c.Abort()
-			return
-		}
-		authToken := t[1]
-		authorized, err := utils.IsAuthorized(authToken, os.Getenv("ACCESS_TOKEN_SECRET"))
-		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
-			return
-		}
-		if authorized {
-			userId, err := utils.ExtractID(authToken, os.Getenv("ACCESS_TOKEN_SECRET"))
-			if err != nil {
-				c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
-				return
-			}
-			if wordCloud.UserId == userId {
-				c.JSON(http.StatusOK, wordCloud)
-				return
-			}
-		}
+	if userId, authorized := requestUserId(c); authorized && userId == wordCloud.UserId {
+		c.JSON(http.StatusOK, struct {
+			*models.WordCloud
+			Open bool `json:"open"`
+		}{wordCloud, isOpen(wordCloud)})
+		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"id":          wordCloud.Id,
-		"name":        wordCloud.Name,
-		"description": wordCloud.Description,
-		"code":        wordCloud.Code,
-		"uuid":        uuid.NewV4(),
-	})
+	c.JSON(http.StatusOK, publicSession(wordCloud))
+}
+
+func (controller *WordCloudController) PostWordCloudParticipant(c *gin.Context) {
+	wordCloud, ok := sessionFromParam(c)
+	if !ok {
+		return
+	}
+	if !isOpen(wordCloud) {
+		c.JSON(http.StatusConflict, gin.H{"error": "word cloud closed"})
+		return
+	}
+	c.JSON(http.StatusCreated, gin.H{"token": utils.SignParticipant(wordCloud.Id.Hex(), uuid.NewV4())})
 }
 
 type PostWordCloudWordBody struct {
-	Text      string    `json:"text" binding:"required,min=1,max=100"`
-	UUID      uuid.UUID `json:"uuid" binding:"required"`
-	UserAgent string    `json:"userAgent" binding:"required"`
+	Text  string `json:"text" binding:"required,min=1,max=100"`
+	Token string `json:"token" binding:"required"`
 }
 
-func (controllers *WordCloudController) PostWordCloudWord(c *gin.Context) {
-	idString := c.Param("id")
-	sessionId, err := primitive.ObjectIDFromHex(idString)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+func (controller *WordCloudController) PostWordCloudWord(c *gin.Context) {
+	wordCloud, ok := sessionFromParam(c)
+	if !ok {
 		return
 	}
 
@@ -260,26 +254,54 @@ func (controllers *WordCloudController) PostWordCloudWord(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	word := models.Word{
-		Text:      cleanText(body.Text),
-		UUID:      body.UUID,
-		UserAgent: body.UserAgent,
-		CreatedAt: primitive.NewDateTimeFromTime(time.Now()),
+	participant, err := utils.VerifyParticipant(wordCloud.Id.Hex(), body.Token)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+	if !isOpen(wordCloud) {
+		c.JSON(http.StatusConflict, gin.H{"error": "word cloud closed"})
+		return
 	}
 
-	if _, err := models.AddWordToWordCloud(c, sessionId, &word); err != nil {
-		if err.Error() == "word already submitted" {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	text := CleanText(body.Text)
+	if text == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "word is empty"})
+		return
+	}
+	submitted := 0
+	for _, word := range wordCloud.Words {
+		if word.UUID == participant {
+			submitted++
+		}
+	}
+	if submitted >= maxWordsPerParticipant {
+		c.JSON(http.StatusForbidden, gin.H{"error": "word limit reached"})
+		return
+	}
+	if allowed, retryAfter := participantLimiter.Allow(wordCloud.Id.Hex() + ":" + participant.String()); !allowed {
+		middlewares.AbortTooManyRequests(c, retryAfter)
+		return
+	}
+
+	word := models.Word{
+		Text:      text,
+		UUID:      participant,
+		UserAgent: c.Request.UserAgent(),
+		CreatedAt: primitive.NewDateTimeFromTime(time.Now()),
+	}
+	if err := models.AddWordToWordCloud(c, wordCloud.Id, &word); err != nil {
+		if errors.Is(err, models.ErrWordNotAdded) {
+			c.JSON(http.StatusConflict, gin.H{"error": "word already submitted"})
 		} else {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		}
 		return
 	}
 
-	go broadcastToAdmins(sessionId, word)
+	go broadcast(wordCloud.Id, gin.H{"type": "word", "word": word}, nil)
 
-	c.JSON(http.StatusCreated, gin.H{})
+	c.JSON(http.StatusCreated, gin.H{"text": text})
 }
 
 type PostWordCloudBody struct {
@@ -295,12 +317,17 @@ func (controller *WordCloudController) PostWordCloud(c *gin.Context) {
 	}
 
 	userId := c.MustGet("x-user-id").(primitive.ObjectID)
+	code, err := newUniqueCode(c)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 
 	result, err := models.CreateWordCloud(c, &models.WordCloud{
 		UserId:      userId,
 		Name:        postWordCloud.Name,
 		Description: postWordCloud.Description,
-		Code:        GenerateCode(),
+		Code:        code,
 		Words:       []models.Word{},
 		CreatedAt:   primitive.NewDateTimeFromTime(time.Now()),
 		UpdatedAt:   primitive.NewDateTimeFromTime(time.Now()),
@@ -310,21 +337,26 @@ func (controller *WordCloudController) PostWordCloud(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{
-		"id": result.InsertedID,
-	})
+	c.JSON(http.StatusCreated, gin.H{"id": result.InsertedID})
 }
 
-type AdminConnection struct {
-	Conn        *websocket.Conn
-	ConnectedAt time.Time
-	SessionID   primitive.ObjectID
+type socketClient struct {
+	conn  *websocket.Conn
+	owner bool
+	// gorilla/websocket allows one concurrent writer per connection
+	write sync.Mutex
+}
+
+func (client *socketClient) send(event any) error {
+	client.write.Lock()
+	defer client.write.Unlock()
+	return client.conn.WriteJSON(event)
 }
 
 var (
-	adminConnections = make(map[primitive.ObjectID][]*AdminConnection)
-	connMutex        = sync.Mutex{} // Mutex to protect concurrent access to the map
-	upgrader         = websocket.Upgrader{
+	socketClients = make(map[primitive.ObjectID][]*socketClient)
+	socketMutex   = sync.Mutex{}
+	upgrader      = websocket.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
 		CheckOrigin: func(r *http.Request) bool {
@@ -333,80 +365,107 @@ var (
 	}
 )
 
+// broadcast sends ownerEvent to owners and publicEvent to other clients; nil events are skipped.
+func broadcast(sessionId primitive.ObjectID, ownerEvent any, publicEvent any) {
+	socketMutex.Lock()
+	clients := append([]*socketClient(nil), socketClients[sessionId]...)
+	socketMutex.Unlock()
+
+	for _, client := range clients {
+		event := publicEvent
+		if client.owner {
+			event = ownerEvent
+		}
+		if event == nil {
+			continue
+		}
+		if err := client.send(event); err != nil {
+			log.Println("Error writing to word cloud socket:", err)
+			client.conn.Close()
+		}
+	}
+}
+
+type socketAuthMessage struct {
+	Type  string `json:"type"`
+	Token string `json:"token"`
+}
+
+// WSWordCloud expects {"type": "auth", "token": accessToken} first; only the owner's token
+// unlocks owner events.
 func (controller *WordCloudController) WSWordCloud(c *gin.Context) {
-	idString := c.Param("id")
-	sessionId, err := primitive.ObjectIDFromHex(idString)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+	wordCloud, ok := sessionFromParam(c)
+	if !ok {
 		return
 	}
 
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+	defer conn.Close()
 
-	connection := &AdminConnection{
-		Conn:        conn,
-		ConnectedAt: time.Now(),
-		SessionID:   sessionId,
+	var auth socketAuthMessage
+	conn.SetReadDeadline(time.Now().Add(socketAuthTimeout))
+	if err := conn.ReadJSON(&auth); err != nil || auth.Type != "auth" {
+		return
+	}
+	conn.SetReadDeadline(time.Time{})
+
+	client := &socketClient{conn: conn}
+	if userId, authorized := userIdFromAccessToken(auth.Token); authorized && userId == wordCloud.UserId {
+		client.owner = true
 	}
 
-	connMutex.Lock()
-	adminConnections[sessionId] = append(adminConnections[sessionId], connection)
-	connMutex.Unlock()
+	socketMutex.Lock()
+	socketClients[wordCloud.Id] = append(socketClients[wordCloud.Id], client)
+	socketMutex.Unlock()
 
 	defer func() {
-		// Clean up on disconnect
-		connMutex.Lock()
-		connections := adminConnections[sessionId]
-		for i, conn := range connections {
-			if conn == connection {
-				adminConnections[sessionId] = append(connections[:i], connections[i+1:]...)
-				conn.Conn.Close()
+		socketMutex.Lock()
+		clients := socketClients[wordCloud.Id]
+		for i, registered := range clients {
+			if registered == client {
+				socketClients[wordCloud.Id] = append(clients[:i], clients[i+1:]...)
 				break
 			}
 		}
-		connMutex.Unlock()
+		if len(socketClients[wordCloud.Id]) == 0 {
+			delete(socketClients, wordCloud.Id)
+		}
+		socketMutex.Unlock()
 	}()
 
-	// Keep the connection alive
+	client.send(gin.H{"type": "ready", "owner": client.owner})
+
 	for {
 		if _, _, err := conn.ReadMessage(); err != nil {
-			break // Disconnect on error
+			return
 		}
 	}
 }
 
 func (controller *WordCloudController) DeleteWordCloud(c *gin.Context) {
-	idString := c.Param("id")
-	id, err := primitive.ObjectIDFromHex(idString)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+	wordCloud, ok := sessionFromParam(c)
+	if !ok {
 		return
 	}
 	userId := c.MustGet("x-user-id").(primitive.ObjectID)
-	wordCloud, err := models.GetWordCloudById(c, id)
-	if err != nil {
-		if err.Error() == "mongo: no documents in result" {
-			c.JSON(http.StatusNotFound, gin.H{"error": "word cloud not found"})
-			return
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
 	if wordCloud.UserId != userId {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 		return
 	}
-	if wordCloud.ClosedAt != nil {
+	if !isOpen(wordCloud) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "word cloud already closed"})
 		return
 	}
-	if _, err := models.CloseWordCloud(c, id); err != nil {
+	if _, err := models.CloseWordCloud(c, wordCloud.Id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusNoContent, gin.H{})
+
+	closed := gin.H{"type": "session", "open": false}
+	go broadcast(wordCloud.Id, closed, closed)
+
+	c.Status(http.StatusNoContent)
 }
