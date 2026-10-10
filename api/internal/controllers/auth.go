@@ -127,7 +127,7 @@ func (controller *AuthController) PostLogin(c *gin.Context) {
 		}
 	}
 
-	verificationToken, err := utils.SignRefreshToken(user.Id.Hex(), 1)
+	verificationToken, err := models.CreateLoginToken(c, user.Id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -167,10 +167,8 @@ func (controller *AuthController) PostVerify(c *gin.Context) {
 		return
 	}
 
-	userId, err := utils.ExtractID(verify.Token, os.Getenv("REFRESH_TOKEN_SECRET"))
-	log.Println("userId", userId)
+	userId, err := models.ConsumeLoginToken(c, verify.Token)
 	if err != nil {
-		log.Println("err", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
