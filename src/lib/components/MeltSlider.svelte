@@ -12,7 +12,7 @@
 	export let disabled: boolean = false;
 
 	const {
-		elements: { root, range, thumb }
+		elements: { root, range, thumbs }
 	} = createSlider({
 		defaultValue: [defaultValue],
 		min,
@@ -33,7 +33,7 @@
 			<span use:melt={$range} class="h-1 rounded bg-ctp-mauve" />
 		</span>
 		<span
-			use:melt={$thumb()}
+			use:melt={$thumbs[0]}
 			class="block square-3 rounded-full outline-none bg-ctp-mauve {!disabled &&
 				'focus:ring-4 focus:ring-ctp-mauve/20'}"
 		/>
