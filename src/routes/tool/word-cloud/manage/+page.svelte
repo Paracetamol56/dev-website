@@ -10,15 +10,17 @@
 	export let data: PageData;
 	let archived: ManagePageData[];
 
-	function loadArchived() {
-		api
-			.callWithAuth('GET', `/word-cloud?user=${$user.id}&status=closed`)
-			.then((res) => {
-				archived = res.data as ManagePageData[];
-			})
-			.catch((err) => {
-				console.error(err);
-			});
+	const fetchSessions = async (status: 'open' | 'closed') =>
+		((await api.callWithAuth('GET', `/word-cloud?user=${$user.id}&status=${status}`)).data ??
+			[]) as ManagePageData[];
+
+	async function loadArchived() {
+		archived = await fetchSessions('closed').catch(() => []);
+	}
+
+	async function refresh() {
+		data.sessions = await fetchSessions('open').catch(() => data.sessions);
+		if (archived !== undefined) await loadArchived();
 	}
 </script>
 
@@ -50,7 +52,7 @@
 			{:else}
 				<div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
 					{#each data.sessions as session (session.id)}
-						<SessionCard {session} open />
+						<SessionCard {session} on:change={refresh} />
 					{/each}
 				</div>
 			{/if}
@@ -70,7 +72,7 @@
 			{:else}
 				<div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
 					{#each archived as session (session.id)}
-						<SessionCard {session} open={false} />
+						<SessionCard {session} on:change={refresh} />
 					{/each}
 				</div>
 			{/if}

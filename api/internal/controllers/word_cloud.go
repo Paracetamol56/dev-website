@@ -20,6 +20,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	uuid "github.com/satori/go.uuid"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/text/unicode/norm"
@@ -174,6 +175,9 @@ func GetWordCloudByUser(c *gin.Context, userIdString string) {
 			"description": wordCloud.Description,
 			"submissions": len(wordCloud.Words),
 			"code":        wordCloud.Code,
+			"open":        isOpen(wordCloud),
+			"createdAt":   wordCloud.CreatedAt,
+			"closedAt":    wordCloud.ClosedAt,
 		})
 	}
 	c.JSON(http.StatusOK, response)
@@ -315,29 +319,109 @@ func (controller *WordCloudController) PostWordCloud(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	createSession(c, c.MustGet("x-user-id").(primitive.ObjectID), postWordCloud.Name, postWordCloud.Description)
+}
 
-	userId := c.MustGet("x-user-id").(primitive.ObjectID)
+func createSession(c *gin.Context, userId primitive.ObjectID, name string, description string) {
 	code, err := newUniqueCode(c)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
+	now := primitive.NewDateTimeFromTime(time.Now())
 	result, err := models.CreateWordCloud(c, &models.WordCloud{
 		UserId:      userId,
-		Name:        postWordCloud.Name,
-		Description: postWordCloud.Description,
+		Name:        name,
+		Description: description,
 		Code:        code,
 		Words:       []models.Word{},
-		CreatedAt:   primitive.NewDateTimeFromTime(time.Now()),
-		UpdatedAt:   primitive.NewDateTimeFromTime(time.Now()),
+		CreatedAt:   now,
+		UpdatedAt:   now,
 	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
 	c.JSON(http.StatusCreated, gin.H{"id": result.InsertedID})
+}
+
+func ownedSession(c *gin.Context) (*models.WordCloud, bool) {
+	wordCloud, ok := sessionFromParam(c)
+	if !ok {
+		return nil, false
+	}
+	if wordCloud.UserId != c.MustGet("x-user-id").(primitive.ObjectID) {
+		c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+		return nil, false
+	}
+	return wordCloud, true
+}
+
+func (controller *WordCloudController) PostWordCloudDuplicate(c *gin.Context) {
+	wordCloud, ok := ownedSession(c)
+	if !ok {
+		return
+	}
+	createSession(c, wordCloud.UserId, wordCloud.Name, wordCloud.Description)
+}
+
+type PatchWordCloudBody struct {
+	Name        *string `json:"name" binding:"omitempty,min=3,max=100"`
+	Description *string `json:"description" binding:"omitempty,max=1000"`
+	Open        *bool   `json:"open"`
+}
+
+func (controller *WordCloudController) PatchWordCloud(c *gin.Context) {
+	wordCloud, ok := ownedSession(c)
+	if !ok {
+		return
+	}
+	var body PatchWordCloudBody
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if body.Description != nil && *body.Description != "" && len(*body.Description) < 10 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "description must be empty or at least 10 characters long"})
+		return
+	}
+
+	set, unset := bson.M{}, bson.M{}
+	if body.Name != nil {
+		wordCloud.Name = *body.Name
+		set["name"] = wordCloud.Name
+	}
+	if body.Description != nil {
+		wordCloud.Description = *body.Description
+		set["description"] = wordCloud.Description
+	}
+	if body.Open != nil && *body.Open != isOpen(wordCloud) {
+		if *body.Open {
+			inUse, err := models.IsCodeInUse(c, wordCloud.Code)
+			if err == nil && inUse {
+				wordCloud.Code, err = newUniqueCode(c)
+			}
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+				return
+			}
+			set["code"] = wordCloud.Code
+			unset["closedAt"] = ""
+			wordCloud.ClosedAt = nil
+		} else {
+			now := primitive.NewDateTimeFromTime(time.Now())
+			set["closedAt"] = now
+			wordCloud.ClosedAt = &now
+		}
+	}
+
+	if err := models.UpdateWordCloud(c, wordCloud.Id, set, unset); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	event := gin.H{"type": "session", "session": publicSession(wordCloud)}
+	go broadcast(wordCloud.Id, event, event)
+	c.JSON(http.StatusOK, publicSession(wordCloud))
 }
 
 type socketClient struct {
@@ -446,26 +530,15 @@ func (controller *WordCloudController) WSWordCloud(c *gin.Context) {
 }
 
 func (controller *WordCloudController) DeleteWordCloud(c *gin.Context) {
-	wordCloud, ok := sessionFromParam(c)
+	wordCloud, ok := ownedSession(c)
 	if !ok {
 		return
 	}
-	userId := c.MustGet("x-user-id").(primitive.ObjectID)
-	if wordCloud.UserId != userId {
-		c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
-		return
-	}
-	if !isOpen(wordCloud) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "word cloud already closed"})
-		return
-	}
-	if _, err := models.CloseWordCloud(c, wordCloud.Id); err != nil {
+	if err := models.DeleteWordCloud(c, wordCloud.Id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
-	closed := gin.H{"type": "session", "open": false}
-	go broadcast(wordCloud.Id, closed, closed)
-
+	event := gin.H{"type": "session", "session": nil}
+	go broadcast(wordCloud.Id, event, event)
 	c.Status(http.StatusNoContent)
 }

@@ -3,17 +3,20 @@
 	import BarChart from './BarChart.svelte';
 	import Table from './Table.svelte';
 	import { createDialog, melt } from '@melt-ui/svelte';
-	import { QrCode, X } from 'lucide-svelte';
+	import { Copy, Lock, LockOpen, Pencil, QrCode, Trash2, X } from 'lucide-svelte';
 	import MeltTooltip from '$lib/components/MeltTooltip.svelte';
 	import { fade, fly } from 'svelte/transition';
 	import QRCode from 'qrcode';
 	import type { PageData } from './$types';
-	import { addToast } from '../../../../+layout.svelte';
 	import { onDestroy, onMount } from 'svelte';
 	import { user } from '$lib/store';
 	import { followSession } from '../../socket';
-	import type { WordCloudWord } from '../../utils';
-	import api from '$lib/api';
+	import type { WordCloudSessionUser, WordCloudWord } from '../../utils';
+	import { deleteSession, duplicateSession, updateSession } from '../../actions';
+	import Dialog from '../../Dialog.svelte';
+	import Button from '$lib/components/Button.svelte';
+	import { goto } from '$app/navigation';
+	import { writable } from 'svelte/store';
 
 	export let data: PageData;
 
@@ -26,20 +29,70 @@
 	}
 
 	let stopFollowing = () => {};
+	function applySession(session: WordCloudSessionUser) {
+		data.session = {
+			...data.session,
+			...session,
+			closedAt: session.open ? null : data.session.closedAt ?? new Date()
+		};
+	}
+
 	onMount(() => {
-		if (!data.session.open) return;
 		stopFollowing = followSession(
 			data.session.id,
 			(event) => {
 				if (event.type === 'word') addWord(event.word);
-				else if (event.type === 'session' && !event.open) {
-					data.session.open = false;
-					data.session.closedAt ??= new Date();
+				else if (event.type === 'session') {
+					if (event.session) applySession(event.session);
+					else goto('/tool/word-cloud/manage');
 				}
 			},
 			$user.accessToken
 		);
 	});
+
+	async function setOpen(open: boolean) {
+		const session = await updateSession(data.session.id, { open });
+		if (session) applySession(session);
+	}
+
+	async function duplicate() {
+		const id = await duplicateSession(data.session.id);
+		if (id) goto(`/tool/word-cloud/manage/${id}`);
+	}
+
+	const confirmDelete = writable(false);
+	async function remove() {
+		if (await deleteSession(data.session.id)) goto('/tool/word-cloud/manage');
+	}
+
+	const editing = writable(false);
+	let editName = '';
+	let editDescription = '';
+	let editError = '';
+	function startEditing() {
+		editName = data.session.name;
+		editDescription = data.session.description;
+		editError = '';
+		editing.set(true);
+	}
+	async function saveEdit(e: Event) {
+		e.preventDefault();
+		const [name, description] = [editName.trim(), editDescription.trim()];
+		if (name.length < 3 || name.length > 100) {
+			editError = 'The title must be between 3 and 100 characters long';
+			return;
+		}
+		if (description && (description.length < 10 || description.length > 1000)) {
+			editError = 'The description must be empty or between 10 and 1000 characters long';
+			return;
+		}
+		const session = await updateSession(data.session.id, { name, description });
+		if (session) {
+			applySession(session);
+			editing.set(false);
+		}
+	}
 	onDestroy(() => stopFollowing());
 
 	let qrWidthAvailable: number;
@@ -65,36 +118,6 @@
 	const humanReadableDate = (date: Date | null) => {
 		if (date === null) return '';
 		return date.toLocaleString();
-	};
-
-	const closeSession = (e: Event) => {
-		e.preventDefault();
-
-		api
-			.callWithAuth('DELETE', `/word-cloud/${data.session.id}`)
-			.then(async (res) => {
-				if (res.status === 204) {
-					addToast({
-						data: {
-							title: 'Success',
-							description: 'The session has been closed',
-							color: 'bg-ctp-green'
-						}
-					});
-					data.session.open = false;
-					data.session.closedAt = new Date();
-				}
-			})
-			.catch((err) => {
-				console.error(err);
-				addToast({
-					data: {
-						title: 'Error',
-						description: 'An error occured while closing the session',
-						color: 'bg-ctp-red'
-					}
-				});
-			});
 	};
 
 	const {
@@ -164,28 +187,59 @@
 					</div>
 				{/if}
 			</dl>
-			{#if data.session.open}
-				<div class="ml-auto flex flex-wrap gap-2">
+			<div class="ml-auto flex flex-wrap gap-2">
+				{#if data.session.open}
 					<MeltTooltip text="Show the code and QR code to the audience">
 						<button
-							class="flex items-center gap-1 rounded-md bg-ctp-mauve px-3 py-1 font-semibold text-ctp-mantle
-								shadow-md shadow-ctp-crust transition-opacity hover:opacity-80 active:opacity-60"
+							class="flex items-center gap-1 rounded-md px-3 py-1 font-semibold text-ctp-mantle shadow-md shadow-ctp-crust transition-opacity hover:opacity-80 active:opacity-60 bg-ctp-mauve"
 							use:melt={$trigger}
 						>
 							<QrCode size="16" />
 							Join info
 						</button>
 					</MeltTooltip>
+				{/if}
+				<button
+					class="flex items-center gap-1 rounded-md px-3 py-1 font-semibold text-ctp-mantle shadow-md shadow-ctp-crust transition-opacity hover:opacity-80 active:opacity-60 bg-ctp-mauve"
+					on:click={startEditing}
+				>
+					<Pencil size="16" />
+					Edit
+				</button>
+				<MeltTooltip text="New empty session with the same title and description">
 					<button
-						class="flex items-center gap-1 rounded-md bg-ctp-red px-3 py-1 font-semibold text-ctp-mantle
-							shadow-md shadow-ctp-crust transition-opacity hover:opacity-80 active:opacity-60"
-						on:click={closeSession}
+						class="flex items-center gap-1 rounded-md px-3 py-1 font-semibold text-ctp-mantle shadow-md shadow-ctp-crust transition-opacity hover:opacity-80 active:opacity-60 bg-ctp-mauve"
+						on:click={duplicate}
 					>
-						<X size="16" />
-						Close session
+						<Copy size="16" />
+						Duplicate
 					</button>
-				</div>
-			{/if}
+				</MeltTooltip>
+				{#if data.session.open}
+					<button
+						class="flex items-center gap-1 rounded-md px-3 py-1 font-semibold text-ctp-mantle shadow-md shadow-ctp-crust transition-opacity hover:opacity-80 active:opacity-60 bg-ctp-peach"
+						on:click={() => setOpen(false)}
+					>
+						<Lock size="16" />
+						Close
+					</button>
+				{:else}
+					<button
+						class="flex items-center gap-1 rounded-md px-3 py-1 font-semibold text-ctp-mantle shadow-md shadow-ctp-crust transition-opacity hover:opacity-80 active:opacity-60 bg-ctp-green"
+						on:click={() => setOpen(true)}
+					>
+						<LockOpen size="16" />
+						Reopen
+					</button>
+				{/if}
+				<button
+					class="flex items-center gap-1 rounded-md px-3 py-1 font-semibold text-ctp-mantle shadow-md shadow-ctp-crust transition-opacity hover:opacity-80 active:opacity-60 bg-ctp-red"
+					on:click={() => confirmDelete.set(true)}
+				>
+					<Trash2 size="16" />
+					Delete
+				</button>
+			</div>
 		</div>
 
 		<div class="bg-ctp-mantle p-6 rounded-md shadow-md shadow-ctp-crust flex flex-col gap-4">
@@ -243,3 +297,57 @@
 		</div>
 	{/if}
 </div>
+
+<Dialog open={confirmDelete} title="Delete this session?">
+	<p class="mb-6 text-ctp-subtext0">
+		“{data.session.name}” and its {data.session.words.length} submission{data.session.words
+			.length === 1
+			? ''
+			: 's'} will be deleted for good.
+	</p>
+	<div class="flex justify-end gap-2">
+		<button
+			class="rounded-md bg-ctp-surface0 px-3 py-1 font-semibold hover:bg-ctp-surface1"
+			on:click={() => confirmDelete.set(false)}>Cancel</button
+		>
+		<button
+			class="flex items-center gap-1 rounded-md bg-ctp-red px-3 py-1 font-semibold text-ctp-mantle hover:opacity-80"
+			on:click={remove}
+		>
+			<Trash2 size="16" />
+			Delete
+		</button>
+	</div>
+</Dialog>
+
+<Dialog open={editing} title="Edit the session">
+	<form class="flex flex-col gap-4" on:submit={saveEdit}>
+		<div>
+			<label for="edit-name" class="mb-2 block text-sm font-semibold">Question or title</label>
+			<input
+				id="edit-name"
+				maxlength="100"
+				bind:value={editName}
+				class="h-8 w-full rounded-md bg-ctp-surface0 px-3 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
+			/>
+		</div>
+		<div>
+			<label for="edit-description" class="mb-2 block text-sm font-semibold">
+				Description <small class="text-ctp-subtext0">(optional)</small>
+			</label>
+			<textarea
+				id="edit-description"
+				maxlength="1000"
+				bind:value={editDescription}
+				class="h-28 w-full rounded-md bg-ctp-surface0 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
+			/>
+		</div>
+		<p class="text-sm font-semibold text-ctp-red" aria-live="polite">{editError}</p>
+		<div class="flex justify-end">
+			<Button type="submit">
+				<Pencil size="16" />
+				<span>Save</span>
+			</Button>
+		</div>
+	</form>
+</Dialog>

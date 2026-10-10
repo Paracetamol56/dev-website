@@ -1,9 +1,9 @@
-import type { WordCloudWord } from './utils';
+import type { WordCloudSessionUser, WordCloudWord } from './utils';
 
 export type SessionEvent =
 	| { type: 'ready'; owner: boolean }
 	| { type: 'word'; word: WordCloudWord }
-	| { type: 'session'; open: boolean };
+	| { type: 'session'; session: WordCloudSessionUser | null };
 
 /**
  * Follows a session's live events, reconnecting with backoff. Only the owner's access token

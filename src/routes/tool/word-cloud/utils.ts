@@ -26,6 +26,9 @@ interface WordCloudSessionUser extends WordCloudSession {
 
 interface ManagePageData extends WordCloudSession {
 	submissions: number;
+	open: boolean;
+	createdAt: string;
+	closedAt: string | null;
 }
 
 export type { WordCloudWord, WordCloudSessionAdmin, WordCloudSessionUser, ManagePageData };

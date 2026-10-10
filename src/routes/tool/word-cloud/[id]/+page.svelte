@@ -9,6 +9,7 @@
 	export let data: PageData;
 
 	let open = data.session.open;
+	let deleted = false;
 	let text = '';
 	let textError = '';
 	let sent: string | null = null;
@@ -46,7 +47,14 @@
 	let stopFollowing = () => {};
 	onMount(() => {
 		stopFollowing = followSession(data.session.id, (event) => {
-			if (event.type === 'session') open = event.open;
+			if (event.type !== 'session') return;
+			if (event.session) {
+				data.session = event.session;
+				open = event.session.open;
+			} else {
+				deleted = true;
+				open = false;
+			}
 		});
 	});
 	onDestroy(() => stopFollowing());
@@ -162,7 +170,9 @@
 			</p>
 		{:else}
 			<p class="py-8 text-center text-lg font-semibold text-ctp-subtext0" role="status">
-				This session is closed, thank you for taking part!
+				{deleted
+					? 'This session no longer exists.'
+					: 'This session is closed, thank you for taking part!'}
 			</p>
 		{/if}
 	</div>

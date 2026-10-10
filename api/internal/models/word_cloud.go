@@ -129,14 +129,19 @@ func AddWordToWordCloud(c *gin.Context, sessionId primitive.ObjectID, word *Word
 	return nil
 }
 
-// CloseWordCloud closes a word cloud session.
-// It takes a gin.Context and an ID of type primitive.ObjectID as parameters.
-// It returns a pointer to mongo.UpdateResult and an error.
-func CloseWordCloud(c *gin.Context, id primitive.ObjectID) (*mongo.UpdateResult, error) {
-	db := db.GetDB()
-	collection := db.Collection("word_cloud_sessions")
-	filter := bson.M{"_id": id}
-	update := bson.M{"$set": bson.M{"closedAt": primitive.NewDateTimeFromTime(time.Now())}}
-	result, err := collection.UpdateOne(c, filter, update)
-	return result, err
+func UpdateWordCloud(c *gin.Context, id primitive.ObjectID, set bson.M, unset bson.M) error {
+	update := bson.M{"$set": bson.M{"updatedAt": primitive.NewDateTimeFromTime(time.Now())}}
+	for key, value := range set {
+		update["$set"].(bson.M)[key] = value
+	}
+	if len(unset) > 0 {
+		update["$unset"] = unset
+	}
+	_, err := db.GetDB().Collection("word_cloud_sessions").UpdateOne(c, bson.M{"_id": id}, update)
+	return err
+}
+
+func DeleteWordCloud(c *gin.Context, id primitive.ObjectID) error {
+	_, err := db.GetDB().Collection("word_cloud_sessions").DeleteOne(c, bson.M{"_id": id})
+	return err
 }
