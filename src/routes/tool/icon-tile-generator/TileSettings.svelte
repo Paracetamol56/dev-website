@@ -4,13 +4,13 @@
 	import NumberInput from '$lib/components/NumberInput.svelte';
 	import type { SelectOption } from '@melt-ui/svelte';
 	import { get, type Writable } from 'svelte/store';
-	import ColorPicker from './ColorPicker.svelte';
-	import type { Palette, TileColor } from './colors';
+	import ColorPicker from '$lib/components/ColorPicker.svelte';
+	import type { Palette, PaletteColor } from '$lib/colors';
 	import { FORMATS, SHAPES, type Format, type IconSource, type Shape } from './types';
 
 	export let palette: Palette;
-	export let bg: Writable<TileColor>;
-	export let fg: Writable<TileColor>;
+	export let bg: Writable<PaletteColor>;
+	export let fg: Writable<PaletteColor>;
 	export let shape: Writable<Shape>;
 	export let format: Writable<Format>;
 	export let resolution: Writable<number>;

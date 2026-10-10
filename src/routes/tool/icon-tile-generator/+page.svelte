@@ -9,7 +9,8 @@
 	import { user } from '$lib/store';
 	import { page } from '$app/stores';
 	import { fetchIcon } from './icon-fetcher';
-	import { randomColorPair, resolveColor, type TileColor } from './colors';
+	import { resolveColor, type PaletteColor } from '$lib/colors';
+	import { randomColorPair } from './colors';
 	import { FORMATS, SHAPES, type Format, type IconSource, type Shape } from './types';
 
 	const CATPPUCCIN_COLORS = palette.variants[$user.flavour];
@@ -26,8 +27,8 @@
 
 	let iconName: Writable<string> = writable('camera');
 	let iconSource: Writable<IconSource | ''> = writable('');
-	let bg: Writable<TileColor> = writable(DEFAULTS.bg);
-	let fg: Writable<TileColor> = writable(DEFAULTS.fg);
+	let bg: Writable<PaletteColor> = writable(DEFAULTS.bg);
+	let fg: Writable<PaletteColor> = writable(DEFAULTS.fg);
 	let shape: Writable<Shape> = writable(DEFAULTS.shape);
 	let format: Writable<Format> = writable(DEFAULTS.format);
 	let resolution: Writable<number> = writable(DEFAULTS.resolution);
@@ -35,7 +36,7 @@
 	let strokeWidth: Writable<number> = writable(DEFAULTS.strokeWidth);
 
 	// Links made before `bg`/`fg` existed stored a mode plus one value per mode
-	function legacyColor(params: URLSearchParams, prefix: 'bg' | 'fg'): TileColor | null {
+	function legacyColor(params: URLSearchParams, prefix: 'bg' | 'fg'): PaletteColor | null {
 		const mode = params.get(`${prefix}Mode`);
 		if (mode === 'transparent') return 'transparent';
 		if (mode === 'custom') return params.get(`${prefix}Custom`);

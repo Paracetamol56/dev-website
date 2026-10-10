@@ -3,10 +3,16 @@
 	import { Dice5 } from 'lucide-svelte';
 	import PaletteWheel from './PaletteWheel.svelte';
 	import { writable, type Writable } from 'svelte/store';
-	import { parseHex, randomPaletteKey, resolveColor, type Palette, type TileColor } from './colors';
+	import {
+		parseHex,
+		randomPaletteKey,
+		resolveColor,
+		type Palette,
+		type PaletteColor
+	} from '$lib/colors';
 
 	export let label: string;
-	export let value: Writable<TileColor>;
+	export let value: Writable<PaletteColor>;
 	export let palette: Palette;
 	export let allowTransparent = false;
 

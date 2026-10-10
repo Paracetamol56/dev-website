@@ -1,10 +1,17 @@
 <script lang="ts">
 	import type { Writable } from 'svelte/store';
-	import { ACCENTS, NEUTRALS, hue, resolveColor, type Palette, type TileColor } from './colors';
+	import {
+		ACCENTS,
+		NEUTRALS,
+		hue,
+		resolveColor,
+		type Palette,
+		type PaletteColor
+	} from '$lib/colors';
 
 	export let label: string;
 	export let palette: Palette;
-	export let value: Writable<TileColor>;
+	export let value: Writable<PaletteColor>;
 
 	const SIZE = 144;
 	const CENTER = SIZE / 2;
