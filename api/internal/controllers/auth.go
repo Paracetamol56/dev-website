@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -168,6 +169,11 @@ func (controller *AuthController) PostVerify(c *gin.Context) {
 		return
 	}
 
+	user.SetIdentity(models.Identity{
+		Provider:   models.IdentityProviderEmail,
+		ProviderId: user.Email,
+		Email:      user.Email,
+	})
 	user.LastLogin = time.Now()
 	user.LastRefresh = time.Now()
 	if _, err = models.UpdateUser(c, userId, user); err != nil {
@@ -235,75 +241,126 @@ func (controller *AuthController) PostRefresh(c *gin.Context) {
 	})
 }
 
-type GithubLoginBody struct {
-	Code string `json:"code" binding:"required"`
+type OAuthProviderResponse struct {
+	Name         string `json:"name" example:"github"`
+	ClientId     string `json:"clientId"`
+	AuthorizeUrl string `json:"authorizeUrl" example:"https://github.com/login/oauth/authorize"`
+	Scope        string `json:"scope" example:"read:user user:email"`
 }
 
-// PostGithubLogin godoc
+// GetOAuthProviders godoc
 //
-//	@Summary		Login or register a user with GitHub
-//	@Description	Login or register a user with GitHub by code
+//	@Summary		List OAuth providers
+//	@Description	List the identity providers configured on this server, with what a client needs to start their authorization flow
+//	@Tags			auth
+//	@Produce		json
+//	@Success		200	{array}	OAuthProviderResponse
+//	@Router			/auth/providers [get]
+func (controller *AuthController) GetOAuthProviders(c *gin.Context) {
+	providers := []OAuthProviderResponse{}
+	for _, provider := range utils.GetOAuthProviders() {
+		providers = append(providers, OAuthProviderResponse{
+			Name:         provider.Name,
+			ClientId:     provider.ClientId(),
+			AuthorizeUrl: provider.AuthorizeURL,
+			Scope:        provider.Scope,
+		})
+	}
+	c.JSON(http.StatusOK, providers)
+}
+
+type OAuthLoginBody struct {
+	Code        string `json:"code" binding:"required"`
+	RedirectUri string `json:"redirectUri" binding:"omitempty,url"`
+}
+
+// PostOAuthLogin godoc
+//
+//	@Summary		Login, register or link an identity with an OAuth provider
+//	@Description	Exchange an authorization code for the identity of its owner and attach it to the user having the same email, creating the user if needed. When called with a bearer token, the identity must have the email of the authenticated user.
 //	@Tags			auth
 //	@Accept			json
 //	@Produce		json
-//	@Param			body	body		GithubLoginBody	true	"Code"
-//	@Success		200		{object}	map[string]interface{}
-//	@Failure		400
-//	@Router			/auth/github/login [post]
-func (controller *AuthController) PostGithubLogin(c *gin.Context) {
-	body := GithubLoginBody{}
+//	@Param			provider	path		string			true	"Identity provider"	Enums(github, google)
+//	@Param			body		body		OAuthLoginBody	true	"Authorization code and the redirect URI it was issued for"
+//	@Success		200			{object}	map[string]interface{}
+//	@Failure		400			{object}	map[string]string
+//	@Failure		401			{object}	map[string]string
+//	@Failure		404			{object}	map[string]string
+//	@Failure		409			{object}	map[string]string
+//	@Router			/auth/{provider} [post]
+func (controller *AuthController) PostOAuthLogin(c *gin.Context) {
+	provider := utils.GetOAuthProvider(c.Param("provider"))
+	if provider == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Unknown identity provider"})
+		return
+	}
+
+	body := OAuthLoginBody{}
 	if err := c.ShouldBindJSON(&body); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
-
-	// Get access token
-	accessToken, err := utils.GetGithubAccessToken(body.Code)
-	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Fetch the GitHub user
-	githubUser, err := utils.GetGithubUser(accessToken)
+	var user *models.User
+	if authHeader := c.GetHeader("Authorization"); authHeader != "" {
+		userId, err := utils.ExtractID(strings.TrimPrefix(authHeader, "Bearer "), os.Getenv("ACCESS_TOKEN_SECRET"))
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+			return
+		}
+		if user, err = models.GetFullUserById(c, userId); err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+			return
+		}
+	}
+
+	identity, err := provider.Authenticate(c, body.Code, body.RedirectUri)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		log.Printf("Failed to authenticate with %s: %v", provider.Name, err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to authenticate with " + provider.Name})
 		return
 	}
 
-	// Check if the user exists in the database
-	user, err := models.GetFullUserByEmail(c, githubUser.Email)
-	if err != nil {
+	if user != nil {
+		if !strings.EqualFold(user.Email, identity.Email) {
+			c.JSON(http.StatusConflict, gin.H{"error": "This account uses another email address (" + identity.Email + ")"})
+			return
+		}
+	} else if user, err = models.GetFullUserByEmail(c, identity.Email); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	if user == nil {
-		// If not, create it
 		result, err := models.CreateUser(c, &models.User{
-			Email:             githubUser.Email,
-			Name:              githubUser.Name,
-			Flavour:           "mocha",
-			ProfilePicture:    githubUser.AvatarUrl,
-			GitHubAccessToken: accessToken,
-			Github:            githubUser,
+			Email:   identity.Email,
+			Flavour: "mocha",
 		})
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-		userId, _ := primitive.ObjectIDFromHex(result.InsertedID.(primitive.ObjectID).Hex())
-		user, err = models.GetFullUserById(c, userId)
-		if err != nil {
+		if user, err = models.GetFullUserById(c, result.InsertedID.(primitive.ObjectID)); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-	} else if user.Github == nil {
-		// If it exists but doesn't have a github account, update it
-		user.GitHubAccessToken = accessToken
-		user.Github = githubUser
+		if err := utils.AddEmailContact(c, user.Email); err != nil {
+			log.Printf("Failed to add %s to the contact list: %v", user.Email, err)
+		}
 	}
 
+	if err := models.DetachIdentity(c, identity.Provider, identity.ProviderId, user.Id); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	user.SetIdentity(*identity)
+	if user.Name == "" {
+		user.Name = identity.Name
+	}
+	if user.ProfilePicture == "" {
+		user.ProfilePicture = identity.AvatarUrl
+	}
 	user.LastLogin = time.Now()
 	user.LastRefresh = time.Now()
 	if _, err := models.UpdateUser(c, user.Id, user); err != nil {
@@ -311,13 +368,7 @@ func (controller *AuthController) PostGithubLogin(c *gin.Context) {
 		return
 	}
 
-	accesstoken, err := utils.SignAccessToken(user.Id.Hex(), 1)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	refreshtoken, err := utils.SignRefreshToken(user.Id.Hex(), 168)
+	refreshtoken, accesstoken, err := SignTokenPair(c, user.Id.Hex())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

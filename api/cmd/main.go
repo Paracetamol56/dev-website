@@ -1,9 +1,12 @@
 package main
 
 import (
+	"context"
 	"dev/internal/db"
+	"dev/internal/models"
 	"dev/internal/server"
 	"dev/internal/utils"
+	"log"
 
 	_ "dev/docs"
 
@@ -33,6 +36,11 @@ import (
 func main() {
 	godotenv.Load()
 	db.Init()
+	if migrated, err := models.MigrateUserIdentities(context.Background()); err != nil {
+		log.Fatalln("Failed to migrate user identities:", err)
+	} else if migrated > 0 {
+		log.Printf("Migrated %d users to identities", migrated)
+	}
 	utils.ScheduleIconRefresh()
 	server.Run()
 }

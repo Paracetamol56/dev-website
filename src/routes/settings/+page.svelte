@@ -72,7 +72,7 @@
 		},
 		{
 			id: 'integration',
-			title: 'Integrations',
+			title: 'Identities',
 			component: Integration
 		}
 	];
@@ -84,7 +84,8 @@
 		elements: { content, item, trigger, root },
 		helpers: { isSelected }
 	} = createAccordion({
-		defaultValue: 'profile'
+		multiple: true,
+		defaultValue: items.map(({ id }) => id)
 	});
 </script>
 

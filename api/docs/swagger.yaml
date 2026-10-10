@@ -19,13 +19,6 @@ definitions:
     - message
     - name
     type: object
-  controllers.GithubLoginBody:
-    properties:
-      code:
-        type: string
-    required:
-    - code
-    type: object
   controllers.HealthResponse:
     properties:
       status:
@@ -38,6 +31,48 @@ definitions:
         type: string
     required:
     - email
+    type: object
+  controllers.OAuthLoginBody:
+    properties:
+      code:
+        type: string
+      redirectUri:
+        type: string
+    required:
+    - code
+    type: object
+  controllers.OAuthProviderResponse:
+    properties:
+      authorizeUrl:
+        example: https://github.com/login/oauth/authorize
+        type: string
+      clientId:
+        type: string
+      name:
+        example: github
+        type: string
+      scope:
+        example: read:user user:email
+        type: string
+    type: object
+  controllers.PasskeyBeginResponse:
+    properties:
+      options: {}
+      sessionId:
+        type: string
+    type: object
+  controllers.PasskeyFinishBody:
+    properties:
+      credential:
+        type: object
+      name:
+        maxLength: 50
+        type: string
+      sessionId:
+        type: string
+    required:
+    - credential
+    - sessionId
     type: object
   controllers.PatchTodoBody:
     properties:
@@ -127,73 +162,6 @@ definitions:
     required:
     - token
     type: object
-  models.GitHubUser:
-    properties:
-      avatar_url:
-        type: string
-      bio:
-        type: string
-      blog:
-        type: string
-      company:
-        type: string
-      created_at:
-        type: string
-      email:
-        type: string
-      events_url:
-        type: string
-      followers:
-        type: integer
-      followers_url:
-        type: string
-      following:
-        type: integer
-      following_url:
-        type: string
-      gists_url:
-        type: string
-      gravatar_id:
-        type: string
-      hireable:
-        type: boolean
-      html_url:
-        type: string
-      id:
-        type: integer
-      location:
-        type: string
-      login:
-        type: string
-      name:
-        type: string
-      node_id:
-        type: string
-      organizations_url:
-        type: string
-      public_gists:
-        type: integer
-      public_repos:
-        type: integer
-      received_events_url:
-        type: string
-      repos_url:
-        type: string
-      site_admin:
-        type: boolean
-      starred_url:
-        type: string
-      subscriptions_url:
-        type: string
-      twitter_username:
-        type: string
-      type:
-        type: string
-      updated_at:
-        type: string
-      url:
-        type: string
-    type: object
   models.HipparcosHR:
     properties:
       Amag:
@@ -235,6 +203,31 @@ definitions:
         example: 42
         type: integer
     type: object
+  models.Identity:
+    properties:
+      avatarUrl:
+        type: string
+      email:
+        type: string
+      lastLogin:
+        type: string
+      linkedAt:
+        type: string
+      name:
+        type: string
+      profileUrl:
+        type: string
+      provider:
+        enum:
+        - email
+        - github
+        - google
+        type: string
+      providerId:
+        type: string
+      username:
+        type: string
+    type: object
   models.OrmiEvent:
     properties:
       newState:
@@ -245,6 +238,17 @@ definitions:
         type: string
       updatedAt:
         format: date-time
+        type: string
+    type: object
+  models.Passkey:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: string
+      lastUsed:
+        type: string
+      name:
         type: string
     type: object
   models.Todo:
@@ -334,18 +338,22 @@ definitions:
         type: string
       flavour:
         type: string
-      github:
-        $ref: '#/definitions/models.GitHubUser'
-      githubAccessToken:
-        type: string
       id:
         type: string
+      identities:
+        items:
+          $ref: '#/definitions/models.Identity'
+        type: array
       lastLogin:
         type: string
       lastRefresh:
         type: string
       name:
         type: string
+      passkeys:
+        items:
+          $ref: '#/definitions/models.Passkey'
+        type: array
       profilePicture:
         type: string
     type: object
@@ -363,18 +371,29 @@ info:
   title: Dev Website API
   version: "1.0"
 paths:
-  /auth/github/login:
+  /auth/{provider}:
     post:
       consumes:
       - application/json
-      description: Login or register a user with GitHub by code
+      description: Exchange an authorization code for the identity of its owner and
+        attach it to the user having the same email, creating the user if needed.
+        When called with a bearer token, the identity must have the email of the authenticated
+        user.
       parameters:
-      - description: Code
+      - description: Identity provider
+        enum:
+        - github
+        - google
+        in: path
+        name: provider
+        required: true
+        type: string
+      - description: Authorization code and the redirect URI it was issued for
         in: body
         name: body
         required: true
         schema:
-          $ref: '#/definitions/controllers.GithubLoginBody'
+          $ref: '#/definitions/controllers.OAuthLoginBody'
       produces:
       - application/json
       responses:
@@ -385,7 +404,29 @@ paths:
             type: object
         "400":
           description: Bad Request
-      summary: Login or register a user with GitHub
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Login, register or link an identity with an OAuth provider
       tags:
       - auth
   /auth/login:
@@ -408,6 +449,78 @@ paths:
         "400":
           description: Bad Request
       summary: Login or register a user
+      tags:
+      - auth
+  /auth/passkey/begin:
+    post:
+      description: Get the options to pass to navigator.credentials.get(). No email
+        is needed, the passkey identifies the user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.PasskeyBeginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Start a passkey login
+      tags:
+      - auth
+  /auth/passkey/finish:
+    post:
+      consumes:
+      - application/json
+      description: Verify the assertion returned by navigator.credentials.get() and
+        log the owner of the passkey in
+      parameters:
+      - description: Session and assertion
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.PasskeyFinishBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Finish a passkey login
+      tags:
+      - auth
+  /auth/providers:
+    get:
+      description: List the identity providers configured on this server, with what
+        a client needs to start their authorization flow
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/controllers.OAuthProviderResponse'
+            type: array
+      summary: List OAuth providers
       tags:
       - auth
   /auth/refresh:
@@ -1182,6 +1295,186 @@ paths:
       security:
       - Bearer: []
       summary: Get user export
+      tags:
+      - user
+  /users/{id}/identities/{provider}:
+    delete:
+      description: Unlink an identity provider from a user. The email identity cannot
+        be removed, so the user can always log in with a magic link.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Identity provider
+        enum:
+        - github
+        - google
+        in: path
+        name: provider
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Unlink an identity
+      tags:
+      - user
+  /users/{id}/passkeys/{passkeyId}:
+    delete:
+      description: Remove a passkey from the authenticated user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Passkey ID
+        in: path
+        name: passkeyId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Remove a passkey
+      tags:
+      - user
+  /users/{id}/passkeys/begin:
+    post:
+      description: Get the options to pass to navigator.credentials.create() to add
+        a passkey to the authenticated user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.PasskeyBeginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Start adding a passkey
+      tags:
+      - user
+  /users/{id}/passkeys/finish:
+    post:
+      consumes:
+      - application/json
+      description: Verify the credential returned by navigator.credentials.create()
+        and add it to the authenticated user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Session, passkey name and credential
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.PasskeyFinishBody'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Finish adding a passkey
       tags:
       - user
 securityDefinitions:

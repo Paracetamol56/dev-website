@@ -3,6 +3,7 @@ package server
 import (
 	"dev/internal/controllers"
 	"dev/internal/middlewares"
+	"dev/internal/utils"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
@@ -17,7 +18,7 @@ func InitRouter() *gin.Engine {
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 	r.Use(cors.New(cors.Config{
-		AllowOrigins: []string{"http://localhost:8000", "http://localhost:5173", "https://dev.matheo-galuba.com", "https://dev-uat.matheo-galuba.com"},
+		AllowOrigins: utils.AllowedOrigins,
 		AllowMethods: []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders: []string{"Origin", "Content-Type", "Authorization"},
 	}))
@@ -32,6 +33,7 @@ func InitRouter() *gin.Engine {
 	wordCloud := new(controllers.WordCloudController)
 	microprocessor := new(controllers.MicroprocessorController)
 	ormi := new(controllers.OrmiController)
+	passkey := new(controllers.PasskeyController)
 	user := new(controllers.UserController)
 
 	apiGroup := r.Group("/api")
@@ -45,8 +47,10 @@ func InitRouter() *gin.Engine {
 			authGroup.POST("/login", auth.PostLogin)
 			authGroup.POST("/verify", auth.PostVerify)
 			authGroup.POST("/refresh", auth.PostRefresh)
-			// Third party auth
-			authGroup.POST("/github", auth.PostGithubLogin)
+			authGroup.GET("/providers", auth.GetOAuthProviders)
+			authGroup.POST("/:provider", auth.PostOAuthLogin)
+			authGroup.POST("/passkey/begin", passkey.PostLoginBegin)
+			authGroup.POST("/passkey/finish", passkey.PostLoginFinish)
 		}
 		hipparcosGroup := apiGroup.Group("/hipparcos")
 		{
@@ -92,6 +96,10 @@ func InitRouter() *gin.Engine {
 			userGroup.PATCH("/:id", user.PatchUser)
 			userGroup.DELETE("/:id", user.DeleteUser)
 			userGroup.GET("/:id/export", user.GetExport)
+			userGroup.DELETE("/:id/identities/:provider", user.DeleteIdentity)
+			userGroup.POST("/:id/passkeys/begin", passkey.PostRegisterBegin)
+			userGroup.POST("/:id/passkeys/finish", passkey.PostRegisterFinish)
+			userGroup.DELETE("/:id/passkeys/:passkeyId", passkey.DeletePasskey)
 		}
 	}
 

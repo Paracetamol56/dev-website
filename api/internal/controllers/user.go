@@ -144,6 +144,53 @@ func (controller *UserController) PatchUser(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
+// DeleteIdentity godoc
+//
+//	@Summary		Unlink an identity
+//	@Description	Unlink an identity provider from a user. The email identity cannot be removed, so the user can always log in with a magic link.
+//	@Tags			user
+//	@Produce		json
+//	@Param			id			path		string	true	"User ID"
+//	@Param			provider	path		string	true	"Identity provider"	Enums(github, google)
+//	@Success		200			{object}	models.User
+//	@Failure		400			{object}	map[string]string
+//	@Failure		403			{object}	map[string]string
+//	@Failure		404			{object}	map[string]string
+//	@Security		Bearer
+//	@Router			/users/{id}/identities/{provider} [delete]
+func (controller *UserController) DeleteIdentity(c *gin.Context) {
+	userId, err := primitive.ObjectIDFromHex(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid id"})
+		return
+	}
+	if userId != c.MustGet("x-user-id").(primitive.ObjectID) {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Forbidden"})
+		return
+	}
+	provider := c.Param("provider")
+	if provider == models.IdentityProviderEmail {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "The email identity cannot be removed"})
+		return
+	}
+
+	user, err := models.GetFullUserById(c, userId)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+	if !user.RemoveIdentity(provider) {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Identity not found"})
+		return
+	}
+	if _, err := models.UpdateUser(c, userId, user); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
+}
+
 // DeleteUser godoc
 //
 //	@Summary		Delete a user

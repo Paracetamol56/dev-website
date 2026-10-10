@@ -3,5 +3,5 @@
 	import { onMount } from 'svelte';
 	import { completeOAuth } from '$lib/oauth';
 
-	onMount(() => completeOAuth('github', $page.url.searchParams));
+	onMount(() => completeOAuth('google', $page.url.searchParams));
 </script>
