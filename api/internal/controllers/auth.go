@@ -3,9 +3,13 @@ package controllers
 import (
 	"dev/internal/models"
 	"dev/internal/utils"
+	"errors"
+	"html"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
+	"slices"
 	"strings"
 	"time"
 
@@ -29,7 +33,7 @@ func SendVerificationEmail(c *gin.Context, user *models.User, url string) error 
 			Please verify your email address by clicking the link below.
 		</p>
 
-		<a href="` + url + `">Verify your email address</a>
+		<a href="` + html.EscapeString(url) + `">Verify your email address</a>
 
 		<p>
 			Thanks,<br>
@@ -62,6 +66,24 @@ func SignTokenPair(c *gin.Context, userId string) (string, string, error) {
 		return "", "", err
 	}
 	return refreshtoken, accesstoken, nil
+}
+
+func verificationLink(origin string, referer string, token string) (string, error) {
+	if !slices.Contains(utils.AllowedOrigins, origin) {
+		return "", errors.New("origin not allowed")
+	}
+
+	redirect := "/"
+	if parsed, err := url.Parse(referer); err == nil && parsed.Path != "" {
+		redirect = parsed.RequestURI()
+	}
+	// "//host" and "/\host" are read by browsers as another host
+	if !strings.HasPrefix(redirect, "/") || strings.HasPrefix(redirect, "//") || strings.HasPrefix(redirect, "/\\") {
+		redirect = "/"
+	}
+
+	query := url.Values{"token": {token}, "redirect": {redirect}}
+	return origin + "/verify/email?" + query.Encode(), nil
 }
 
 type LoginBody struct {
@@ -110,7 +132,11 @@ func (controller *AuthController) PostLogin(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	link := c.GetHeader("Origin") + "/verify/email?token=" + verificationToken + "&redirect=" + c.GetHeader("Referer")
+	link, err := verificationLink(c.GetHeader("Origin"), c.GetHeader("Referer"), verificationToken)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 	if err := SendVerificationEmail(c, user, link); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
