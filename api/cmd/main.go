@@ -42,5 +42,6 @@ func main() {
 		log.Printf("Migrated %d users to identities", migrated)
 	}
 	utils.ScheduleIconRefresh()
+	utils.ScheduleMicroprocessorRefresh()
 	server.Run()
 }

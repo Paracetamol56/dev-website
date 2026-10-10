@@ -71,7 +71,7 @@ func InitRouter() *gin.Engine {
 			iconGroup.GET("", icon.GetIcons)
 			iconGroup.GET("/search", icon.SearchIcons)
 		}
-		microprocessorGroup := apiGroup.Group("/microprocessors")
+		microprocessorGroup := apiGroup.Group("/chips")
 		{
 			microprocessorGroup.GET("", microprocessor.GetMicroprocessor)
 			microprocessorGroup.GET("/:id", microprocessor.GetMicroprocessorById)

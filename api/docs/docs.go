@@ -322,6 +322,112 @@ const docTemplate = `{
                 }
             }
         },
+        "/chips": {
+            "get": {
+                "description": "List CPUs and GPUs with their transistor count (in millions), process node (nm), die area (mm²) and density (transistors per mm²). Documents are flat and do not all have the same keys: besides the fields documented here, each one carries every column of its source table (for example processor, designer, fab, year), and fields without a value are omitted. A column holding a quantity is an object with its value and unit, such as {\"value\": 8000, \"unit\": \"nm\"}, plus the original text when it says more; other columns are text. Chips imported from Wikipedia are refreshed weekly and licensed under CC BY-SA 4.0, see their sourceUrl.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "chips"
+                ],
+                "summary": "List chips",
+                "parameters": [
+                    {
+                        "enum": [
+                            "CPU",
+                            "GPU"
+                        ],
+                        "type": "string",
+                        "description": "Only return chips of this type",
+                        "name": "type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Only return chips of this vendor",
+                        "name": "vendor",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Microprocessor"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/chips/{id}": {
+            "get": {
+                "description": "Get a chip by id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "chips"
+                ],
+                "summary": "Get one chip",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Chip ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Microprocessor"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/contact": {
             "post": {
                 "description": "Send a contact message",
@@ -2011,6 +2117,55 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Microprocessor": {
+            "type": "object",
+            "properties": {
+                "density": {
+                    "type": "number"
+                },
+                "dieSize": {
+                    "type": "number"
+                },
+                "frequency": {
+                    "type": "number"
+                },
+                "gateSize": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "manufacturer": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "release": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "source": {
+                    "type": "string"
+                },
+                "sourceUrl": {
+                    "type": "string"
+                },
+                "tdp": {
+                    "type": "number"
+                },
+                "transistors": {
+                    "type": "number"
+                },
+                "type": {
+                    "type": "string",
+                    "example": "CPU"
+                },
+                "vendor": {
                     "type": "string"
                 }
             }

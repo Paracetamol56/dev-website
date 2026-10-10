@@ -228,6 +228,39 @@ definitions:
       username:
         type: string
     type: object
+  models.Microprocessor:
+    properties:
+      density:
+        type: number
+      dieSize:
+        type: number
+      frequency:
+        type: number
+      gateSize:
+        type: number
+      id:
+        type: string
+      manufacturer:
+        type: string
+      name:
+        type: string
+      release:
+        format: date-time
+        type: string
+      source:
+        type: string
+      sourceUrl:
+        type: string
+      tdp:
+        type: number
+      transistors:
+        type: number
+      type:
+        example: CPU
+        type: string
+      vendor:
+        type: string
+    type: object
   models.OrmiEvent:
     properties:
       newState:
@@ -573,6 +606,84 @@ paths:
       summary: Verify a user's email
       tags:
       - auth
+  /chips:
+    get:
+      description: 'List CPUs and GPUs with their transistor count (in millions),
+        process node (nm), die area (mm²) and density (transistors per mm²). Documents
+        are flat and do not all have the same keys: besides the fields documented
+        here, each one carries every column of its source table (for example processor,
+        designer, fab, year), and fields without a value are omitted. A column holding
+        a quantity is an object with its value and unit, such as {"value": 8000, "unit":
+        "nm"}, plus the original text when it says more; other columns are text. Chips
+        imported from Wikipedia are refreshed weekly and licensed under CC BY-SA 4.0,
+        see their sourceUrl.'
+      parameters:
+      - description: Only return chips of this type
+        enum:
+        - CPU
+        - GPU
+        in: query
+        name: type
+        type: string
+      - description: Only return chips of this vendor
+        in: query
+        name: vendor
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Microprocessor'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List chips
+      tags:
+      - chips
+  /chips/{id}:
+    get:
+      description: Get a chip by id
+      parameters:
+      - description: Chip ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Microprocessor'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get one chip
+      tags:
+      - chips
   /contact:
     post:
       consumes:

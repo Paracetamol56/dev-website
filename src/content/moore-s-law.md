@@ -18,7 +18,7 @@ The Moore's Law is an observation made by Gordon Moore, co-founder of Intel, in 
 > The number of transistors in a dense integrated circuit doubles approximately every two years.
 > His observation has held true for decades and has been a driving force behind the exponential growth of computing power.
 
-The chart below shows how the number of transistors, the gate size, the frequency or TDP have evolved over the years from 2000 to 2024.
+The chart below shows how the number of transistors, the process node, the die area and the transistor density of CPUs and GPUs have evolved from the 1970s to today.
 
 #### Transistor count
 
@@ -34,7 +34,7 @@ The constant shrinking of the gate size has been a major factor in the exponenti
 
 #### Frequency
 
-The frequency is the number of clock cycles per second (measured in Hertz) at which a chip operates. As shown in the chart, the frequency has been increasing until the early 2000s and has been relatively stable since then due to physical limitations such as power consumption and heat dissipation. That's why chip manufacturers decided to put multiple cores on a single chip to increase performance.
+The frequency is the number of clock cycles per second (measured in Hertz) at which a chip operates. The frequency has been increasing until the early 2000s and has been relatively stable since then due to physical limitations such as power consumption and heat dissipation. That's why chip manufacturers decided to put multiple cores on a single chip to increase performance.
 
 #### TDP
 
@@ -43,10 +43,6 @@ TDP stands for Thermal Design Power and is a measure of the maximum amount of he
 As you can imagine, the TDP is an important constraint to take into account for consumer electronics. Especially for mobile devices and embedded systems.
 
 <Chart />
-
-### Data source
-
-The data used in this chart comes from [Yifan Sun](https://sarchlab.org/syifan) who created a similar [chart](https://chip-dataset.vercel.app/) and published his dataset.
 
 ### Ressources
 
