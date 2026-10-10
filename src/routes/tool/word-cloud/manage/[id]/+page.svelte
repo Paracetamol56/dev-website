@@ -1,9 +1,10 @@
 <script lang="ts">
-	import WordCloud from './WordCloud.svelte';
+	import WordCloud from '../../WordCloud.svelte';
 	import BarChart from './BarChart.svelte';
 	import Table from './Table.svelte';
 	import { createDialog, melt } from '@melt-ui/svelte';
 	import { QrCode, X } from 'lucide-svelte';
+	import MeltTooltip from '$lib/components/MeltTooltip.svelte';
 	import { fade, fly } from 'svelte/transition';
 	import QRCode from 'qrcode';
 	import type { PageData } from './$types';
@@ -105,58 +106,100 @@
 </script>
 
 <svelte:head>
-	<title>Word cloud - Mathéo Galuba</title>
+	<title>{data.session.name} - Word cloud - Mathéo Galuba</title>
 </svelte:head>
 
 <section class="container mx-auto mb-32">
 	<hgroup>
-		<h1 class="mb-8 text-6xl font-bold text-center">
-			<span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender"
-				>Word cloud</span
-			>
-			{data.session?.name || ''}
+		<h1 class="mb-8 text-4xl font-bold text-center">
+			<span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender">
+				{data.session.name}
+			</span>
 		</h1>
+		{#if data.session.description}
+			<p class="text-center text-ctp-subtext0 mb-8">{data.session.description}</p>
+		{/if}
 	</hgroup>
-</section>
 
-<section class="container mx-auto">
-	{#if data.session}
-		<WordCloud data={data.distribution} />
-		<div class="mb-4 p-4 w-full bg-ctp-mantle rounded-md">
-			<p><strong>Submissions:</strong> {data.session.words.length}</p>
-			<p><strong>Unique words:</strong> {data.distribution.length}</p>
-			<p><strong>Created at:</strong> {humanReadableDate(new Date(data.session.createdAt))}</p>
-			{#if !data.session.open}
-				<p>
-					<strong>Closed at:</strong>
-					{humanReadableDate(data.session.closedAt ? new Date(data.session.closedAt) : null)}
-				</p>
-			{:else}
-				<div class="mt-2 flex justify-start gap-2">
+	<div class="flex flex-col gap-8">
+		<div
+			class="bg-ctp-mantle p-6 rounded-md shadow-md shadow-ctp-crust flex flex-wrap items-center gap-x-8 gap-y-4"
+		>
+			<div class="flex items-center gap-2">
+				{#if data.session.open}
+					<span class="relative square-2 rounded-full bg-ctp-green">
+						<span class="absolute inset-0 animate-ping rounded-full bg-ctp-green" />
+					</span>
+					<span class="font-semibold">Open</span>
+				{:else}
+					<span class="square-2 rounded-full bg-ctp-red" />
+					<span class="font-semibold">Closed</span>
+				{/if}
+			</div>
+			<dl class="flex flex-wrap gap-x-8 gap-y-2 text-sm">
+				<div>
+					<dt class="text-ctp-subtext0">Code</dt>
+					<dd class="font-mono text-lg font-bold text-ctp-mauve">{data.session.code}</dd>
+				</div>
+				<div>
+					<dt class="text-ctp-subtext0">Submissions</dt>
+					<dd class="text-lg font-semibold">{data.session.words.length}</dd>
+				</div>
+				<div>
+					<dt class="text-ctp-subtext0">Unique words</dt>
+					<dd class="text-lg font-semibold">{data.distribution.length}</dd>
+				</div>
+				<div>
+					<dt class="text-ctp-subtext0">Created</dt>
+					<dd class="text-lg font-semibold">
+						{humanReadableDate(new Date(data.session.createdAt))}
+					</dd>
+				</div>
+				{#if !data.session.open && data.session.closedAt}
+					<div>
+						<dt class="text-ctp-subtext0">Closed</dt>
+						<dd class="text-lg font-semibold">
+							{humanReadableDate(new Date(data.session.closedAt))}
+						</dd>
+					</div>
+				{/if}
+			</dl>
+			{#if data.session.open}
+				<div class="ml-auto flex flex-wrap gap-2">
+					<MeltTooltip text="Show the code and QR code to the audience">
+						<button
+							class="flex items-center gap-1 rounded-md bg-ctp-mauve px-3 py-1 font-semibold text-ctp-mantle
+								shadow-md shadow-ctp-crust transition-opacity hover:opacity-80 active:opacity-60"
+							use:melt={$trigger}
+						>
+							<QrCode size="16" />
+							Join info
+						</button>
+					</MeltTooltip>
 					<button
-						class="flex items-center gap-1 rounded-md bg-ctp-mauve px-3 py-1
-                  font-semibold text-ctp-mantle
-                  shadow-md shadow-ctp-crust transition-opacity
-                  hover:opacity-80 active:opacity-60"
-						use:melt={$trigger}
-					>
-						Session info <QrCode size="20" stroke-width="3" />
-					</button>
-					<button
-						class="flex items-center gap-1 rounded-md bg-ctp-red px-3 py-1
-                  font-semibold text-ctp-mantle
-                  shadow-md shadow-ctp-crust transition-opacity
-                  hover:opacity-80 active:opacity-60"
+						class="flex items-center gap-1 rounded-md bg-ctp-red px-3 py-1 font-semibold text-ctp-mantle
+							shadow-md shadow-ctp-crust transition-opacity hover:opacity-80 active:opacity-60"
 						on:click={closeSession}
 					>
-						Close session <X size="20" stroke-width="3" />
+						<X size="16" />
+						Close session
 					</button>
 				</div>
 			{/if}
 		</div>
-		<BarChart data={data.distribution} />
+
+		<div class="bg-ctp-mantle p-6 rounded-md shadow-md shadow-ctp-crust flex flex-col gap-4">
+			<h2 class="text-2xl font-bold text-ctp-text">Word cloud</h2>
+			<WordCloud data={data.distribution} filename="word-cloud-{data.session.code}" />
+		</div>
+
+		<div class="bg-ctp-mantle p-6 rounded-md shadow-md shadow-ctp-crust flex flex-col gap-4">
+			<h2 class="text-2xl font-bold text-ctp-text">Most frequent words</h2>
+			<BarChart data={data.distribution} />
+		</div>
+
 		<Table data={data.session.words} id={data.session.id} />
-	{/if}
+	</div>
 </section>
 
 <div use:melt={$portalled}>

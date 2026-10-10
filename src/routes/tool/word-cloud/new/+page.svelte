@@ -33,6 +33,7 @@
 	const validateDescription = (description: string) => {
 		description = description.trim();
 		if (description.length === 0) {
+			descriptionError = '';
 			return true;
 		}
 		if (description.length < 10) {
@@ -87,72 +88,73 @@
 </script>
 
 <svelte:head>
-	<title>Word cloud - Mathéo Galuba</title>
+	<title>New word cloud - Mathéo Galuba</title>
 </svelte:head>
 
 <section class="container mx-auto mb-32">
 	<hgroup>
-		<h1 class="mb-8 text-6xl font-bold text-center">
-			<span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender"
-				>Word cloud</span
-			>
+		<h1 class="mb-8 text-4xl font-bold text-center">
+			<span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender">
+				New word cloud
+			</span>
 		</h1>
+		<p class="text-center text-ctp-subtext0 mb-8">
+			Name your question; your audience joins with a code or a QR code.
+		</p>
 	</hgroup>
-</section>
 
-<section class="container mx-auto">
-	<h2 class="mb-4 text-2xl font-semibold text-center">Create a new session</h2>
-	<div class="relative">
-		<form class="mx-auto max-w-xl {$user.accessToken ? '' : 'blur-sm'}" on:submit={handleSubmit}>
-			<div class="flex flex-col gap-y-6">
-				<fieldset class="w-full">
-					<label for="name" class="mb-2 text-sm font-semibold"> Name </label>
-					<input
-						id="name"
-						type="text"
-						name="name"
-						class="flex h-8 w-full items-center justify-between rounded-md bg-ctp-surface0
-									shadow-md shadow-ctp-crust px-3 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
-						bind:value={name}
-						on:blur={() => validateName(name)}
-						disabled={$user.id === null}
-					/>
-					<p class="text-left text-sm font-semibold text-ctp-red">{nameError}</p>
-				</fieldset>
-				<fieldset class="sm:col-span-2">
-					<label for="description" class="mb-2 text-sm font-semibold">
-						Description <small>(optional)</small></label
-					>
-					<textarea
-						id="description"
-						name="description"
-						class="flex h-32 w-full items-center justify-between rounded-md bg-ctp-surface0
-									shadow-md shadow-ctp-crust px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
-						bind:value={description}
-						on:blur={() => validateDescription(description)}
-						disabled={$user.id === null}
-					/>
-					<p class="text-left text-sm font-semibold text-ctp-red">{descriptionError}</p>
-				</fieldset>
-				<div class="sm:col-span-2 flex justify-end">
-					<Button type="submit">
-						<span>Create</span>
-						<Send size="16" />
-					</Button>
-				</div>
+	<div class="relative mx-auto max-w-xl">
+		<form
+			class="bg-ctp-mantle p-6 rounded-md shadow-md shadow-ctp-crust flex flex-col gap-6
+				{$user.accessToken ? '' : 'blur-sm'}"
+			on:submit={handleSubmit}
+			inert={$user.accessToken === null}
+		>
+			<div>
+				<label for="name" class="mb-2 block text-sm font-semibold">Question or title</label>
+				<input
+					id="name"
+					type="text"
+					name="name"
+					maxlength="100"
+					class="flex h-8 w-full items-center rounded-md bg-ctp-surface0 shadow-md shadow-ctp-crust px-3
+						focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
+					bind:value={name}
+					on:blur={() => validateName(name)}
+				/>
+				<p class="text-left text-sm font-semibold text-ctp-red" aria-live="polite">{nameError}</p>
+			</div>
+			<div>
+				<label for="description" class="mb-2 block text-sm font-semibold">
+					Description <small class="text-ctp-subtext0">(optional)</small>
+				</label>
+				<textarea
+					id="description"
+					name="description"
+					maxlength="1000"
+					class="flex h-32 w-full rounded-md bg-ctp-surface0 shadow-md shadow-ctp-crust px-3 py-2
+						focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
+					bind:value={description}
+					on:blur={() => validateDescription(description)}
+				/>
+				<p class="text-left text-sm font-semibold text-ctp-red" aria-live="polite">
+					{descriptionError}
+				</p>
+			</div>
+			<div class="flex justify-end">
+				<Button type="submit">
+					<span>Create</span>
+					<Send size="16" />
+				</Button>
 			</div>
 		</form>
 		{#if $user.accessToken === null}
-			<div>
-				<div
-					class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center"
-				>
-					<div class="text-ctp-red font-semibold mb-4 flex items-baseline gap-1">
-						<AlertTriangle size="16" />
-						<p>You must be logged in to create a new session</p>
-					</div>
-					<LoginDialog />
-				</div>
+			<div class="absolute inset-0 flex flex-col items-center justify-center gap-4 text-center">
+				<p class="flex items-baseline gap-1 font-semibold text-ctp-red">
+					<AlertTriangle size="16" />
+					You must be logged in to create a session
+				</p>
+				<LoginDialog />
 			</div>
 		{/if}
 	</div>

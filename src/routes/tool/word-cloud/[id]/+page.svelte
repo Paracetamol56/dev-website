@@ -106,24 +106,32 @@
 	<title>{data.session.name} - Word cloud - Mathéo Galuba</title>
 </svelte:head>
 
-<div class="mx-auto max-w-xl">
-	<h2 class="mb-4 text-4xl font-bold text-center">{data.session.name}</h2>
-	<p class="text-center">{data.session.description}</p>
+<section class="container mx-auto mb-32">
+	<hgroup>
+		<h1 class="mb-8 text-4xl font-bold text-center">
+			<span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender">
+				{data.session.name}
+			</span>
+		</h1>
+		{#if data.session.description}
+			<p class="text-center text-ctp-subtext0 mb-8">{data.session.description}</p>
+		{/if}
+	</hgroup>
 
-	{#if open}
-		<form class="my-16" on:submit={handleSubmit}>
-			<div class="flex flex-col gap-8 items-center">
+	<div class="mx-auto max-w-xl bg-ctp-mantle p-6 rounded-md shadow-md shadow-ctp-crust">
+		{#if open}
+			<form class="flex flex-col items-center gap-6" on:submit={handleSubmit}>
 				<div class="w-full">
-					<label for="text" class="mb-2 text-sm font-semibold">Write something</label>
+					<label for="text" class="mb-2 block text-sm font-semibold">Your answer</label>
 					<input
 						id="text"
 						name="text"
 						type="text"
 						maxlength="100"
 						autocomplete="off"
-						class="flex h-8 w-full items-center justify-between rounded-md bg-ctp-surface0
-                px-3 pr-12 focus:outline-none transition-colors
-                {textError
+						class="flex h-10 w-full items-center rounded-md bg-ctp-surface0 px-3 shadow-md shadow-ctp-crust
+							focus:outline-none transition-colors
+							{textError
 							? 'ring-2 ring-ctp-red'
 							: sent
 							? 'ring-2 ring-ctp-green'
@@ -134,11 +142,11 @@
 							textError = '';
 						}}
 					/>
-					<p class="text-left text-sm font-semibold text-ctp-red" aria-live="polite">
+					<p class="mt-1 text-left text-sm font-semibold text-ctp-red" aria-live="polite">
 						{textError}
 					</p>
 					{#if sent}
-						<p class="text-left text-sm font-semibold text-ctp-green" aria-live="polite">
+						<p class="mt-1 text-left text-sm font-semibold text-ctp-green" aria-live="polite">
 							“{sent}” was sent
 						</p>
 					{/if}
@@ -147,15 +155,15 @@
 					<span>Send</span>
 					<Send size="18" />
 				</Button>
-			</div>
-		</form>
-
-		<p class="mt-8 text-center">
-			The session code is <strong>{data.session.code}</strong>,<br />share it with your neighbors.
-		</p>
-	{:else}
-		<p class="my-16 text-center text-lg font-semibold text-ctp-subtext0" role="status">
-			This session is closed, thank you for taking part!
-		</p>
-	{/if}
-</div>
+			</form>
+			<p class="mt-6 text-center text-sm text-ctp-subtext0">
+				Session code <strong class="font-mono text-ctp-mauve">{data.session.code}</strong>, share it
+				with your neighbours.
+			</p>
+		{:else}
+			<p class="py-8 text-center text-lg font-semibold text-ctp-subtext0" role="status">
+				This session is closed, thank you for taking part!
+			</p>
+		{/if}
+	</div>
+</section>

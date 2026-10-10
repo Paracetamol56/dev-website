@@ -3,7 +3,7 @@
 	import { page } from '$app/stores';
 	import api from '$lib/api';
 	import Button from '$lib/components/Button.svelte';
-	import { ArrowRightToLine } from 'lucide-svelte';
+	import { ArrowRightToLine, List, Plus } from 'lucide-svelte';
 	import { addToast } from '../../+layout.svelte';
 	import { createPinInput, melt } from '@melt-ui/svelte';
 	import { user } from '$lib/store';
@@ -72,19 +72,24 @@
 
 <section class="container mx-auto mb-32">
 	<hgroup>
-		<h1 class="mb-8 text-6xl font-bold text-center">
+		<h1 class="mb-8 text-4xl font-bold text-center">
 			<span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender">
 				Word cloud
 			</span>
 		</h1>
+		<p class="text-center text-ctp-subtext0 mb-8">
+			Ask your audience a question and watch their answers grow into a live word cloud.
+		</p>
 	</hgroup>
-</section>
 
-<section class="container mx-auto">
-	<form on:submit={handleSubmit}>
-		<div class="flex flex-col gap-8 items-center">
+	<div class="mx-auto flex max-w-xl flex-col gap-8">
+		<form
+			class="bg-ctp-mantle p-6 rounded-md shadow-md shadow-ctp-crust flex flex-col items-center gap-6"
+			on:submit={handleSubmit}
+		>
+			<h2 class="text-2xl font-bold text-ctp-text">Join a session</h2>
 			<div class="w-fit">
-				<label for="code" class="mb-2 text-sm font-semibold"> Session code </label>
+				<label for="code" class="mb-2 block text-sm font-semibold">Session code</label>
 				<div use:melt={$root} class="flex items-center gap-2">
 					{#each Array.from({ length: 5 }) as _}
 						<input
@@ -92,34 +97,41 @@
 							autocomplete="off"
 							type="text"
 							maxlength="1"
-							class="rounded-md bg-ctp-surface0 text-center text-lg text-ctp-text square-12
-                  shadow-md shadow-ctp-crust focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
+							class="rounded-md bg-ctp-surface0 text-center text-lg uppercase text-ctp-text square-12
+								shadow-md shadow-ctp-crust focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
 							on:keydown={(e) => {
-								if (e.key === 'Enter') {
-									handleSubmit(e);
-								}
+								if (e.key === 'Enter') handleSubmit(e);
 							}}
 							use:melt={$input()}
 						/>
 					{/each}
 				</div>
-				<p class="text-left text-sm font-semibold text-ctp-red">{codeError}</p>
+				<p class="mt-1 text-left text-sm font-semibold text-ctp-red" aria-live="polite">
+					{codeError}
+				</p>
 			</div>
 			<Button type="submit">
 				<span>Join</span>
 				<ArrowRightToLine size="18" />
 			</Button>
-		</div>
-	</form>
+		</form>
 
-	<div class="mt-8 flex justify-center gap-4">
-		<a class="font-semibold hover:text-ctp-blue transition-colors" href="/tool/word-cloud/new"
-			>Create a new session</a
+		<div
+			class="bg-ctp-mantle p-6 rounded-md shadow-md shadow-ctp-crust flex flex-wrap items-center justify-between gap-4"
 		>
-		{#if $user.id !== null}
-			<a class="font-semibold hover:text-ctp-blue transition-colors" href="/tool/word-cloud/manage"
-				>View your sessions</a
-			>
-		{/if}
+			<p class="text-ctp-subtext0">Running a talk or a workshop?</p>
+			<div class="flex flex-wrap gap-2">
+				<Button link="/tool/word-cloud/new">
+					<Plus size="18" />
+					<span>Create a session</span>
+				</Button>
+				{#if $user.id !== null}
+					<Button link="/tool/word-cloud/manage">
+						<List size="18" />
+						<span>Your sessions</span>
+					</Button>
+				{/if}
+			</div>
+		</div>
 	</div>
 </section>
