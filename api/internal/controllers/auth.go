@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"dev/internal/middlewares"
 	"dev/internal/models"
 	"dev/internal/utils"
 	"errors"
@@ -86,6 +87,8 @@ func verificationLink(origin string, referer string, token string) (string, erro
 	return origin + "/verify/email?" + query.Encode(), nil
 }
 
+var loginEmailLimiter = utils.NewRateLimiter(3, 15*time.Minute)
+
 type LoginBody struct {
 	Email string `json:"email" binding:"required,email"`
 }
@@ -105,6 +108,11 @@ func (controller *AuthController) PostLogin(c *gin.Context) {
 	var login LoginBody
 	if err := c.ShouldBindJSON(&login); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if allowed, retryAfter := loginEmailLimiter.Allow(strings.ToLower(login.Email)); !allowed {
+		middlewares.AbortTooManyRequests(c, retryAfter)
 		return
 	}
 

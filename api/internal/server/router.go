@@ -1,6 +1,8 @@
 package server
 
 import (
+	"time"
+
 	"dev/internal/controllers"
 	"dev/internal/middlewares"
 	"dev/internal/utils"
@@ -15,6 +17,8 @@ import (
 
 func InitRouter() *gin.Engine {
 	r := gin.New()
+	// The reverse proxy reaches the API from a private network, clients cannot spoof X-Forwarded-For
+	r.SetTrustedProxies([]string{"127.0.0.0/8", "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "::1/128", "fc00::/7"})
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 	r.Use(cors.New(cors.Config{
@@ -41,10 +45,11 @@ func InitRouter() *gin.Engine {
 		apiGroup.Use(middlewares.RequestIdMiddleware())
 		apiGroup.GET("/doc/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 		apiGroup.GET("/health", heatlh.GetHealth)
-		apiGroup.POST("/contact", contact.PostContact)
+		apiGroup.POST("/contact", middlewares.RateLimitByIP(5, time.Hour), contact.PostContact)
 		authGroup := apiGroup.Group("/auth")
 		{
-			authGroup.POST("/login", auth.PostLogin)
+			authGroup.Use(middlewares.RateLimitByIP(30, time.Minute))
+			authGroup.POST("/login", middlewares.RateLimitByIP(10, time.Hour), auth.PostLogin)
 			authGroup.POST("/verify", auth.PostVerify)
 			authGroup.POST("/refresh", auth.PostRefresh)
 			authGroup.GET("/providers", auth.GetOAuthProviders)
