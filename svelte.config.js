@@ -1,6 +1,6 @@
 import adapter from '@sveltejs/adapter-static';
 import sequence from 'svelte-sequential-preprocessor';
-import { vitePreprocess } from '@sveltejs/kit/vite';
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 import { escapeSvelte, mdsvex } from 'mdsvex';
 import { preprocessMeltUI } from '@melt-ui/pp';
 import shiki from 'shiki';

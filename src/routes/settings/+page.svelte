@@ -3,7 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { addToast } from '../+layout.svelte';
 	import { createAccordion, melt } from '@melt-ui/svelte';
-	import { SvelteComponent, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import { slide } from 'svelte/transition';
 	import Integration from './Integration.svelte';
 	import Appearance from './Appearance.svelte';
@@ -72,7 +72,7 @@
 		},
 		{
 			id: 'integration',
-			title: 'Integrations',
+			title: 'Identities',
 			component: Integration
 		}
 	];
@@ -84,7 +84,8 @@
 		elements: { content, item, trigger, root },
 		helpers: { isSelected }
 	} = createAccordion({
-		defaultValue: 'profile'
+		multiple: true,
+		defaultValue: items.map(({ id }) => id)
 	});
 </script>
 

@@ -29,11 +29,11 @@ func GenerateCode() string {
 	for i := 0; i < 5; i++ {
 		randInt := rand.Intn(62)
 		if randInt < 10 {
-			code += string(randInt + 48) // ASCII range for numbers: 48-57
+			code += string(rune(randInt + 48)) // ASCII range for numbers: 48-57
 		} else if randInt < 36 {
-			code += string(randInt + 55) // ASCII range for uppercase letters: 65-90
+			code += string(rune(randInt + 55)) // ASCII range for uppercase letters: 65-90
 		} else {
-			code += string(randInt + 61) // ASCII range for lowercase letters: 97-122
+			code += string(rune(randInt + 61)) // ASCII range for lowercase letters: 97-122
 		}
 	}
 	return code

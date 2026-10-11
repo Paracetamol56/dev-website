@@ -1,5 +1,16 @@
-import type { SelectOption } from '@melt-ui/svelte';
+export type IconSource = 'lucide' | 'simpleicons';
 
-export type ColorMode = 'catppuccin' | 'random' | 'custom' | 'transparent';
-export type ShapeOption = SelectOption<'square' | 'round'>;
-export type FormatOption = SelectOption<'png' | 'jpg' | 'webp' | 'svg' | 'bmp' | 'ico'>;
+export type Icon = {
+	id: string;
+	name: string;
+	title: string;
+	source: IconSource;
+	tags: string[];
+	hex?: string;
+};
+
+export const SHAPES = ['square', 'round'] as const;
+export type Shape = (typeof SHAPES)[number];
+
+export const FORMATS = ['png', 'jpg', 'webp', 'svg', 'bmp', 'ico'] as const;
+export type Format = (typeof FORMATS)[number];

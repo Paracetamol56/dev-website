@@ -2,9 +2,9 @@
 	import SocialButton from './SocialButton.svelte';
 </script>
 
-<footer class="sticky top-[100vh] min-w-max p-3">
+<footer class="sticky top-[100vh] p-3">
 	<div
-		class="flex flex-col items-center gap-4 rounded-md bg-ctp-mantle p-3 text-ctp-text shadow-md shadow-ctp-crust"
+		class="flex flex-col items-center gap-4 rounded-md bg-ctp-mantle p-3 text-center text-ctp-text shadow-md shadow-ctp-crust"
 	>
 		<p class="font-semibold">
 			Source code available on <a
@@ -15,7 +15,7 @@
 				GitHub
 			</a>
 		</p>
-		<div class="flex gap-2">
+		<div class="flex flex-wrap justify-center gap-2">
 			<SocialButton href="https://github.com/Paracetamol56" tooltip="GitHub">
 				<svg
 					version="1.1"
@@ -186,10 +186,8 @@
 			</SocialButton>
 		</div>
 		<small>
-			© 2025 Matheo Galuba. All rights reserved. <a
-				class="text-ctp-blue"
-				href="/page/privacy-policy">Privacy policy</a
-			></small
+			© {new Date().getFullYear()} Matheo Galuba. All rights reserved.
+			<a class="text-ctp-blue" href="/page/privacy-policy">Privacy policy</a></small
 		>
 	</div>
 </footer>

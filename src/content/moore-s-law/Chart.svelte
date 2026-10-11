@@ -5,147 +5,317 @@
 	import { user } from '$lib/store';
 	import { variants } from '@catppuccin/palette';
 	import * as d3 from 'd3';
-	import MeltRadioGroup from '$lib/components/MeltRadioGroup.svelte';
-	import { writable, type Writable } from 'svelte/store';
-	import MeltCheckbox from '$lib/components/MeltCheckbox.svelte';
 
-	type Microprocessors = {
+	type Chip = {
 		id: string;
 		name: string;
-		type: 'CPU' | 'GPU';
+		type: string;
 		release: Date;
-		gateSize: number;
-		tdp: number;
-		transistors: number;
-		frequency: number;
 		vendor: string;
+		transistors?: number;
+		gateSize?: number;
+		dieSize?: number;
+		density?: number;
+		frequency?: number;
+		tdp?: number;
+		sourceUrl?: string;
+	};
+	type Metric = 'transistors' | 'gateSize' | 'dieSize' | 'density' | 'frequency' | 'tdp';
+
+	const compact = (value: number) => d3.format('.3~s')(value).replace('G', 'B');
+	const plain = (value: number) => d3.format(',.4~r')(value);
+	const metrics: {
+		name: Metric;
+		label: string;
+		axis: string;
+		format: (value: number) => string;
+	}[] = [
+		{ name: 'transistors', label: 'Transistors', axis: 'Transistors', format: compact },
+		{ name: 'gateSize', label: 'Process node', axis: 'Process node (nm)', format: plain },
+		{ name: 'dieSize', label: 'Die area', axis: 'Die area (mm²)', format: plain },
+		{ name: 'density', label: 'Density', axis: 'Transistors per mm²', format: compact },
+		{ name: 'frequency', label: 'Frequency', axis: 'Frequency (MHz)', format: plain },
+		{ name: 'tdp', label: 'TDP', axis: 'TDP (W)', format: plain }
+	];
+	const types = [
+		{ name: 'CPU', symbol: 'circle' },
+		{ name: 'GPU', symbol: 'square' }
+	];
+	const scales = ['log', 'linear'];
+	const VENDORS = 5;
+	const OTHER = 'Other';
+
+	let chips: Chip[] = [];
+	let loaded = false;
+	let metric: Metric = 'transistors';
+	let selectedTypes = ['CPU'];
+	let scale = 'log';
+
+	let container: HTMLDivElement;
+	let width = 0;
+	let legend: { name: string; color: string }[] = [];
+	let shown = 0;
+	let showTrend = true;
+	let trend: { slope: number; doubling: number; r2: number } | null = null;
+
+	// Least squares on log2(value) over the release year: an exponential trend, straight on the log scale
+	const fitTrend = (points: { year: number; value: number }[]) => {
+		if (points.length < 3) return null;
+		const x = d3.mean(points, (point) => point.year) as number;
+		const y = d3.mean(points, (point) => Math.log2(point.value)) as number;
+		const sxx = d3.sum(points, (point) => (point.year - x) ** 2);
+		const syy = d3.sum(points, (point) => (Math.log2(point.value) - y) ** 2);
+		const sxy = d3.sum(points, (point) => (point.year - x) * (Math.log2(point.value) - y));
+		if (sxx === 0 || syy === 0) return null;
+		const slope = sxy / sxx;
+		return { slope, intercept: y - slope * x, r2: sxy ** 2 / (sxx * syy) };
 	};
 
-	let div: HTMLDivElement;
-	let width: number;
-
-	let chipsData: Microprocessors[] = [];
-	const mooreData = d3
-		.ticks(2000, 2024, 24)
-		.map((year) => ({ release: new Date(year, 0), transistors: 30 * 2 ** ((year - 2000) / 2.5) }));
-
-	const features = [
-		{ name: 'transistors', label: 'Transistors (millions)' },
-		{ name: 'gateSize', label: 'Gate size (nm)' },
-		{ name: 'frequency', label: 'Frequency (MHz)' },
-		{ name: 'tdp', label: 'TDP (W)' }
-	];
-	let selectedFeature: Writable<string> = writable(features[0].name);
-	const types = [
-		{ name: 'CPU', label: 'CPU' },
-		{ name: 'GPU', label: 'GPU' }
-	];
-	const cpuSelected: Writable<boolean> = writable(true);
-	const gpuSelected: Writable<boolean> = writable(false);
-	const scales = [
-		{ name: 'linear', label: 'Linear' },
-		{ name: 'log', label: 'Logarithmic' }
-	];
-	let selectedScale: Writable<string> = writable(scales[1].name);
+	$: sourceUrl = chips.find((chip) => chip.sourceUrl)?.sourceUrl;
+	$: availableMetrics = metrics.filter(({ name }) => chips.some((chip) => (chip[name] ?? 0) > 0));
+	$: availableTypes = types.filter(({ name }) => chips.some((chip) => chip.type === name));
+	$: current = metrics.find(({ name }) => name === metric) ?? metrics[0];
 
 	onMount(() => {
-		api.call('GET', '/microprocessors').then((res) => {
-			chipsData = Array.from(res.data, (chip: any) => ({
-				id: chip.id,
-				name: chip.name,
-				type: chip.type,
-				release: new Date(chip.release),
-				gateSize: chip.gateSize,
-				tdp: chip.tdp,
-				transistors: chip.transistors,
-				frequency: chip.frequency,
-				vendor: chip.vendor
-			}));
-		});
+		api
+			.call('GET', '/chips')
+			.then((res) => {
+				chips = (res.data as any[])
+					.map((chip) => ({
+						...chip,
+						release: new Date(chip.release),
+						// The API counts transistors in millions
+						transistors: chip.transistors ? chip.transistors * 1e6 : undefined
+					}))
+					.filter((chip) => !isNaN(chip.release.getTime()));
+			})
+			.catch((error) => console.error('Failed to fetch chips:', error))
+			.finally(() => (loaded = true));
 	});
 
-	$: {
-		div?.firstChild?.remove();
+	const toggleType = (name: string) => {
+		selectedTypes = selectedTypes.includes(name)
+			? selectedTypes.filter((type) => type !== name)
+			: [...selectedTypes, name];
+	};
 
-		let data: Microprocessors[] = [];
-		if ($cpuSelected && $gpuSelected) {
-			data = chipsData;
-		} else if ($cpuSelected) {
-			data = chipsData.filter((chip) => chip.type === 'CPU');
-		} else if ($gpuSelected) {
-			data = chipsData.filter((chip) => chip.type === 'GPU');
-		}
+	$: if (container && width > 0) {
+		const palette = variants[$user.flavour];
+		const colors = [palette.blue, palette.peach, palette.mauve, palette.green, palette.red];
 
-		div?.append(
+		const data = chips.filter(
+			(chip) => selectedTypes.includes(chip.type) && (chip[metric] ?? 0) > 0
+		);
+		const vendors = d3
+			.rollups(
+				data,
+				(group) => group.length,
+				(chip) => chip.vendor
+			)
+			.sort((a, b) => b[1] - a[1])
+			.slice(0, VENDORS)
+			.map(([vendor]) => vendor);
+		const group = (chip: Chip) => (vendors.includes(chip.vendor) ? chip.vendor : OTHER);
+
+		const domain =
+			vendors.length < new Set(data.map((chip) => chip.vendor)).size
+				? [...vendors, OTHER]
+				: vendors;
+		const range = domain.map((name, i) => (name === OTHER ? palette.overlay1.hex : colors[i].hex));
+		legend = domain.map((name, i) => ({ name, color: range[i] }));
+		shown = data.length;
+
+		const extent = d3.extent(data, (chip) => chip.release) as [Date, Date];
+		const [min, max] = d3.extent(data, (chip) => chip[metric] ?? 0) as [number, number];
+		const powersOfTen = d3
+			.range(Math.ceil(Math.log10(min || 1)), Math.floor(Math.log10(max || 1)) + 1)
+			.map((exponent) => 10 ** exponent);
+		const fit = showTrend
+			? fitTrend(
+					data.map((chip) => ({ year: chip.release.getFullYear(), value: chip[metric] ?? 0 }))
+			  )
+			: null;
+		trend = fit && { slope: fit.slope, doubling: 1 / fit.slope, r2: fit.r2 };
+		const trendLine = fit
+			? d3.range(extent[0].getFullYear(), extent[1].getFullYear() + 1).map((year) => ({
+					release: new Date(year, 0),
+					value: 2 ** (fit.intercept + fit.slope * year)
+			  }))
+			: [];
+
+		container.replaceChildren(
 			Plot.plot({
-				width: Math.max(width, 800),
-				height: 600,
-				grid: true,
-				x: {
-					label: 'Release date',
-					type: 'time'
-				},
+				width,
+				height: Math.max(320, Math.min(560, width * 0.6)),
+				marginLeft: 56,
+				marginRight: 16,
+				style: { background: 'transparent', fontSize: '12px', overflow: 'visible' },
+				x: { type: 'time', label: null, grid: true },
 				y: {
-					label: features.find((f) => f.name === $selectedFeature)?.label,
-					type: $selectedScale as Plot.ScaleType
+					type: scale as Plot.ScaleType,
+					label: current.axis,
+					grid: true,
+					ticks: scale === 'log' ? powersOfTen : undefined,
+					tickFormat: current.format
 				},
+				color: { domain, range },
 				symbol: {
-					legend: true,
-					range: ['circle', 'square'],
-					domain: ['CPU', 'GPU']
-				},
-				color: {
-					legend: true,
-					range: [
-						variants[$user.flavour].peach.rgb,
-						variants[$user.flavour].maroon.rgb,
-						variants[$user.flavour].red.rgb,
-						variants[$user.flavour].lavender.rgb,
-						variants[$user.flavour].green.rgb,
-						variants[$user.flavour].mauve.rgb,
-						variants[$user.flavour].blue.rgb
-					],
-					domain: ['3dfx', 'AMD', 'ATI', 'Intel', 'NVIDIA', 'Sony', 'VIA']
+					domain: types.map(({ name }) => name),
+					range: types.map(({ symbol }) => symbol)
 				},
 				marks: [
+					Plot.line(trendLine, {
+						x: 'release',
+						y: 'value',
+						stroke: palette.text.hex,
+						strokeWidth: 2
+					}),
 					Plot.dot(data, {
 						x: 'release',
-						y: $selectedFeature,
-						fill: 'vendor',
-						opacity: 0.4,
+						y: metric,
+						fill: group,
+						fillOpacity: 0.75,
+						stroke: palette.mantle.hex,
+						strokeWidth: 0.75,
 						symbol: 'type',
 						r: 4
 					}),
-					Plot.line($selectedFeature === features[0].name ? mooreData : [], {
-						x: 'release',
-						y: 'transistors',
-						stroke: variants[$user.flavour].blue.rgb,
-						strokeWidth: 2
-					})
+					Plot.tip(
+						data,
+						Plot.pointer({
+							x: 'release',
+							y: metric,
+							title: (chip: Chip) =>
+								`${chip.name}\n${chip.vendor || 'Unknown'} · ${
+									chip.type
+								} · ${chip.release.getFullYear()}\n${current.axis}: ${current.format(
+									chip[metric] ?? 0
+								)}`,
+							fill: palette.crust.hex,
+							stroke: palette.surface1.hex,
+							lineWidth: 24
+						})
+					)
 				]
 			})
 		);
 	}
+
+	const pill =
+		'rounded-md px-3 py-1 text-sm font-semibold transition-colors bg-ctp-surface0 hover:bg-ctp-surface1 aria-pressed:bg-ctp-mauve aria-pressed:text-ctp-base';
 </script>
 
-<form
-	class="mb-2 p-4 bg-ctp-mantle shadow-md shadow-ctp-crust rounded-md flex justify-center gap-4"
->
-	<div class="flex flex-col">
-		<h4 class="content-ignore mb-2 text-lg font-bold">Features</h4>
-		<MeltRadioGroup options={features} value={selectedFeature} orientation="vertical" />
-	</div>
-	<div class="flex flex-col">
-		<h4 class="content-ignore mb-2 text-lg font-bold">Types</h4>
-		<div class="flex flex-col gap-3">
-			<MeltCheckbox name={types[0].name} label={types[0].label} checked={cpuSelected} />
-			<MeltCheckbox name={types[1].name} label={types[1].label} checked={gpuSelected} />
+<figure class="my-8 rounded-md bg-ctp-mantle p-4 shadow-md shadow-ctp-crust">
+	<div class="mb-4 flex flex-wrap gap-x-8 gap-y-3">
+		<div>
+			<span class="mb-1 block text-sm font-semibold">Metric</span>
+			<div class="flex flex-wrap gap-1">
+				{#each availableMetrics as { name, label } (name)}
+					<button
+						type="button"
+						class={pill}
+						aria-pressed={metric === name}
+						on:click={() => (metric = name)}
+					>
+						{label}
+					</button>
+				{/each}
+			</div>
+		</div>
+		<div>
+			<span class="mb-1 block text-sm font-semibold">Type</span>
+			<div class="flex flex-wrap gap-1">
+				{#each availableTypes as { name, symbol } (name)}
+					<button
+						type="button"
+						class="{pill} flex items-center gap-2"
+						aria-pressed={selectedTypes.includes(name)}
+						on:click={() => toggleType(name)}
+					>
+						<span
+							class="inline-block size-2.5 bg-current {symbol === 'circle' ? 'rounded-full' : ''}"
+						/>
+						{name}
+					</button>
+				{/each}
+			</div>
+		</div>
+		<div>
+			<span class="mb-1 block text-sm font-semibold">Scale</span>
+			<div class="flex flex-wrap gap-1">
+				{#each scales as name (name)}
+					<button
+						type="button"
+						class="{pill} capitalize"
+						aria-pressed={scale === name}
+						on:click={() => (scale = name)}
+					>
+						{name}
+					</button>
+				{/each}
+			</div>
+		</div>
+		<div class="flex flex-wrap items-center gap-x-3 gap-y-1 self-end">
+			<button
+				type="button"
+				class={pill}
+				aria-pressed={showTrend}
+				on:click={() => (showTrend = !showTrend)}
+			>
+				Linear regression
+			</button>
+			{#if trend}
+				<span class="text-sm text-ctp-subtext0">
+					{d3.format('+.3f')(trend.slope)} log₂/yr ({d3.format('+.0%')(2 ** trend.slope - 1)}/yr)
+				</span>
+			{/if}
 		</div>
 	</div>
-	<div class=" flex flex-col">
-		<h4 class="content-ignore mb-2 text-lg font-bold">Scale</h4>
-		<MeltRadioGroup options={scales} value={selectedScale} orientation="vertical" />
-	</div>
-</form>
 
-<div bind:clientWidth={width} bind:this={div} class="flex justify-center" role="img" />
+	<div
+		bind:clientWidth={width}
+		bind:this={container}
+		class="text-ctp-text"
+		role="img"
+		aria-label="{current.axis} of {selectedTypes.join(' and ')} chips by release year"
+	/>
+
+	{#if loaded && shown === 0}
+		<p class="py-8 text-center text-sm text-ctp-subtext0">
+			{chips.length === 0 ? 'No data available.' : 'Nothing to show, select at least one type.'}
+		</p>
+	{/if}
+
+	<figcaption
+		class="mt-3 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 text-sm text-ctp-subtext0"
+	>
+		<ul class="flex flex-wrap gap-x-4 gap-y-1">
+			{#each legend as { name, color } (name)}
+				<li class="flex items-center gap-1.5">
+					<span class="inline-block size-2.5 rounded-full" style="background-color: {color};" />
+					{name}
+				</li>
+			{/each}
+			{#if trend}
+				<li class="flex items-center gap-1.5">
+					<span class="inline-block h-0.5 w-4 bg-ctp-text" />
+					Trend: {trend.doubling > 0 ? '×2' : '÷2'} every {d3.format('.2~f')(
+						Math.abs(trend.doubling)
+					)} years (R² {d3.format('.2f')(trend.r2)})
+				</li>
+			{/if}
+		</ul>
+		<span>
+			{shown} chips
+			{#if sourceUrl}
+				· <a class="text-ctp-blue" href={sourceUrl} target="_blank" rel="noreferrer">Wikipedia</a>,
+				<a
+					class="text-ctp-blue"
+					href="https://creativecommons.org/licenses/by-sa/4.0/"
+					target="_blank"
+					rel="noreferrer">CC BY-SA</a
+				>
+			{/if}
+		</span>
+	</figcaption>
+</figure>

@@ -62,12 +62,12 @@
 </script>
 
 <form class="grid grid-cols-1 gap-x-8 gap-y-6" on:submit={handleSave}>
-	<fieldset class="max-w-xl">
+	<fieldset>
 		<label for="flavour" class="flex items-center gap-1 mb-2 text-sm font-semibold">
 			<Palette size="16" />
 			<span>Flavour</span>
 		</label>
-		<div class="grid grid-cols-1 sm:grid-cols-2 rounded-lg bg-ctp-base gap-3" use:melt={$root}>
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 rounded-lg bg-ctp-base gap-3" use:melt={$root}>
 			{#each Object.keys(variants) as variant, i}
 				<div
 					class="{variantsClasses[

@@ -20,7 +20,7 @@
 <svelte:window on:wheel={handleMouseWheel} bind:scrollY />
 
 <nav
-	class="min-w-max p-3 fixed top-0 left-0 right-0 transition-transform duration-200
+	class="p-3 fixed top-0 left-0 right-0 transition-transform duration-200
 				transform {scrollYdelta > 0 && scrollY >= 250 ? '-translate-y-full' : ''} z-20"
 	use:melt={$root}
 >
@@ -66,7 +66,7 @@
 		<div class="flex items-center gap-3 text-md font-semibold">
 			<a class="hover:text-ctp-blue transition-colors" href="/contact" use:melt={$link}>Contact</a>
 			<a
-				class="hover:text-ctp-blue transition-colors flex items-center gap-1"
+				class="hover:text-ctp-blue transition-colors hidden sm:flex items-center gap-1"
 				href="https://matheo-galuba.com"
 				target="_blank"
 				use:melt={$link}>Portfolio <ExternalLink size="16" stroke-width="3" /></a

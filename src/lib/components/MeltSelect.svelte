@@ -5,7 +5,7 @@
 	import { fade } from 'svelte/transition';
 
 	export let name: string;
-	export let options: SelectOption<string>[];
+	export let options: (string | SelectOption<string>)[];
 	export let value: Writable<SelectOption<string>> = writable({ value: '', label: '' });
 	export let disabled: boolean = false;
 
@@ -23,6 +23,10 @@
 			sameWidth: true
 		}
 	});
+
+	$: items = options.map((option) =>
+		typeof option === 'string' ? { value: option, label: option } : option
+	);
 </script>
 
 <div class="flex flex-col gap-1">
@@ -45,7 +49,7 @@
 			transition:fade={{ duration: 150 }}
 		>
 			<div class="flex flex-col gap-1">
-				{#each options as item}
+				{#each items as item}
 					<div
 						class="relative cursor-pointer rounded-md py-1 pl-8 pr-4
               focus:z-10
@@ -55,7 +59,7 @@
 					>
 						<div
 							class="absolute left-[0.5rem] top-1/2 transform -translate-y-1/2 z-20 text-ctp-mauve {$isSelected(
-								item
+								item.value
 							)
 								? 'block'
 								: 'hidden'}"

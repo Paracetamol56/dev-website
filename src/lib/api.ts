@@ -9,18 +9,7 @@ import { isExpired } from '$lib/token';
 async function login(email: string) {
 	await axios
 		.post(`/api/auth/login`, { email })
-		.then((response) => {
-			if (response.status != 200) {
-				console.error(response);
-				addToast({
-					data: {
-						title: 'Error',
-						description: 'An error occured, please try again later',
-						color: 'bg-ctp-red'
-					}
-				});
-				return;
-			}
+		.then(() => {
 			addToast({
 				data: {
 					title: 'Magic link sent',

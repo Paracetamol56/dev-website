@@ -4,7 +4,7 @@
 	import Plot from './Plot.svelte';
 
 	const {
-		elements: { root, range, thumb },
+		elements: { root, range, thumbs },
 		states: { value }
 	} = createSlider({
 		defaultValue: [0.1],
@@ -32,7 +32,7 @@
 						<span use:melt={$range} class="h-1 rounded bg-ctp-mauve" />
 					</span>
 					<span
-						use:melt={$thumb()}
+						use:melt={$thumbs[0]}
 						class="block square-3 rounded-full outline-none bg-ctp-mauve focus:ring-4 focus:ring-ctp-mauve/20"
 					/>
 				</span>

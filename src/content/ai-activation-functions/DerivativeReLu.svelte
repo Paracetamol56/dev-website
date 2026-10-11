@@ -4,7 +4,7 @@
 	import Plot from './Plot.svelte';
 
 	const {
-		elements: { root, range, thumb },
+		elements: { root, range, thumbs },
 		states: { value }
 	} = createSlider({
 		defaultValue: [10],

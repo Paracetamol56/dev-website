@@ -2,12 +2,15 @@
 	import '../app.postcss';
 	import Button from '$lib/components/Button.svelte';
 	import { createDialog, melt } from '@melt-ui/svelte';
-	import { Send, X } from 'lucide-svelte';
+	import { KeyRound, Send, X } from 'lucide-svelte';
+	import { isCancellation, loginWithPasskey, passkeysSupported } from '$lib/passkey';
 	import { addToast } from './+layout.svelte';
 	import { writable, type Writable } from 'svelte/store';
 	import { fade, fly } from 'svelte/transition';
 	import api from '$lib/api';
-	import GitHub from '$lib/components/GitHub.svelte';
+	import ProviderIcon from '$lib/components/ProviderIcon.svelte';
+	import { getProviders, providerLabels, startOAuth, type OAuthProvider } from '$lib/oauth';
+	import { onMount } from 'svelte';
 
 	const dialogOpen: Writable<boolean> = writable(false);
 	const {
@@ -21,7 +24,8 @@
 	let email = '';
 	let emailError = '';
 
-	const GITHUB_CLIENT_ID = '566de517d2c2d47ad218';
+	let providers: OAuthProvider[] = [];
+	onMount(async () => (providers = await getProviders()));
 
 	function validateEmail(): boolean {
 		if (email.length == 0) {
@@ -35,6 +39,23 @@
 		emailError = '';
 		return true;
 	}
+
+	const handlePasskey = async () => {
+		try {
+			await loginWithPasskey();
+			dialogOpen.set(false);
+		} catch (error: any) {
+			if (isCancellation(error)) return;
+			console.error(error);
+			addToast({
+				data: {
+					title: 'Passkey login failed',
+					description: error.response?.data?.error ?? 'An error occured, please try again later',
+					color: 'bg-ctp-red'
+				}
+			});
+		}
+	};
 
 	const handleSubmit = (event: Event) => {
 		event.preventDefault();
@@ -84,21 +105,33 @@
 		>
 			<h2 use:melt={$title} class="m-0 text-lg font-medium text-ctp-text">Login</h2>
 
-			<div class="mt-6 flex justify-center gap-4">
-				<Button
-					link={`https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${window.location.origin}/verify/github?path=${window.location.pathname}&scope=user:email`}
-					data-umami-event="login-oauth"
-					data-umami-event-properties={`{ "provider": "GitHub" }`}
-				>
-					<span>Continue with GitHub</span>
-					<GitHub size="16" />
-				</Button>
-			</div>
-			<div class="my-4 flex justify-between items-center">
-				<span class="w-full h-px bg-ctp-text opacity-20" />
-				<strong class="mx-4">OR</strong>
-				<span class="w-full h-px bg-ctp-text opacity-20" />
-			</div>
+			{#if providers.length > 0 || passkeysSupported()}
+				<div class="mt-6 flex flex-wrap justify-center gap-4">
+					{#if passkeysSupported()}
+						<Button on:click={handlePasskey} data={{ 'umami-event': 'login-passkey' }}>
+							<span>Continue with a passkey</span>
+							<KeyRound size="16" />
+						</Button>
+					{/if}
+					{#each providers as provider}
+						<Button
+							on:click={() => startOAuth(provider, window.location.pathname)}
+							data={{
+								'umami-event': 'login-oauth',
+								'umami-event-provider': provider.name
+							}}
+						>
+							<span>Continue with {providerLabels[provider.name] ?? provider.name}</span>
+							<ProviderIcon provider={provider.name} />
+						</Button>
+					{/each}
+				</div>
+				<div class="my-4 flex justify-between items-center">
+					<span class="w-full h-px bg-ctp-text opacity-20" />
+					<strong class="mx-4">OR</strong>
+					<span class="w-full h-px bg-ctp-text opacity-20" />
+				</div>
+			{/if}
 
 			<p use:melt={$description} class="mb-5 mt-2 leading-normal text-ctp-text">
 				This is a passwordless authentication. I only need your email to send you a magic link.

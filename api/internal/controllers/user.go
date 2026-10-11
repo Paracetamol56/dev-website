@@ -2,12 +2,10 @@ package controllers
 
 import (
 	"dev/internal/models"
+	"dev/internal/utils"
 	"net/http"
-	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sendgrid/sendgrid-go"
-	"github.com/sendgrid/sendgrid-go/helpers/mail"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -16,10 +14,10 @@ type UserController struct{}
 // SendDeletionEmail godoc
 // Sends a notification email to the user when their account is deleted
 func SendDeletionEmail(c *gin.Context, user *models.User) error {
-	from := mail.NewEmail("Matheo Galuba", os.Getenv("ADMIN_EMAIL"))
-	subject := "Your account has been deleted"
-	to := mail.NewEmail(user.Name, user.Email)
-	htmlContent := `
+	_, err := utils.SendEmail(c, utils.Email{
+		To:      utils.EmailAddress{Name: user.Name, Email: user.Email},
+		Subject: "Your account has been deleted",
+		HTMLContent: `
 		<h1>Your account has been deleted</h1>
 		<p>
 			Hi,<br>
@@ -40,15 +38,9 @@ func SendDeletionEmail(c *gin.Context, user *models.User) error {
 			This email is voluntarily ugly because it's lightweight, so the environment impact is reduced..<br>
 			By the way, this email is single-use, so you can delete it to avoid keeping it on someone's else hard drive 😎.
 		</p>
-	`
-
-	mail := mail.NewSingleEmail(from, subject, to, "", htmlContent)
-	client := sendgrid.NewSendClient(os.Getenv("SENDGRID_API_KEY"))
-	response, err := client.Send(mail)
-	if err != nil || response.StatusCode != http.StatusAccepted {
-		return err
-	}
-	return nil
+	`,
+	})
+	return err
 }
 
 // GetUsers godoc
@@ -144,6 +136,53 @@ func (controller *UserController) PatchUser(c *gin.Context) {
 		user.ProfilePicture = patchUser.ProfilePicture
 	}
 
+	if _, err := models.UpdateUser(c, userId, user); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
+}
+
+// DeleteIdentity godoc
+//
+//	@Summary		Unlink an identity
+//	@Description	Unlink an identity provider from a user. The email identity cannot be removed, so the user can always log in with a magic link.
+//	@Tags			user
+//	@Produce		json
+//	@Param			id			path		string	true	"User ID"
+//	@Param			provider	path		string	true	"Identity provider"	Enums(github, google)
+//	@Success		200			{object}	models.User
+//	@Failure		400			{object}	map[string]string
+//	@Failure		403			{object}	map[string]string
+//	@Failure		404			{object}	map[string]string
+//	@Security		Bearer
+//	@Router			/users/{id}/identities/{provider} [delete]
+func (controller *UserController) DeleteIdentity(c *gin.Context) {
+	userId, err := primitive.ObjectIDFromHex(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid id"})
+		return
+	}
+	if userId != c.MustGet("x-user-id").(primitive.ObjectID) {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Forbidden"})
+		return
+	}
+	provider := c.Param("provider")
+	if provider == models.IdentityProviderEmail {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "The email identity cannot be removed"})
+		return
+	}
+
+	user, err := models.GetFullUserById(c, userId)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+	if !user.RemoveIdentity(provider) {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Identity not found"})
+		return
+	}
 	if _, err := models.UpdateUser(c, userId, user); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

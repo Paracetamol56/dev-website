@@ -2,7 +2,7 @@
 	import { Eraser } from 'lucide-svelte';
 	import PageDisplay from '../PageDisplay.svelte';
 	import type { PageData } from './$types';
-	import { Tool } from '$lib/page';
+	import type { Tool } from '$lib/page';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 
@@ -44,7 +44,7 @@
 <section class="relative container mx-auto mb-32">
 	<div class="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
 		{#each tools as tool}
-			<PageDisplay page={tool} path="/tool" />
+			<PageDisplay page={tool} path="/tool" requiresAuth={tool.requiresAuth} />
 		{/each}
 	</div>
 	<!--<div class="my-4 flex justify-center">

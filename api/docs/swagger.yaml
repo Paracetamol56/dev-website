@@ -15,16 +15,9 @@ definitions:
       userId:
         type: string
     required:
-      - email
-      - message
-      - name
-    type: object
-  controllers.GithubLoginBody:
-    properties:
-      code:
-        type: string
-    required:
-      - code
+    - email
+    - message
+    - name
     type: object
   controllers.HealthResponse:
     properties:
@@ -37,16 +30,88 @@ definitions:
       email:
         type: string
     required:
-      - email
+    - email
+    type: object
+  controllers.OAuthLoginBody:
+    properties:
+      code:
+        type: string
+      redirectUri:
+        type: string
+    required:
+    - code
+    type: object
+  controllers.OAuthProviderResponse:
+    properties:
+      authorizeUrl:
+        example: https://github.com/login/oauth/authorize
+        type: string
+      clientId:
+        type: string
+      name:
+        example: github
+        type: string
+      scope:
+        example: read:user user:email
+        type: string
+    type: object
+  controllers.PasskeyBeginResponse:
+    properties:
+      options: {}
+      sessionId:
+        type: string
+    type: object
+  controllers.PasskeyFinishBody:
+    properties:
+      credential:
+        type: object
+      name:
+        maxLength: 50
+        type: string
+      sessionId:
+        type: string
+    required:
+    - credential
+    - sessionId
+    type: object
+  controllers.PatchTodoBody:
+    properties:
+      description:
+        maxLength: 1000
+        type: string
+      dueDate:
+        format: date-time
+        type: string
+      gitIssue:
+        minimum: 1
+        type: integer
+      gitURL:
+        type: string
+      labels:
+        items:
+          type: string
+        type: array
+      state:
+        enum:
+        - TODO
+        - IN_PROGRESS
+        - STANDBY
+        - DONE
+        - CANCELLED
+        type: string
+      title:
+        maxLength: 100
+        minLength: 2
+        type: string
     type: object
   controllers.PatchUserBody:
     properties:
       flavour:
         enum:
-          - latte
-          - frappe
-          - macchiato
-          - mocha
+        - latte
+        - frappe
+        - macchiato
+        - mocha
         type: string
       name:
         maxLength: 100
@@ -55,79 +120,47 @@ definitions:
       profilePicture:
         type: string
     type: object
+  controllers.TodoBody:
+    properties:
+      description:
+        maxLength: 1000
+        type: string
+      dueDate:
+        format: date-time
+        type: string
+      gitIssue:
+        minimum: 1
+        type: integer
+      gitURL:
+        type: string
+      labels:
+        items:
+          type: string
+        type: array
+      title:
+        maxLength: 100
+        minLength: 2
+        type: string
+    required:
+    - title
+    type: object
+  controllers.TodoOrderBody:
+    properties:
+      ids:
+        items:
+          type: string
+        maxItems: 1000
+        minItems: 1
+        type: array
+    required:
+    - ids
+    type: object
   controllers.VerifyBody:
     properties:
       token:
         type: string
     required:
-      - token
-    type: object
-  models.GitHubUser:
-    properties:
-      avatar_url:
-        type: string
-      bio:
-        type: string
-      blog:
-        type: string
-      company:
-        type: string
-      created_at:
-        type: string
-      email:
-        type: string
-      events_url:
-        type: string
-      followers:
-        type: integer
-      followers_url:
-        type: string
-      following:
-        type: integer
-      following_url:
-        type: string
-      gists_url:
-        type: string
-      gravatar_id:
-        type: string
-      hireable:
-        type: boolean
-      html_url:
-        type: string
-      id:
-        type: integer
-      location:
-        type: string
-      login:
-        type: string
-      name:
-        type: string
-      node_id:
-        type: string
-      organizations_url:
-        type: string
-      public_gists:
-        type: integer
-      public_repos:
-        type: integer
-      received_events_url:
-        type: string
-      repos_url:
-        type: string
-      site_admin:
-        type: boolean
-      starred_url:
-        type: string
-      subscriptions_url:
-        type: string
-      twitter_username:
-        type: string
-      type:
-        type: string
-      updated_at:
-        type: string
-      url:
-        type: string
+    - token
     type: object
   models.HipparcosHR:
     properties:
@@ -138,6 +171,198 @@ definitions:
       hip:
         type: integer
     type: object
+  models.Icon:
+    properties:
+      hex:
+        example: ECD53F
+        type: string
+      id:
+        example: lucide:a-arrow-down
+        type: string
+      name:
+        example: a-arrow-down
+        type: string
+      source:
+        example: lucide
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+      title:
+        example: A Arrow Down
+        type: string
+    type: object
+  models.IconSearchResult:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/models.Icon'
+        type: array
+      total:
+        example: 42
+        type: integer
+    type: object
+  models.Identity:
+    properties:
+      avatarUrl:
+        type: string
+      email:
+        type: string
+      lastLogin:
+        type: string
+      linkedAt:
+        type: string
+      name:
+        type: string
+      profileUrl:
+        type: string
+      provider:
+        enum:
+        - email
+        - github
+        - google
+        type: string
+      providerId:
+        type: string
+      username:
+        type: string
+    type: object
+  models.Microprocessor:
+    properties:
+      density:
+        type: number
+      dieSize:
+        type: number
+      frequency:
+        type: number
+      gateSize:
+        type: number
+      id:
+        type: string
+      manufacturer:
+        type: string
+      name:
+        type: string
+      release:
+        format: date-time
+        type: string
+      source:
+        type: string
+      sourceUrl:
+        type: string
+      tdp:
+        type: number
+      transistors:
+        type: number
+      type:
+        example: CPU
+        type: string
+      vendor:
+        type: string
+    type: object
+  models.OrmiEvent:
+    properties:
+      newState:
+        example: DONE
+        type: string
+      previousState:
+        example: TODO
+        type: string
+      updatedAt:
+        format: date-time
+        type: string
+    type: object
+  models.Passkey:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: string
+      lastUsed:
+        type: string
+      name:
+        type: string
+    type: object
+  models.Todo:
+    properties:
+      createdAt:
+        format: date-time
+        type: string
+      description:
+        type: string
+      dueDate:
+        format: date-time
+        type: string
+      gitIssue:
+        type: integer
+      gitURL:
+        type: string
+      history:
+        items:
+          $ref: '#/definitions/models.OrmiEvent'
+        type: array
+      id:
+        type: string
+      labels:
+        items:
+          type: string
+        type: array
+      position:
+        type: integer
+      state:
+        enum:
+        - TODO
+        - IN_PROGRESS
+        - STANDBY
+        - DONE
+        - CANCELLED
+        type: string
+      title:
+        type: string
+      user:
+        type: string
+    type: object
+  models.TodoDayCount:
+    properties:
+      count:
+        type: integer
+      date:
+        example: "2026-10-09"
+        type: string
+    type: object
+  models.TodoPage:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/models.Todo'
+        type: array
+      total:
+        example: 42
+        type: integer
+    type: object
+  models.TodoStats:
+    properties:
+      currentStreak:
+        type: integer
+      days:
+        items:
+          $ref: '#/definitions/models.TodoDayCount'
+        type: array
+      firstYear:
+        example: 2024
+        type: integer
+      inProgress:
+        type: integer
+      longestStreak:
+        type: integer
+      overdue:
+        type: integer
+      standby:
+        type: integer
+      todo:
+        type: integer
+    type: object
   models.User:
     properties:
       createdAt:
@@ -146,18 +371,22 @@ definitions:
         type: string
       flavour:
         type: string
-      github:
-        $ref: '#/definitions/models.GitHubUser'
-      githubAccessToken:
-        type: string
       id:
         type: string
+      identities:
+        items:
+          $ref: '#/definitions/models.Identity'
+        type: array
       lastLogin:
         type: string
       lastRefresh:
         type: string
       name:
         type: string
+      passkeys:
+        items:
+          $ref: '#/definitions/models.Passkey'
+        type: array
       profilePicture:
         type: string
     type: object
@@ -173,147 +402,330 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   termsOfService: http://swagger.io/terms/
   title: Dev Website API
-  version: '1.0'
+  version: "1.0"
 paths:
-  /auth/github/login:
+  /auth/{provider}:
     post:
       consumes:
-        - application/json
-      description: Login or register a user with GitHub by code
+      - application/json
+      description: Exchange an authorization code for the identity of its owner and
+        attach it to the user having the same email, creating the user if needed.
+        When called with a bearer token, the identity must have the email of the authenticated
+        user.
       parameters:
-        - description: Code
-          in: body
-          name: body
-          required: true
-          schema:
-            $ref: '#/definitions/controllers.GithubLoginBody'
+      - description: Identity provider
+        enum:
+        - github
+        - google
+        in: path
+        name: provider
+        required: true
+        type: string
+      - description: Authorization code and the redirect URI it was issued for
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.OAuthLoginBody'
       produces:
-        - application/json
+      - application/json
       responses:
-        '200':
+        "200":
           description: OK
           schema:
             additionalProperties: true
             type: object
-        '400':
+        "400":
           description: Bad Request
-      summary: Login or register a user with GitHub
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Login, register or link an identity with an OAuth provider
       tags:
-        - auth
+      - auth
   /auth/login:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Login or register a user by email
       parameters:
-        - description: Email
-          in: body
-          name: body
-          required: true
-          schema:
-            $ref: '#/definitions/controllers.LoginBody'
+      - description: Email
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.LoginBody'
       produces:
-        - application/json
+      - application/json
       responses:
-        '204':
+        "204":
           description: No Content
-        '400':
+        "400":
           description: Bad Request
       summary: Login or register a user
       tags:
-        - auth
+      - auth
+  /auth/passkey/begin:
+    post:
+      description: Get the options to pass to navigator.credentials.get(). No email
+        is needed, the passkey identifies the user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.PasskeyBeginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Start a passkey login
+      tags:
+      - auth
+  /auth/passkey/finish:
+    post:
+      consumes:
+      - application/json
+      description: Verify the assertion returned by navigator.credentials.get() and
+        log the owner of the passkey in
+      parameters:
+      - description: Session and assertion
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.PasskeyFinishBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Finish a passkey login
+      tags:
+      - auth
+  /auth/providers:
+    get:
+      description: List the identity providers configured on this server, with what
+        a client needs to start their authorization flow
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/controllers.OAuthProviderResponse'
+            type: array
+      summary: List OAuth providers
+      tags:
+      - auth
   /auth/refresh:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Refresh a user's access token by refresh token
       parameters:
-        - description: Refresh token
-          in: body
-          name: body
-          required: true
-          schema:
-            $ref: '#/definitions/controllers.VerifyBody'
+      - description: Refresh token
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.VerifyBody'
       produces:
-        - application/json
+      - application/json
       responses:
-        '200':
+        "200":
           description: OK
           schema:
             additionalProperties:
               type: string
             type: object
-        '400':
+        "400":
           description: Bad Request
       summary: Refresh a user's access token
       tags:
-        - auth
+      - auth
   /auth/verify:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Verify a user's email by token
       parameters:
-        - description: Token
-          in: body
-          name: body
-          required: true
-          schema:
-            $ref: '#/definitions/controllers.VerifyBody'
+      - description: Token
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.VerifyBody'
       produces:
-        - application/json
+      - application/json
       responses:
-        '200':
+        "200":
           description: OK
           schema:
             $ref: '#/definitions/models.User'
-        '400':
+        "400":
           description: Bad Request
       summary: Verify a user's email
       tags:
-        - auth
+      - auth
+  /chips:
+    get:
+      description: 'List CPUs and GPUs with their transistor count (in millions),
+        process node (nm), die area (mm²) and density (transistors per mm²). Documents
+        are flat and do not all have the same keys: besides the fields documented
+        here, each one carries every column of its source table (for example processor,
+        designer, fab, year), and fields without a value are omitted. A column holding
+        a quantity is an object with its value and unit, such as {"value": 8000, "unit":
+        "nm"}, plus the original text when it says more; other columns are text. Chips
+        imported from Wikipedia are refreshed weekly and licensed under CC BY-SA 4.0,
+        see their sourceUrl.'
+      parameters:
+      - description: Only return chips of this type
+        enum:
+        - CPU
+        - GPU
+        in: query
+        name: type
+        type: string
+      - description: Only return chips of this vendor
+        in: query
+        name: vendor
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Microprocessor'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List chips
+      tags:
+      - chips
+  /chips/{id}:
+    get:
+      description: Get a chip by id
+      parameters:
+      - description: Chip ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Microprocessor'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get one chip
+      tags:
+      - chips
   /contact:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Send a contact message
       parameters:
-        - description: Contact message
-          in: body
-          name: contact
-          required: true
-          schema:
-            $ref: '#/definitions/controllers.ContactBody'
+      - description: Contact message
+        in: body
+        name: contact
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.ContactBody'
       produces:
-        - application/json
+      - application/json
       responses:
-        '201':
+        "201":
           description: Created
-        '400':
+        "400":
           description: Bad Request
       summary: Send a contact message
       tags:
-        - contact
+      - contact
   /health:
     get:
       description: Get health status
       produces:
-        - application/json
+      - application/json
       responses:
-        '200':
+        "200":
           description: OK
           schema:
             $ref: '#/definitions/controllers.HealthResponse'
       summary: Get health status
       tags:
-        - health
+      - health
   /hipparcos/hr:
     get:
       description: Get all Hipparcos HR stars
       produces:
-        - application/json
+      - application/json
       responses:
-        '200':
+        "200":
           description: OK
           schema:
             items:
@@ -321,144 +733,865 @@ paths:
             type: array
       summary: Get all Hipparcos HR stars
       tags:
-        - hipparcos
+      - hipparcos
   /hipparcos/hr/{hip}:
     get:
       description: Get one Hipparcos HR star by HIP number
       parameters:
-        - description: HIP number
-          in: path
-          name: hip
-          required: true
-          type: string
+      - description: HIP number
+        in: path
+        name: hip
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
-        '200':
+        "200":
           description: OK
           schema:
             $ref: '#/definitions/models.HipparcosHR'
-        '400':
+        "400":
           description: Bad Request
-        '404':
+        "404":
           description: Not Found
       summary: Get one Hipparcos HR star
       tags:
-        - hipparcos
+      - hipparcos
+  /icons:
+    get:
+      description: List every available lucide.dev and simpleicons.org icon, refreshed
+        weekly
+      parameters:
+      - description: Only return icons from this source
+        enum:
+        - lucide
+        - simpleicons
+        in: query
+        name: source
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Icon'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List icons
+      tags:
+      - icons
+  /icons/search:
+    get:
+      description: Search lucide.dev and simpleicons.org icons by text (every word
+        must match the name, title or a tag), source and tag. Results are ranked by
+        relevance.
+      parameters:
+      - description: Text to search for
+        in: query
+        name: q
+        type: string
+      - collectionFormat: multi
+        description: Only return icons from these sources (repeat the parameter for
+          several)
+        in: query
+        items:
+          enum:
+          - lucide
+          - simpleicons
+          type: string
+        name: source
+        type: array
+      - description: Only return icons having this tag (case-insensitive)
+        in: query
+        name: tag
+        type: string
+      - default: 50
+        description: Maximum number of results
+        in: query
+        maximum: 500
+        minimum: 1
+        name: limit
+        type: integer
+      - default: 0
+        description: Number of results to skip
+        in: query
+        minimum: 0
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IconSearchResult'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Search icons
+      tags:
+      - icons
+  /ormi:
+    get:
+      description: List a page of the todos of the authenticated user, filtered by
+        state, labels and date of last state change, along with the total number of
+        matches
+      parameters:
+      - collectionFormat: multi
+        description: Only return todos in these states (repeat the parameter for several)
+        in: query
+        items:
+          enum:
+          - TODO
+          - IN_PROGRESS
+          - STANDBY
+          - DONE
+          - CANCELLED
+          type: string
+        name: state
+        type: array
+      - collectionFormat: multi
+        description: Only return todos having all these labels (repeat the parameter
+          for several)
+        in: query
+        items:
+          type: string
+        name: label
+        type: array
+      - description: Only return todos whose last state change is at or after this
+          date
+        format: date-time
+        in: query
+        name: from
+        type: string
+      - description: Only return todos whose last state change is before this date
+        format: date-time
+        in: query
+        name: to
+        type: string
+      - default: position
+        description: Custom order, due date (todos without one last), creation date
+          or last state change
+        enum:
+        - position
+        - due
+        - created
+        - updated
+        in: query
+        name: sort
+        type: string
+      - description: Sort direction, defaults to desc for created and updated, asc
+          otherwise
+        enum:
+        - asc
+        - desc
+        in: query
+        name: order
+        type: string
+      - default: 50
+        description: Maximum number of results
+        in: query
+        maximum: 200
+        minimum: 1
+        name: limit
+        type: integer
+      - default: 0
+        description: Number of results to skip
+        in: query
+        minimum: 0
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TodoPage'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: List todos
+      tags:
+      - ormi
+    post:
+      consumes:
+      - application/json
+      description: Create a todo in the TODO state, placed at the end of the list
+      parameters:
+      - description: Todo data
+        in: body
+        name: todo
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.TodoBody'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Todo'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Create a todo
+      tags:
+      - ormi
+  /ormi/{id}:
+    delete:
+      description: Delete a todo of the authenticated user by id
+      parameters:
+      - description: Todo ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Delete a todo
+      tags:
+      - ormi
+    get:
+      description: Get a todo of the authenticated user by id
+      parameters:
+      - description: Todo ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Todo'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get one todo
+      tags:
+      - ormi
+    patch:
+      consumes:
+      - application/json
+      description: Update the given fields of a todo. A null dueDate removes the due
+        date, a new state is appended to the history.
+      parameters:
+      - description: Todo ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Fields to update
+        in: body
+        name: todo
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.PatchTodoBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Todo'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Update a todo
+      tags:
+      - ormi
+  /ormi/labels:
+    get:
+      description: List the labels already used by the authenticated user, most used
+        first, optionally restricted to those containing a text (case-insensitive)
+      parameters:
+      - description: Text the labels must contain
+        in: query
+        name: q
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: List used labels
+      tags:
+      - ormi
+  /ormi/order:
+    put:
+      consumes:
+      - application/json
+      description: Set the position of the given todos to their index in the list
+      parameters:
+      - description: Todo IDs in their new order
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.TodoOrderBody'
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Reorder todos
+      tags:
+      - ormi
+  /ormi/stats:
+    get:
+      description: Todos completed per day over the last year (days without completion
+        are omitted), completion streaks and counts of open todos
+      parameters:
+      - default: UTC
+        description: IANA timezone used to split days
+        in: query
+        name: tz
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TodoStats'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get todo stats
+      tags:
+      - ormi
+  /ormi/stats/{year}:
+    get:
+      description: Count the todos completed per day of a calendar year, days without
+        completion are omitted
+      parameters:
+      - description: Calendar year
+        in: path
+        name: year
+        required: true
+        type: integer
+      - default: UTC
+        description: IANA timezone used to split days
+        in: query
+        name: tz
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TodoDayCount'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get completions of a year
+      tags:
+      - ormi
   /users/{id}:
     delete:
       description: Delete a user by id
       parameters:
-        - description: User ID
-          in: path
-          name: id
-          required: true
-          type: string
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
-        '204':
+        "204":
           description: No Content
-        '400':
+        "400":
           description: Bad Request
-        '403':
+        "403":
           description: Forbidden
-        '404':
+        "404":
           description: Not Found
       security:
-        - Bearer: []
+      - Bearer: []
       summary: Delete a user
       tags:
-        - user
+      - user
     get:
       description: Get one user by id
       parameters:
-        - description: User ID
-          in: path
-          name: id
-          required: true
-          type: string
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
-        '200':
+        "200":
           description: OK
           schema:
             $ref: '#/definitions/models.User'
-        '400':
+        "400":
           description: Bad Request
-        '404':
+        "404":
           description: Not Found
       security:
-        - Bearer: []
+      - Bearer: []
       summary: Get one user
       tags:
-        - user
+      - user
     patch:
       consumes:
-        - application/json
+      - application/json
       description: Update a user by id
       parameters:
-        - description: User ID
-          in: path
-          name: id
-          required: true
-          type: string
-        - description: User data
-          in: body
-          name: patchUser
-          required: true
-          schema:
-            $ref: '#/definitions/controllers.PatchUserBody'
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User data
+        in: body
+        name: patchUser
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.PatchUserBody'
       produces:
-        - application/json
+      - application/json
       responses:
-        '200':
+        "200":
           description: OK
           schema:
             $ref: '#/definitions/models.User'
-        '400':
+        "400":
           description: Bad Request
-        '403':
+        "403":
           description: Forbidden
-        '404':
+        "404":
           description: Not Found
       security:
-        - Bearer: []
+      - Bearer: []
       summary: Update a user
       tags:
-        - user
+      - user
   /users/{id}/export:
     get:
       description: Get user export by id
       parameters:
-        - description: User ID
-          in: path
-          name: id
-          required: true
-          type: string
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
-        '200':
+        "200":
           description: OK
           schema:
             $ref: '#/definitions/models.User'
-        '400':
+        "400":
           description: Bad Request
-        '403':
+        "403":
           description: Forbidden
-        '404':
+        "404":
           description: Not Found
       security:
-        - Bearer: []
+      - Bearer: []
       summary: Get user export
       tags:
-        - user
+      - user
+  /users/{id}/identities/{provider}:
+    delete:
+      description: Unlink an identity provider from a user. The email identity cannot
+        be removed, so the user can always log in with a magic link.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Identity provider
+        enum:
+        - github
+        - google
+        in: path
+        name: provider
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Unlink an identity
+      tags:
+      - user
+  /users/{id}/passkeys/{passkeyId}:
+    delete:
+      description: Remove a passkey from the authenticated user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Passkey ID
+        in: path
+        name: passkeyId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Remove a passkey
+      tags:
+      - user
+  /users/{id}/passkeys/begin:
+    post:
+      description: Get the options to pass to navigator.credentials.create() to add
+        a passkey to the authenticated user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.PasskeyBeginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Start adding a passkey
+      tags:
+      - user
+  /users/{id}/passkeys/finish:
+    post:
+      consumes:
+      - application/json
+      description: Verify the credential returned by navigator.credentials.create()
+        and add it to the authenticated user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Session, passkey name and credential
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.PasskeyFinishBody'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Finish adding a passkey
+      tags:
+      - user
 securityDefinitions:
   Bearer:
     description: Bearer token
     in: header
     name: Authorization
     type: apiKey
-swagger: '2.0'
+swagger: "2.0"
