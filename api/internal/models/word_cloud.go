@@ -2,6 +2,7 @@ package models
 
 import (
 	"dev/internal/db"
+	"errors"
 	"fmt"
 	"time"
 
@@ -10,14 +11,67 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
+
+var ErrWordNotAdded = errors.New("word not added")
+
+// Also matches old codes, created before codes were uppercase only
+var caseInsensitive = &options.Collation{Locale: "en", Strength: 2}
 
 // Word represents a word in a word cloud.
 type Word struct {
-	Text      string             `json:"text" bson:"text"`
-	UUID      uuid.UUID          `json:"uuid" bson:"uuid"`
-	UserAgent string             `json:"userAgent" bson:"userAgent"`
-	CreatedAt primitive.DateTime `json:"createdAt" bson:"createdAt"`
+	Id   primitive.ObjectID `json:"id" bson:"_id,omitempty"`
+	Text string             `json:"text" bson:"text"`
+	// The text as submitted, kept when words are merged
+	OriginalText string             `json:"originalText,omitempty" bson:"originalText,omitempty"`
+	Hidden       bool               `json:"hidden" bson:"hidden"`
+	UUID         uuid.UUID          `json:"uuid" bson:"uuid"`
+	UserAgent    string             `json:"userAgent" bson:"userAgent"`
+	CreatedAt    primitive.DateTime `json:"createdAt" bson:"createdAt"`
+	// Kept for abuse investigations; only the hashes below are ever sent to the host
+	Client  *ClientInfo `json:"-" bson:"client,omitempty"`
+	Device  string      `json:"device,omitempty" bson:"device,omitempty"`
+	Network string      `json:"network,omitempty" bson:"network,omitempty"`
+	// Computed on read, so merged words and lexicon updates are always reflected
+	Sentiment *int `json:"sentiment,omitempty" bson:"-"`
+}
+
+type ClientInfo struct {
+	Timezone       string   `json:"timezone" bson:"timezone" binding:"max=64"`
+	Languages      []string `json:"languages" bson:"languages" binding:"max=10,dive,max=35"`
+	Platform       string   `json:"platform" bson:"platform" binding:"max=64"`
+	Mobile         bool     `json:"mobile" bson:"mobile"`
+	Screen         string   `json:"screen" bson:"screen" binding:"max=32"`
+	AvailableArea  string   `json:"availableArea" bson:"availableArea" binding:"max=32"`
+	PixelRatio     float64  `json:"pixelRatio" bson:"pixelRatio" binding:"min=0,max=16"`
+	ColorDepth     int      `json:"colorDepth" bson:"colorDepth" binding:"min=0,max=64"`
+	Cores          int      `json:"cores" bson:"cores" binding:"min=0,max=1024"`
+	Memory         float64  `json:"memory" bson:"memory" binding:"min=0,max=1024"`
+	TouchPoints    int      `json:"touchPoints" bson:"touchPoints" binding:"min=0,max=64"`
+	ColorScheme    string   `json:"colorScheme" bson:"colorScheme" binding:"max=16"`
+	ReducedMotion  bool     `json:"reducedMotion" bson:"reducedMotion"`
+	CookiesEnabled bool     `json:"cookiesEnabled" bson:"cookiesEnabled"`
+}
+
+type Settings struct {
+	ShowCloudToAudience  bool `json:"showCloudToAudience" bson:"showCloudToAudience"`
+	FilterProfanity      bool `json:"filterProfanity" bson:"filterProfanity"`
+	AllowUpvotes         bool `json:"allowUpvotes" bson:"allowUpvotes"`
+	Sentiment            bool `json:"sentiment" bson:"sentiment"`
+	SentimentInPresenter bool `json:"sentimentInPresenter" bson:"sentimentInPresenter"`
+	// Unset for the default limit, 0 for no limit
+	MaxWords *int `json:"maxWords" bson:"maxWords,omitempty" binding:"omitempty,min=0,max=100"`
+}
+
+const DefaultMaxWords = 20
+
+// WordLimit returns the words allowed per participant, 0 meaning no limit.
+func (settings Settings) WordLimit() int {
+	if settings.MaxWords == nil {
+		return DefaultMaxWords
+	}
+	return *settings.MaxWords
 }
 
 // WordCloud represents a word cloud object.
@@ -28,6 +82,7 @@ type WordCloud struct {
 	Description string              `json:"description" bson:"description"`
 	Code        string              `json:"code" bson:"code"`
 	Words       []Word              `json:"words" bson:"words"`
+	Settings    Settings            `json:"settings" bson:"settings"`
 	CreatedAt   primitive.DateTime  `json:"createdAt" bson:"createdAt"`
 	UpdatedAt   primitive.DateTime  `json:"updatedAt" bson:"updatedAt"`
 	ClosedAt    *primitive.DateTime `json:"closedAt,omitempty" bson:"closedAt,omitempty"`
@@ -40,10 +95,18 @@ func GetWordCloudByCode(c *gin.Context, code string) (*WordCloud, error) {
 	db := db.GetDB()
 	collection := db.Collection("word_cloud_sessions")
 	var wordCloud WordCloud
-	if err := collection.FindOne(c, bson.M{"code": code, "closedAt": bson.M{"$exists": false}}).Decode(&wordCloud); err != nil {
+	filter := bson.M{"code": code, "closedAt": bson.M{"$exists": false}}
+	if err := collection.FindOne(c, filter, options.FindOne().SetCollation(caseInsensitive)).Decode(&wordCloud); err != nil {
 		return nil, err
 	}
 	return &wordCloud, nil
+}
+
+func IsCodeInUse(c *gin.Context, code string) (bool, error) {
+	collection := db.GetDB().Collection("word_cloud_sessions")
+	filter := bson.M{"code": code, "closedAt": bson.M{"$exists": false}}
+	count, err := collection.CountDocuments(c, filter, options.Count().SetCollation(caseInsensitive).SetLimit(1))
+	return count > 0, err
 }
 
 // GetWordCloudById retrieves a word cloud by its ID.
@@ -95,42 +158,85 @@ func CreateWordCloud(c *gin.Context, wordCloud *WordCloud) (*mongo.InsertOneResu
 	return result, err
 }
 
-// AddWordToWordCloud adds a word to a word cloud.
-// It takes a gin.Context, a pointer to a WordCloud object, and a pointer to a Word object as parameters.
-// It returns a pointer to a mongo.UpdateResult object and an error.
-func AddWordToWordCloud(c *gin.Context, sessionId primitive.ObjectID, word *Word) (*mongo.UpdateResult, error) {
-	db := db.GetDB()
-	collection := db.Collection("word_cloud_sessions")
-
-	// Check if the word already exists within this session
-	existingWord := collection.FindOne(c, bson.M{
-		"_id": sessionId,
-		"words": bson.M{
-			"$elemMatch": bson.M{
-				"text": word.Text,
-				"uuid": word.UUID,
-			},
-		},
-	})
-	if existingWord.Err() == nil {
-		// If a word with the same text and UUID exists, return an error
-		return nil, fmt.Errorf("word already submitted")
+// AddWordToWordCloud returns ErrWordNotAdded when the session is closed or the participant
+// already sent this word; both are checked within the update itself.
+func AddWordToWordCloud(c *gin.Context, sessionId primitive.ObjectID, word *Word) error {
+	collection := db.GetDB().Collection("word_cloud_sessions")
+	filter := bson.M{
+		"_id":      sessionId,
+		"closedAt": bson.M{"$exists": false},
+		"words":    bson.M{"$not": bson.M{"$elemMatch": bson.M{"text": word.Text, "uuid": word.UUID}}},
 	}
-
-	filter := bson.M{"_id": sessionId}
-	update := bson.M{"$push": bson.M{"words": word}}
-	result, err := collection.UpdateOne(c, filter, update)
-	return result, err
+	result, err := collection.UpdateOne(c, filter, bson.M{"$push": bson.M{"words": word}})
+	if err != nil {
+		return err
+	}
+	if result.MatchedCount == 0 {
+		return ErrWordNotAdded
+	}
+	return nil
 }
 
-// CloseWordCloud closes a word cloud session.
-// It takes a gin.Context and an ID of type primitive.ObjectID as parameters.
-// It returns a pointer to mongo.UpdateResult and an error.
-func CloseWordCloud(c *gin.Context, id primitive.ObjectID) (*mongo.UpdateResult, error) {
-	db := db.GetDB()
-	collection := db.Collection("word_cloud_sessions")
-	filter := bson.M{"_id": id}
-	update := bson.M{"$set": bson.M{"closedAt": primitive.NewDateTimeFromTime(time.Now())}}
-	result, err := collection.UpdateOne(c, filter, update)
-	return result, err
+func UpdateWordCloud(c *gin.Context, id primitive.ObjectID, set bson.M, unset bson.M) error {
+	update := bson.M{"$set": bson.M{"updatedAt": primitive.NewDateTimeFromTime(time.Now())}}
+	for key, value := range set {
+		update["$set"].(bson.M)[key] = value
+	}
+	if len(unset) > 0 {
+		update["$unset"] = unset
+	}
+	_, err := db.GetDB().Collection("word_cloud_sessions").UpdateOne(c, bson.M{"_id": id}, update)
+	return err
+}
+
+func DeleteWordCloud(c *gin.Context, id primitive.ObjectID) error {
+	_, err := db.GetDB().Collection("word_cloud_sessions").DeleteOne(c, bson.M{"_id": id})
+	return err
+}
+
+// EnsureWordIds gives an id to words stored before words had one. The update only applies
+// if no word was added since the session was read.
+func EnsureWordIds(c *gin.Context, wordCloud *WordCloud) error {
+	missing := false
+	for i := range wordCloud.Words {
+		if wordCloud.Words[i].Id.IsZero() {
+			wordCloud.Words[i].Id = primitive.NewObjectID()
+			missing = true
+		}
+	}
+	if !missing {
+		return nil
+	}
+	filter := bson.M{"_id": wordCloud.Id, "words": bson.M{"$size": len(wordCloud.Words)}}
+	_, err := db.GetDB().Collection("word_cloud_sessions").UpdateOne(c, filter, bson.M{"$set": bson.M{"words": wordCloud.Words}})
+	return err
+}
+
+func SetWordHidden(c *gin.Context, sessionId primitive.ObjectID, wordId primitive.ObjectID, hidden bool) (bool, error) {
+	result, err := db.GetDB().Collection("word_cloud_sessions").UpdateOne(c,
+		bson.M{"_id": sessionId, "words._id": wordId},
+		bson.M{"$set": bson.M{"words.$.hidden": hidden}})
+	if err != nil {
+		return false, err
+	}
+	return result.MatchedCount > 0, nil
+}
+
+// MergeWords rewrites every word whose text is in from to into, keeping the submitted text.
+func MergeWords(c *gin.Context, sessionId primitive.ObjectID, from []string, into string) error {
+	merged := bson.M{"$map": bson.M{
+		"input": "$words",
+		"in": bson.M{"$cond": bson.A{
+			bson.M{"$in": bson.A{"$$this.text", from}},
+			bson.M{"$mergeObjects": bson.A{"$$this", bson.M{
+				"text":         into,
+				"originalText": bson.M{"$ifNull": bson.A{"$$this.originalText", "$$this.text"}},
+			}}},
+			"$$this",
+		}},
+	}}
+	_, err := db.GetDB().Collection("word_cloud_sessions").UpdateOne(c,
+		bson.M{"_id": sessionId},
+		mongo.Pipeline{{{Key: "$set", Value: bson.M{"words": merged}}}})
+	return err
 }

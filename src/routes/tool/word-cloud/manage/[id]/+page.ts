@@ -4,32 +4,16 @@ import type { PageLoad } from './$types';
 import type { WordCloudSessionAdmin } from '../../utils';
 
 export const load: PageLoad = async ({ params }) => {
-	const result = await api
+	const session = await api
 		.callWithAuth('GET', `/word-cloud/${params.id}`)
-		.then((res) => {
-			const session: WordCloudSessionAdmin = res.data as WordCloudSessionAdmin;
-			const distribution: { text: string; occurence: number }[] = [];
-			for (const word of res.data.words) {
-				const wDistribition = distribution.find((w) => w.text.toLowerCase() === word.text);
-				if (wDistribition) {
-					wDistribition.occurence++;
-				} else {
-					distribution.push({ text: word.text.toLowerCase(), occurence: 1 });
-				}
-				distribution.sort((a, b) => b.occurence - a.occurence);
-			}
-			return { session, distribution };
-		})
+		.then((res) => res.data as WordCloudSessionAdmin)
 		.catch((err) => {
-			console.error(err);
-			if (err.response.status === 404) throw error(404, 'This session does not exist');
-			else if (err.response.status === 403)
-				throw error(403, 'You are not allowed to access this session');
-			else throw error(500, 'An error occured while fetching the session');
+			if (err.response?.status === 404 || err.response?.status === 400) {
+				error(404, 'This session does not exist');
+			}
+			error(500, 'An error occured while fetching the session');
 		});
+	if (!Array.isArray(session.words)) error(403, 'You are not allowed to access this session');
 
-	return {
-		session: result.session,
-		distribution: result.distribution
-	};
+	return { session };
 };

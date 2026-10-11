@@ -9,6 +9,7 @@
 	export let label: string = '';
 	export let placeholder: string = '';
 	export let disabled: boolean = false;
+	export let maxlength: number | undefined = undefined;
 	let className = '';
 	const id = `text-input-${++count}`;
 	export { className as class };
@@ -22,8 +23,12 @@
 		{id}
 		type="text"
 		bind:value={$value}
+		on:input
+		on:blur
 		{placeholder}
 		{disabled}
+		{maxlength}
+		autocomplete="off"
 		class="h-8 min-w-8 w-full rounded-md bg-ctp-surface0 px-3 focus:outline-none focus:ring-2 focus:ring-ctp-mauve shadow-md shadow-ctp-crust {className}"
 	/>
 </div>

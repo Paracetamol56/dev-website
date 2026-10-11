@@ -1,206 +1,257 @@
 <script lang="ts">
-	import WordCloud from './WordCloud.svelte';
+	import WordCloud from '../../WordCloud.svelte';
 	import BarChart from './BarChart.svelte';
 	import Table from './Table.svelte';
-	import { createDialog, melt } from '@melt-ui/svelte';
-	import { QrCode, X } from 'lucide-svelte';
-	import { fade, fly } from 'svelte/transition';
-	import QRCode from 'qrcode';
+	import ParticipantPanel from './ParticipantPanel.svelte';
+	import Activity from './Activity.svelte';
+	import Sentiment from './Sentiment.svelte';
+	import { Copy, Lock, LockOpen, Pencil, Presentation, Trash2 } from 'lucide-svelte';
+	import MeltTooltip from '$lib/components/MeltTooltip.svelte';
 	import type { PageData } from './$types';
-	import { addToast } from '../../../../+layout.svelte';
-	import { onMount } from 'svelte';
-	import type { WordCloudWord } from '../../utils';
-	import api from '$lib/api';
-	import { invalidateAll } from '$app/navigation';
+	import { onDestroy, onMount } from 'svelte';
+	import { user } from '$lib/store';
+	import { followSession } from '../../socket';
+	import {
+		countWords,
+		type Settings,
+		type WordCloudSessionUser,
+		type WordCloudWord
+	} from '../../utils';
+	import { deleteSession, duplicateSession, updateSession } from '../../actions';
+	import Dialog from '../../Dialog.svelte';
+	import Card from '../../Card.svelte';
+	import SettingsFields from '../../SettingsFields.svelte';
+	import Stats from './Stats.svelte';
+	import TextInput from '$lib/components/TextInput.svelte';
+	import Button from '$lib/components/Button.svelte';
+	import { goto } from '$app/navigation';
+	import { writable } from 'svelte/store';
 
 	export let data: PageData;
 
-	onMount(() => {
-		if (data.session.closedAt !== null) {
-			// Connect to a WebSocket to fetch new word submissions in real time
-			const ws = new WebSocket(`ws://${window.location.host}/api/word-cloud/${data.session.id}/ws`);
+	$: participants = new Map(
+		[
+			...new Set(
+				[...data.session.words]
+					.sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+					.map((word) => word.uuid)
+			)
+		].map((uuid, i) => [uuid, i + 1])
+	);
+	let participant: string | null = null;
 
-			ws.onopen = () => {
-				console.log('Connected to WebSocket');
-			};
+	$: visibleWords = data.session.words.filter((word) => !word.hidden);
+	$: distribution = countWords(visibleWords.map((word) => word.text));
 
-			ws.onmessage = (event) => {
-				const message = JSON.parse(event.data) as WordCloudWord;
-				console.log(message);
-				// Update the session data with the new word
-				data.session.words = [...data.session.words, message];
-				// Udpate the distribution of words
-				const found = (data.distribution as { text: string; occurence: number }[]).find(
-					(word) => word.text === message.text
-				);
-				if (found !== undefined) {
-					found.occurence++;
-				} else {
-					data.distribution.push({ text: message.text, occurence: 1 });
-				}
-			};
-
-			ws.onclose = () => {
-				console.log('Disconnected from WebSocket');
-			};
-		}
-	});
-
-	let qrWidthAvailable: number;
-	let canvas: HTMLCanvasElement;
-
-	$: {
-		if (canvas !== undefined) {
-			const url = `${window.location.origin}/tool/word-cloud?code=${data.session.code}`;
-			QRCode.toCanvas(
-				canvas,
-				url,
-				{
-					errorCorrectionLevel: 'H',
-					scale: 3 + qrWidthAvailable / 175
-				},
-				(error) => {
-					if (error) console.error(error);
-				}
-			);
-		}
+	let stopFollowing = () => {};
+	function applySession(
+		session: WordCloudSessionUser,
+		words?: WordCloudWord[],
+		settings?: Settings
+	) {
+		data.session = {
+			...data.session,
+			...session,
+			settings: { ...data.session.settings, ...session.settings, ...settings },
+			words: words ?? data.session.words,
+			closedAt: session.open ? null : data.session.closedAt ?? new Date().toISOString()
+		};
 	}
 
-	const humanReadableDate = (date: Date | null) => {
-		if (date === null) return '';
-		return date.toLocaleString();
-	};
-
-	const closeSession = (e: Event) => {
-		e.preventDefault();
-
-		api
-			.callWithAuth('DELETE', `/word-cloud/${data.session.id}`)
-			.then(async (res) => {
-				if (res.status === 204) {
-					addToast({
-						data: {
-							title: 'Success',
-							description: 'The session has been closed',
-							color: 'bg-ctp-green'
-						}
-					});
-					data.session.closedAt = new Date();
+	onMount(() => {
+		stopFollowing = followSession(
+			data.session.id,
+			(event) => {
+				if (event.type === 'word')
+					data.session.words = [...data.session.words, event.word as WordCloudWord];
+				else if (event.type === 'session') {
+					if (event.session) applySession(event.session, event.words, event.settings);
+					else goto('/tool/word-cloud/manage');
 				}
-			})
-			.catch((err) => {
-				console.error(err);
-				addToast({
-					data: {
-						title: 'Error',
-						description: 'An error occured while closing the session',
-						color: 'bg-ctp-red'
-					}
-				});
-			});
-	};
-
-	const {
-		elements: { trigger, overlay, content, title, close, portalled },
-		states: { open }
-	} = createDialog({
-		forceVisible: true
+			},
+			$user.accessToken
+		);
 	});
+
+	async function setOpen(open: boolean) {
+		const session = await updateSession(data.session.id, { open });
+		if (session) applySession(session);
+	}
+
+	async function duplicate() {
+		const id = await duplicateSession(data.session.id);
+		if (id) goto(`/tool/word-cloud/manage/${id}`);
+	}
+
+	const confirmDelete = writable(false);
+	async function remove() {
+		if (await deleteSession(data.session.id)) goto('/tool/word-cloud/manage');
+	}
+
+	const editing = writable(false);
+	const editName = writable('');
+	const editDescription = writable('');
+	let settings: Settings;
+	let editError = '';
+	function startEditing() {
+		editName.set(data.session.name);
+		editDescription.set(data.session.description);
+		editError = '';
+		editing.set(true);
+	}
+	async function saveEdit(e: Event) {
+		e.preventDefault();
+		const [name, description] = [$editName.trim(), $editDescription.trim()];
+		if (name.length < 3 || name.length > 100) {
+			editError = 'The title must be between 3 and 100 characters long';
+			return;
+		}
+		if (description && (description.length < 10 || description.length > 1000)) {
+			editError = 'The description must be empty or between 10 and 1000 characters long';
+			return;
+		}
+		const session = await updateSession(data.session.id, { name, description, settings });
+		if (session) {
+			applySession(session);
+			editing.set(false);
+		}
+	}
+	onDestroy(() => stopFollowing());
 </script>
 
 <svelte:head>
-	<title>Word cloud - Mathéo Galuba</title>
+	<title>{data.session.name} - Word cloud - Mathéo Galuba</title>
 </svelte:head>
 
 <section class="container mx-auto mb-32">
 	<hgroup>
-		<h1 class="mb-8 text-6xl font-bold text-center">
-			<span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender"
-				>Word cloud</span
-			>
-			{data.session?.name || ''}
+		<h1 class="mb-8 text-4xl font-bold text-center">
+			<span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender">
+				{data.session.name}
+			</span>
 		</h1>
+		{#if data.session.description}
+			<p class="text-center text-ctp-subtext0 mb-8">{data.session.description}</p>
+		{/if}
 	</hgroup>
-</section>
 
-<section class="container mx-auto">
-	{#if data.session}
-		<WordCloud data={data.distribution} />
-		<div class="mb-4 p-4 w-full bg-ctp-mantle rounded-md">
-			<p><strong>Submitions:</strong> {data.session.words.length}</p>
-			<p><strong>Unique words:</strong> {data.distribution.length}</p>
-			<p><strong>Created at:</strong> {humanReadableDate(new Date(data.session.createdAt))}</p>
-			{#if data.session.closedAt !== undefined}
-				<p>
-					<strong>Closed at:</strong>
-					{humanReadableDate(data.session.closedAt ? new Date(data.session.closedAt) : null)}
-				</p>
-			{:else}
-				<div class="mt-2 flex justify-start gap-2">
-					<button
-						class="flex items-center gap-1 rounded-md bg-ctp-mauve px-3 py-1
-                  font-semibold text-ctp-mantle
-                  shadow-md shadow-ctp-crust transition-opacity
-                  hover:opacity-80 active:opacity-60"
-						use:melt={$trigger}
-					>
-						Session info <QrCode size="20" stroke-width="3" />
-					</button>
-					<button
-						class="flex items-center gap-1 rounded-md bg-ctp-red px-3 py-1
-                  font-semibold text-ctp-mantle
-                  shadow-md shadow-ctp-crust transition-opacity
-                  hover:opacity-80 active:opacity-60"
-						on:click={closeSession}
-					>
-						Close session <X size="20" stroke-width="3" />
-					</button>
-				</div>
-			{/if}
-		</div>
-		<BarChart data={data.distribution} />
-		<Table data={data.session.words} id={data.session.id} />
-	{/if}
-</section>
-
-<div use:melt={$portalled}>
-	{#if $open}
-		<div
-			use:melt={$overlay}
-			class="fixed inset-0 z-30 bg-black/50"
-			transition:fade={{ duration: 200 }}
-		/>
-		<div
-			class="fixed left-[50%] top-[50%] z-50 h-[90vh] w-[90vw]
-            translate-x-[-50%] translate-y-[-50%] rounded-md bg-ctp-base
-            p-6 shadow-md overflow-auto"
-			transition:fly={{ duration: 200, y: 10 }}
-			use:melt={$content}
-		>
-			<h2 use:melt={$title} class="mt-4 mb-8 text-center text-4xl font-bold">Join the session !</h2>
-			<div class="w-full flex flex-col items-center" bind:clientWidth={qrWidthAvailable}>
-				<canvas bind:this={canvas} />
-				<a
-					class="my-8 text-3xl font-medium"
-					href="{window.location.origin}/tool/word-cloud?code={data.session.code}"
-					target="_blank"
-				>
-					{window.location.origin}/tool/word-cloud
-				</a>
-				<p class="my-8 text-4xl font-bold">
-					Code: <span class="text-ctp-mauve">{data.session.code}</span>
-				</p>
+	<div class="grid gap-8 lg:grid-cols-3">
+		<div class="flex flex-col gap-4 lg:col-span-3">
+			<Stats
+				open={data.session.open}
+				code={data.session.code}
+				words={data.session.words}
+				participants={participants.size}
+				{distribution}
+			/>
+			<div class="flex flex-wrap gap-2">
+				<Button link="/tool/word-cloud/manage/{data.session.id}/present">
+					<Presentation size="16" />
+					Present
+				</Button>
+				<Button on:click={startEditing}>
+					<Pencil size="16" />
+					Edit
+				</Button>
+				<MeltTooltip text="New empty session with the same title and description">
+					<Button on:click={duplicate}>
+						<Copy size="16" />
+						Duplicate
+					</Button>
+				</MeltTooltip>
+				{#if data.session.open}
+					<Button color="bg-ctp-peach text-ctp-mantle" on:click={() => setOpen(false)}>
+						<Lock size="16" />
+						Close
+					</Button>
+				{:else}
+					<Button color="bg-ctp-green text-ctp-mantle" on:click={() => setOpen(true)}>
+						<LockOpen size="16" />
+						Reopen
+					</Button>
+				{/if}
+				<Button color="bg-ctp-red text-ctp-mantle" on:click={() => confirmDelete.set(true)}>
+					<Trash2 size="16" />
+					Delete
+				</Button>
 			</div>
-
-			<button
-				use:melt={$close}
-				aria-label="close"
-				class="absolute right-4 top-4 inline-flex h-6 w-6 appearance-none
-                items-center justify-center rounded-full p-1 text-base
-                hover:bg-ctp-mauve hover:text-ctp-base transition-colors"
-			>
-				<X class="square-4" />
-			</button>
 		</div>
-	{/if}
-</div>
+
+		<Card class={data.session.settings.sentiment ? 'lg:col-span-2' : 'lg:col-span-3'}>
+			<WordCloud title="Word cloud" data={distribution} filename="word-cloud-{data.session.code}" />
+		</Card>
+		{#if data.session.settings.sentiment}
+			<Card title="Mood">
+				<Sentiment words={visibleWords} />
+			</Card>
+		{/if}
+
+		<Card class="lg:col-span-2">
+			<Activity words={visibleWords} />
+		</Card>
+		<Card title="Most frequent words">
+			<BarChart data={distribution} />
+		</Card>
+
+		<Card title="Submissions" class="lg:col-span-3">
+			<Table
+				id={data.session.id}
+				words={data.session.words}
+				{participants}
+				on:words={(event) => (data.session.words = event.detail)}
+				on:participant={(event) => (participant = event.detail)}
+			/>
+		</Card>
+	</div>
+	<ParticipantPanel
+		id={data.session.id}
+		words={data.session.words}
+		{participants}
+		bind:participant
+		on:words={(event) => (data.session.words = event.detail)}
+		on:participant={(event) => (participant = event.detail)}
+	/>
+</section>
+
+<Dialog open={confirmDelete} title="Delete this session?">
+	<p class="mb-6 text-ctp-subtext0">
+		“{data.session.name}” and its {data.session.words.length} submission{data.session.words
+			.length === 1
+			? ''
+			: 's'} will be deleted for good.
+	</p>
+	<div class="flex justify-end gap-2">
+		<Button color="bg-ctp-surface0 text-ctp-text" on:click={() => confirmDelete.set(false)}>
+			Cancel
+		</Button>
+		<Button color="bg-ctp-red text-ctp-mantle" on:click={remove}>
+			<Trash2 size="16" />
+			Delete
+		</Button>
+	</div>
+</Dialog>
+
+<Dialog open={editing} title="Edit the session">
+	<form class="flex flex-col gap-4" on:submit={saveEdit}>
+		<TextInput label="Question or title" value={editName} />
+		<div class="flex flex-col gap-1">
+			<label for="edit-description" class="block text-sm font-semibold text-ctp-text">
+				Description <small class="text-ctp-subtext0">(optional)</small>
+			</label>
+			<textarea
+				id="edit-description"
+				maxlength="1000"
+				bind:value={$editDescription}
+				class="h-28 w-full rounded-md bg-ctp-surface0 px-3 py-2 shadow-md shadow-ctp-crust focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
+			/>
+		</div>
+		<SettingsFields initial={data.session.settings} bind:settings />
+		<p class="text-sm font-semibold text-ctp-red" aria-live="polite">{editError}</p>
+		<div class="flex justify-end">
+			<Button type="submit">
+				<Pencil size="16" />
+				<span>Save</span>
+			</Button>
+		</div>
+	</form>
+</Dialog>

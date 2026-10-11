@@ -11,6 +11,7 @@
 	export let required: boolean = false;
 	export let disabled: boolean = false;
 	export let label: string;
+	export let hideLabel = false;
 
 	const {
 		elements: { root, input },
@@ -38,7 +39,7 @@
 		{/if}
 		<input use:melt={$input} />
 	</button>
-	<label class="font-semibold leading-none" for={name}>
+	<label class="font-semibold leading-none {hideLabel ? 'sr-only' : ''}" for={name}>
 		{label}
 	</label>
 </div>

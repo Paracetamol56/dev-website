@@ -5,6 +5,7 @@
 	import { fade } from 'svelte/transition';
 
 	export let name: string;
+	export let hideLabel = false;
 	export let options: (string | SelectOption<string>)[];
 	export let value: Writable<SelectOption<string>> = writable({ value: '', label: '' });
 	export let disabled: boolean = false;
@@ -31,7 +32,10 @@
 
 <div class="flex flex-col gap-1">
 	<!-- svelte-ignore a11y-label-has-associated-control - $label contains the 'for' attribute -->
-	<label class="block text-ctp-text font-semibold text-sm" use:melt={$label}>{name}</label>
+	<label
+		class="block text-ctp-text font-semibold text-sm {hideLabel ? 'sr-only' : ''}"
+		use:melt={$label}>{name}</label
+	>
 	<button
 		class="flex min-w-[220px] items-center justify-between rounded-md bg-ctp-surface0 px-3 py-1
         shadow-md shadow-ctp-crust transition-opacity hover:opacity-90"
