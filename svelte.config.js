@@ -88,7 +88,8 @@ const config = {
 				'/settings',
 				'/tool',
 				'/verify/email',
-				'/verify/github'
+				'/verify/github',
+				'/verify/google'
 			],
 			handleHttpError: 'warn',
 			handleMissingId: 'warn'

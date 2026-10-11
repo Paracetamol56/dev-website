@@ -15,7 +15,7 @@
 	import { writable, type Writable } from 'svelte/store';
 	import { browser } from '$app/environment';
 
-	let search: string = $page.url.searchParams.get('q') ?? '';
+	let search: string = browser ? $page.url.searchParams.get('q') ?? '' : '';
 	let searchError: string = '';
 
 	const handleSearch = async () => {
