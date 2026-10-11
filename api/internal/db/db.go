@@ -9,6 +9,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+const defaultName = "dev"
+
 var db *mongo.Database
 
 func Init() error {
@@ -23,10 +25,19 @@ func Init() error {
 		log.Fatalln(err)
 	}
 
-	db = client.Database("dev")
+	name := os.Getenv("DB_NAME")
+	if name == "" {
+		name = defaultName
+	}
+	db = client.Database(name)
 	return err
 }
 
 func GetDB() *mongo.Database {
 	return db
+}
+
+// Use swaps the database, which tests need to run against a disposable one
+func Use(database *mongo.Database) {
+	db = database
 }

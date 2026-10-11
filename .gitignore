@@ -11,3 +11,4 @@ package-lock.json
 .output
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+api/coverage

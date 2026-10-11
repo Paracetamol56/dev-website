@@ -3,6 +3,7 @@ module dev
 go 1.26.0
 
 require (
+	github.com/descope/virtualwebauthn v1.0.5
 	github.com/gin-contrib/cors v1.6.0
 	github.com/gin-contrib/static v0.0.1
 	github.com/gin-gonic/gin v1.9.1
