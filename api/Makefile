@@ -5,10 +5,10 @@ OUT = coverage
 .PHONY: test test-e2e coverage coverage-e2e
 
 test:
-	go test $(PACKAGES)
+	go test -race $(PACKAGES)
 
 test-e2e:
-	go test -tags e2e ./internal/e2e
+	go test -race -tags e2e ./internal/e2e
 
 coverage:
 	@mkdir -p $(OUT)

@@ -3,11 +3,22 @@ package controllers
 import (
 	"dev/internal/models"
 	"dev/internal/utils"
+	"errors"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
+
+func respondUserError(c *gin.Context, err error) {
+	if errors.Is(err, mongo.ErrNoDocuments) {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+	c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+}
 
 type UserController struct{}
 
@@ -66,14 +77,14 @@ func (controller *UserController) GetUser(c *gin.Context) {
 	if userId == c.MustGet("x-user-id").(primitive.ObjectID) {
 		user, err := models.GetFullUserById(c, userId)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			respondUserError(c, err)
 			return
 		}
 		c.JSON(http.StatusOK, user)
 	} else {
 		user, err := models.GetUserById(c, userId)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			respondUserError(c, err)
 			return
 		}
 		c.JSON(http.StatusOK, user)
@@ -122,7 +133,7 @@ func (controller *UserController) PatchUser(c *gin.Context) {
 
 	user, err := models.GetFullUserById(c, userId)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		respondUserError(c, err)
 		return
 	}
 
@@ -220,11 +231,7 @@ func (controller *UserController) DeleteUser(c *gin.Context) {
 
 	user, err := models.GetFullUserById(c, userId)
 	if err != nil {
-		if err.Error() == "User not found" {
-			c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
-			return
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		respondUserError(c, err)
 		return
 	}
 
@@ -238,10 +245,9 @@ func (controller *UserController) DeleteUser(c *gin.Context) {
 		return
 	}
 
-	// Send deletion email
+	// The account is already deleted: a notice that cannot be sent must not report a failure
 	if err := SendDeletionEmail(c, user); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
+		log.Printf("Failed to send the deletion notice to %s: %v", user.Email, err)
 	}
 
 	c.JSON(http.StatusNoContent, nil)
@@ -276,7 +282,7 @@ func (controller *UserController) GetExport(c *gin.Context) {
 
 	user, err := models.GetFullUserById(c, userId)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		respondUserError(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, user)

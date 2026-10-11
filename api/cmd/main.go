@@ -7,6 +7,8 @@ import (
 	"dev/internal/server"
 	"dev/internal/utils"
 	"log"
+	// The production image ships without a timezone database
+	_ "time/tzdata"
 
 	_ "dev/docs"
 

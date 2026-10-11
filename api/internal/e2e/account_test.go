@@ -68,8 +68,9 @@ func TestMagicLinkAccountLifecycle(t *testing.T) {
 	ada.delete("/users/" + ada.userId).expect(http.StatusNoContent)
 	notices := app.inbox(app.address("ada"))
 	assert.Equal(t, "Your account has been deleted", notices[len(notices)-1].Subject)
-	ada.get("/users/" + ada.userId).expect(http.StatusInternalServerError)
-	grace.get("/users/" + ada.userId).expect(http.StatusInternalServerError)
+	ada.get("/users/" + ada.userId).expect(http.StatusNotFound)
+	grace.get("/users/" + ada.userId).expect(http.StatusNotFound)
+	ada.delete("/users/" + ada.userId).expect(http.StatusNotFound)
 
 	reborn := app.visitor()
 	reborn.login(app.address("ada"))

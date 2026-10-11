@@ -34,10 +34,15 @@ func TestGetUser(t *testing.T) {
 
 	assert.Equal(t, http.StatusBadRequest, do(t, http.MethodGet, "/users/me", nil, as(ada.Id)).Code)
 	assert.Equal(t, http.StatusUnauthorized, do(t, http.MethodGet, "/users/"+ada.Id.Hex(), nil).Code)
-	// Unknown users are reported as a server error rather than a 404
-	assert.Equal(t, http.StatusInternalServerError, do(t, http.MethodGet, "/users/"+primitive.NewObjectID().Hex(), nil, as(ada.Id)).Code)
+	unknown := do(t, http.MethodGet, "/users/"+primitive.NewObjectID().Hex(), nil, as(ada.Id))
+	assert.Equal(t, http.StatusNotFound, unknown.Code)
+	assert.Equal(t, "User not found", errorOf(t, unknown))
 	ghost := primitive.NewObjectID()
-	assert.Equal(t, http.StatusInternalServerError, do(t, http.MethodGet, "/users/"+ghost.Hex(), nil, as(ghost)).Code)
+	assert.Equal(t, http.StatusNotFound, do(t, http.MethodGet, "/users/"+ghost.Hex(), nil, as(ghost)).Code, "own account that no longer exists")
+
+	testutil.BreakDB(t)
+	assert.Equal(t, http.StatusInternalServerError, do(t, http.MethodGet, "/users/"+ada.Id.Hex(), nil, as(ada.Id)).Code)
+	assert.Equal(t, http.StatusInternalServerError, do(t, http.MethodGet, "/users/"+ada.Id.Hex(), nil, as(grace.Id)).Code)
 }
 
 func TestPatchUser(t *testing.T) {
@@ -74,6 +79,8 @@ func TestPatchUser(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, do(t, http.MethodPatch, "/users/me", map[string]string{}, as(user.Id)).Code)
 	assert.Equal(t, http.StatusForbidden, do(t, http.MethodPatch, path, map[string]string{"name": "Mallory"}, as(primitive.NewObjectID())).Code)
 	assert.Equal(t, "Countess", storedUser(t, user.Id).Name)
+	ghost := primitive.NewObjectID()
+	assert.Equal(t, http.StatusNotFound, do(t, http.MethodPatch, "/users/"+ghost.Hex(), map[string]string{"name": "Ghost"}, as(ghost)).Code)
 
 	testutil.BreakDB(t)
 	assert.Equal(t, http.StatusInternalServerError, do(t, http.MethodPatch, path, map[string]string{"name": "Countess"}, as(user.Id)).Code)
@@ -134,9 +141,13 @@ func TestDeleteUser(t *testing.T) {
 	require.NoError(t, db.GetDB().Collection("users").FindOne(ctx, bson.M{"_id": user.Id}).Decode(&kept))
 	assert.Contains(t, kept, "deletedAt", "but kept until the purge")
 
-	// An account that is already gone is reported as a server error rather than a 404
-	assert.Equal(t, http.StatusInternalServerError, do(t, http.MethodDelete, path, nil, as(user.Id)).Code)
+	again := do(t, http.MethodDelete, path, nil, as(user.Id))
+	assert.Equal(t, http.StatusNotFound, again.Code, "an account is deleted once")
+	assert.Equal(t, "User not found", errorOf(t, again))
 	assert.Len(t, sentEmails(t, internet), 1)
+
+	testutil.BreakDB(t)
+	assert.Equal(t, http.StatusInternalServerError, do(t, http.MethodDelete, path, nil, as(user.Id)).Code)
 }
 
 func TestDeleteUserWhenTheEmailFails(t *testing.T) {
@@ -145,9 +156,10 @@ func TestDeleteUserWhenTheEmailFails(t *testing.T) {
 	internet.JSON(brevoHost, http.StatusInternalServerError, `{}`)
 	user := createUser(t, models.User{})
 
-	assert.Equal(t, http.StatusInternalServerError, do(t, http.MethodDelete, "/users/"+user.Id.Hex(), nil, as(user.Id)).Code)
+	assert.Equal(t, http.StatusNoContent, do(t, http.MethodDelete, "/users/"+user.Id.Hex(), nil, as(user.Id)).Code,
+		"the deletion succeeded, only its notice could not be sent")
 	_, err := models.GetFullUserById(ginContext(), user.Id)
-	assert.Error(t, err, "the account is deleted even though the request reports a failure")
+	assert.Error(t, err)
 }
 
 func TestGetExport(t *testing.T) {
@@ -168,6 +180,8 @@ func TestGetExport(t *testing.T) {
 
 	assert.Equal(t, http.StatusBadRequest, do(t, http.MethodGet, "/users/me/export", nil, as(user.Id)).Code)
 	assert.Equal(t, http.StatusForbidden, do(t, http.MethodGet, path, nil, as(primitive.NewObjectID())).Code)
+	ghost := primitive.NewObjectID()
+	assert.Equal(t, http.StatusNotFound, do(t, http.MethodGet, "/users/"+ghost.Hex()+"/export", nil, as(ghost)).Code)
 	testutil.BreakDB(t)
 	assert.Equal(t, http.StatusInternalServerError, do(t, http.MethodGet, path, nil, as(user.Id)).Code)
 }

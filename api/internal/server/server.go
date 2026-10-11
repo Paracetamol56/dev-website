@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"log"
 	"net/http"
@@ -14,10 +15,11 @@ import (
 )
 
 func Run() {
-	host := flag.String("host", "localhost", "host to run the server on")
-	port := flag.String("port", "8080", "port to run the server on")
-	docker := flag.Bool("docker", false, "whether to run in docker mode")
-	flag.Parse()
+	flags := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
+	host := flags.String("host", "localhost", "host to run the server on")
+	port := flags.String("port", "8080", "port to run the server on")
+	docker := flags.Bool("docker", false, "whether to run in docker mode")
+	flags.Parse(os.Args[1:])
 
 	gin.SetMode(gin.ReleaseMode)
 
@@ -41,7 +43,7 @@ func Run() {
 	}
 
 	go func() {
-		if err := server.ListenAndServe(); err != nil {
+		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Fatalln(err)
 		}
 	}()

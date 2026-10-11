@@ -192,8 +192,9 @@ func TestGetWordCloudByUser(t *testing.T) {
 	for _, authorization := range []string{"Bearer garbage", "Basic " + owner.Hex(), "Bearer"} {
 		assert.Equal(t, http.StatusUnauthorized, do(t, http.MethodGet, path, nil, header("Authorization", authorization)).Code, authorization)
 	}
-	// An unknown status is reported as a server error rather than a 400
-	assert.Equal(t, http.StatusInternalServerError, do(t, http.MethodGet, path+"&status=archived", nil, bearer(t, owner)).Code)
+	invalid := do(t, http.MethodGet, path+"&status=archived", nil, bearer(t, owner))
+	assert.Equal(t, http.StatusBadRequest, invalid.Code)
+	assert.Equal(t, "invalid status", errorOf(t, invalid))
 }
 
 func TestGetWordCloudById(t *testing.T) {
@@ -241,13 +242,14 @@ func TestGetWordCloudById(t *testing.T) {
 
 func TestWithSentiment(t *testing.T) {
 	words := []models.Word{{Text: "good"}, {Text: "hate"}, {Text: "teamwork"}}
-	withSentiment(&models.WordCloud{Settings: models.Settings{Sentiment: true}}, words)
-	assert.Equal(t, 3, *words[0].Sentiment)
-	assert.Equal(t, -3, *words[1].Sentiment)
-	assert.Nil(t, words[2].Sentiment)
+	rated := withSentiment(&models.WordCloud{Settings: models.Settings{Sentiment: true}}, words)
+	assert.Equal(t, 3, *rated[0].Sentiment)
+	assert.Equal(t, -3, *rated[1].Sentiment)
+	assert.Nil(t, rated[2].Sentiment)
+	assert.Nil(t, words[0].Sentiment, "the given words are left untouched")
 
-	withSentiment(&models.WordCloud{}, words)
-	assert.Nil(t, words[0].Sentiment, "sentiment turned off")
+	assert.Nil(t, withSentiment(&models.WordCloud{}, rated)[0].Sentiment, "sentiment turned off")
+	assert.NotNil(t, rated[0].Sentiment)
 }
 
 func TestPostWordCloudParticipant(t *testing.T) {

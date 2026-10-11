@@ -173,6 +173,10 @@ func GetWordCloudByCode(c *gin.Context, code string) {
 
 func GetWordCloudByUser(c *gin.Context, userIdString string) {
 	status := c.DefaultQuery("status", "open")
+	if status != "open" && status != "closed" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid status"})
+		return
+	}
 
 	queryUserId, err := primitive.ObjectIDFromHex(userIdString)
 	if err != nil {
@@ -248,7 +252,7 @@ func (controller *WordCloudController) GetWordCloudById(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-		withSentiment(wordCloud, wordCloud.Words)
+		wordCloud.Words = withSentiment(wordCloud, wordCloud.Words)
 		c.JSON(http.StatusOK, struct {
 			*models.WordCloud
 			Open bool `json:"open"`
@@ -664,15 +668,18 @@ func respondWithWords(c *gin.Context, sessionId primitive.ObjectID) {
 	c.JSON(http.StatusOK, gin.H{"words": withSentiment(wordCloud, wordCloud.Words)})
 }
 
+// withSentiment returns a copy: the session is read by the response and by broadcasts at the same time
 func withSentiment(wordCloud *models.WordCloud, words []models.Word) []models.Word {
-	for i := range words {
+	rated := make([]models.Word, len(words))
+	copy(rated, words)
+	for i := range rated {
 		if !wordCloud.Settings.Sentiment {
-			words[i].Sentiment = nil
-		} else if score, ok := utils.Sentiment(words[i].Text); ok {
-			words[i].Sentiment = &score
+			rated[i].Sentiment = nil
+		} else if score, ok := utils.Sentiment(rated[i].Text); ok {
+			rated[i].Sentiment = &score
 		} else {
-			words[i].Sentiment = nil
+			rated[i].Sentiment = nil
 		}
 	}
-	return words
+	return rated
 }
