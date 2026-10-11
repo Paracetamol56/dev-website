@@ -44,8 +44,7 @@
 	}
 
 	// URL parameter handling
-	$: {
-		// This will run on both server and client
+	$: if (typeof window !== 'undefined') {
 		const params = $page.url.searchParams;
 		const icon = params.get('icon');
 		if (icon) iconName.set(icon);

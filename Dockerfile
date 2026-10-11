@@ -1,9 +1,10 @@
 FROM node:lts-alpine AS www-builder
+COPY --from=oven/bun:1-alpine /usr/local/bin/bun /usr/local/bin/bun
 WORKDIR /app
-COPY ./package*.json ./
-RUN npm install
+COPY ./package.json ./bun.lock ./
+RUN bun install --frozen-lockfile
 COPY . .
-RUN npm run build
+RUN bun run build
 
 FROM golang:alpine AS api-builder
 WORKDIR /app
