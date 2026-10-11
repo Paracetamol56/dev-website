@@ -3,9 +3,17 @@ package server
 import (
 	"time"
 
-	"dev/internal/controllers"
+	"dev/internal/auth"
+	"dev/internal/chip"
+	"dev/internal/contact"
+	"dev/internal/health"
+	"dev/internal/hipparcos"
+	"dev/internal/icon"
 	"dev/internal/middlewares"
+	"dev/internal/ormi"
+	"dev/internal/user"
 	"dev/internal/utils"
+	"dev/internal/wordcloud"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
@@ -28,39 +36,37 @@ func InitRouter() *gin.Engine {
 	}))
 	r.Use(middlewares.CORPMiddleware())
 
-	// Init controllers
-	auth := new(controllers.AuthController)
-	contact := new(controllers.ContactController)
-	heatlh := new(controllers.HealthController)
-	hipparcos := new(controllers.HipparcosController)
-	icon := new(controllers.IconController)
-	wordCloud := new(controllers.WordCloudController)
-	microprocessor := new(controllers.MicroprocessorController)
-	ormi := new(controllers.OrmiController)
-	passkey := new(controllers.PasskeyController)
-	user := new(controllers.UserController)
+	authController := new(auth.Controller)
+	contactController := new(contact.Controller)
+	healthController := new(health.Controller)
+	hipparcosController := new(hipparcos.Controller)
+	iconController := new(icon.Controller)
+	wordCloud := new(wordcloud.Controller)
+	chipController := new(chip.Controller)
+	ormiController := new(ormi.Controller)
+	userController := new(user.Controller)
 
 	apiGroup := r.Group("/api")
 	{
 		apiGroup.Use(middlewares.RequestIdMiddleware())
 		apiGroup.GET("/doc/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-		apiGroup.GET("/health", heatlh.GetHealth)
-		apiGroup.POST("/contact", middlewares.RateLimitByIP(5, time.Hour), contact.PostContact)
+		apiGroup.GET("/health", healthController.GetHealth)
+		apiGroup.POST("/contact", middlewares.RateLimitByIP(5, time.Hour), contactController.PostContact)
 		authGroup := apiGroup.Group("/auth")
 		{
 			authGroup.Use(middlewares.RateLimitByIP(30, time.Minute))
-			authGroup.POST("/login", middlewares.RateLimitByIP(10, time.Hour), auth.PostLogin)
-			authGroup.POST("/verify", auth.PostVerify)
-			authGroup.POST("/refresh", auth.PostRefresh)
-			authGroup.GET("/providers", auth.GetOAuthProviders)
-			authGroup.POST("/:provider", auth.PostOAuthLogin)
-			authGroup.POST("/passkey/begin", passkey.PostLoginBegin)
-			authGroup.POST("/passkey/finish", passkey.PostLoginFinish)
+			authGroup.POST("/login", middlewares.RateLimitByIP(10, time.Hour), authController.PostLogin)
+			authGroup.POST("/verify", authController.PostVerify)
+			authGroup.POST("/refresh", authController.PostRefresh)
+			authGroup.GET("/providers", authController.GetOAuthProviders)
+			authGroup.POST("/:provider", authController.PostOAuthLogin)
+			authGroup.POST("/passkey/begin", authController.PostPasskeyLoginBegin)
+			authGroup.POST("/passkey/finish", authController.PostPasskeyLoginFinish)
 		}
 		hipparcosGroup := apiGroup.Group("/hipparcos")
 		{
-			hipparcosGroup.GET("", hipparcos.GetHipparcosHR)
-			hipparcosGroup.GET("/:hip", hipparcos.GetHipparcosHRByHIP)
+			hipparcosGroup.GET("", hipparcosController.GetHipparcosHR)
+			hipparcosGroup.GET("/:hip", hipparcosController.GetHipparcosHRByHIP)
 		}
 		wordCloudGroup := apiGroup.Group("/word-cloud")
 		{
@@ -79,38 +85,38 @@ func InitRouter() *gin.Engine {
 		}
 		iconGroup := apiGroup.Group("/icons")
 		{
-			iconGroup.GET("", icon.GetIcons)
-			iconGroup.GET("/search", icon.SearchIcons)
+			iconGroup.GET("", iconController.GetIcons)
+			iconGroup.GET("/search", iconController.SearchIcons)
 		}
-		microprocessorGroup := apiGroup.Group("/chips")
+		chipGroup := apiGroup.Group("/chips")
 		{
-			microprocessorGroup.GET("", microprocessor.GetMicroprocessor)
-			microprocessorGroup.GET("/:id", microprocessor.GetMicroprocessorById)
+			chipGroup.GET("", chipController.GetMicroprocessor)
+			chipGroup.GET("/:id", chipController.GetMicroprocessorById)
 		}
 		ormiGroup := apiGroup.Group("/ormi")
 		{
 			ormiGroup.Use(middlewares.JwtAuthMiddleware())
-			ormiGroup.GET("", ormi.GetTodos)
-			ormiGroup.GET("/stats", ormi.GetTodoStats)
-			ormiGroup.GET("/stats/:year", ormi.GetTodoYearStats)
-			ormiGroup.GET("/labels", ormi.GetTodoLabels)
-			ormiGroup.PUT("/order", ormi.PutTodoOrder)
-			ormiGroup.GET("/:id", ormi.GetTodo)
-			ormiGroup.POST("", ormi.PostTodo)
-			ormiGroup.PATCH("/:id", ormi.PatchTodo)
-			ormiGroup.DELETE("/:id", ormi.DeleteTodo)
+			ormiGroup.GET("", ormiController.GetTodos)
+			ormiGroup.GET("/stats", ormiController.GetTodoStats)
+			ormiGroup.GET("/stats/:year", ormiController.GetTodoYearStats)
+			ormiGroup.GET("/labels", ormiController.GetTodoLabels)
+			ormiGroup.PUT("/order", ormiController.PutTodoOrder)
+			ormiGroup.GET("/:id", ormiController.GetTodo)
+			ormiGroup.POST("", ormiController.PostTodo)
+			ormiGroup.PATCH("/:id", ormiController.PatchTodo)
+			ormiGroup.DELETE("/:id", ormiController.DeleteTodo)
 		}
 		userGroup := apiGroup.Group("/users")
 		{
 			userGroup.Use(middlewares.JwtAuthMiddleware())
-			userGroup.GET("/:id", user.GetUser)
-			userGroup.PATCH("/:id", user.PatchUser)
-			userGroup.DELETE("/:id", user.DeleteUser)
-			userGroup.GET("/:id/export", user.GetExport)
-			userGroup.DELETE("/:id/identities/:provider", user.DeleteIdentity)
-			userGroup.POST("/:id/passkeys/begin", passkey.PostRegisterBegin)
-			userGroup.POST("/:id/passkeys/finish", passkey.PostRegisterFinish)
-			userGroup.DELETE("/:id/passkeys/:passkeyId", passkey.DeletePasskey)
+			userGroup.GET("/:id", userController.GetUser)
+			userGroup.PATCH("/:id", userController.PatchUser)
+			userGroup.DELETE("/:id", userController.DeleteUser)
+			userGroup.GET("/:id/export", userController.GetExport)
+			userGroup.DELETE("/:id/identities/:provider", userController.DeleteIdentity)
+			userGroup.POST("/:id/passkeys/begin", authController.PostPasskeyRegisterBegin)
+			userGroup.POST("/:id/passkeys/finish", authController.PostPasskeyRegisterFinish)
+			userGroup.DELETE("/:id/passkeys/:passkeyId", authController.DeletePasskey)
 		}
 	}
 

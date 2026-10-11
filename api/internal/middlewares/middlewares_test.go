@@ -1,6 +1,8 @@
 package middlewares
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -134,4 +136,31 @@ func TestAbortTooManyRequests(t *testing.T) {
 	assert.True(t, c.IsAborted())
 	assert.Equal(t, http.StatusTooManyRequests, recorder.Code)
 	assert.Equal(t, "2", recorder.Header().Get("Retry-After"), "rounded up to whole seconds")
+}
+
+func TestRespondError(t *testing.T) {
+	respond := func(err error) *httptest.ResponseRecorder {
+		recorder := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(recorder)
+		RespondError(c, err)
+		return recorder
+	}
+
+	for status, err := range map[int]error{
+		http.StatusBadRequest:          utils.Invalid("message"),
+		http.StatusUnauthorized:        utils.Unauthorized("message"),
+		http.StatusForbidden:           utils.Forbidden("message"),
+		http.StatusNotFound:            utils.NotFound("message"),
+		http.StatusConflict:            utils.Conflict("message"),
+		http.StatusInternalServerError: errors.New("message"),
+	} {
+		response := respond(err)
+		assert.Equal(t, status, response.Code)
+		assert.JSONEq(t, `{"error": "message"}`, response.Body.String())
+	}
+	assert.Equal(t, http.StatusNotFound, respond(fmt.Errorf("lookup: %w", utils.NotFound("message"))).Code, "wrapped errors keep their meaning")
+
+	limited := respond(utils.TooManyRequests(90 * time.Second))
+	assert.Equal(t, http.StatusTooManyRequests, limited.Code)
+	assert.Equal(t, "90", limited.Header().Get("Retry-After"))
 }

@@ -1,5 +1,5 @@
 PACKAGES = ./cmd/... ./internal/...
-COVERED = ./internal/controllers,./internal/db,./internal/middlewares,./internal/models,./internal/server,./internal/utils
+COVERED = ./internal/auth,./internal/chip,./internal/contact,./internal/db,./internal/health,./internal/hipparcos,./internal/icon,./internal/middlewares,./internal/ormi,./internal/server,./internal/user,./internal/utils,./internal/wordcloud
 OUT = coverage
 
 .PHONY: test test-e2e coverage coverage-e2e

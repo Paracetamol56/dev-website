@@ -9,8 +9,9 @@ import (
 	"net/http"
 	"testing"
 
+	"dev/internal/chip"
 	"dev/internal/db"
-	"dev/internal/utils"
+	"dev/internal/icon"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -70,8 +71,8 @@ func TestCatalogsAreImportedThenServed(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	utils.SeedIcons(context.Background())
-	utils.SeedMicroprocessors(context.Background())
+	icon.SeedIcons(context.Background())
+	chip.SeedMicroprocessors(context.Background())
 	visitor := app.visitor()
 
 	assert.Len(t, visitor.get("/icons").expect(http.StatusOK).list(), 5)

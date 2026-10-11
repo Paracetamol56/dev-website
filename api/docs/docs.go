@@ -44,7 +44,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/controllers.LoginBody"
+                            "$ref": "#/definitions/auth.LoginBody"
                         }
                     }
                 ],
@@ -72,7 +72,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/controllers.PasskeyBeginResponse"
+                            "$ref": "#/definitions/auth.PasskeyBeginResponse"
                         }
                     },
                     "400": {
@@ -107,7 +107,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/controllers.PasskeyFinishBody"
+                            "$ref": "#/definitions/auth.PasskeyFinishBody"
                         }
                     }
                 ],
@@ -115,8 +115,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/auth.Session"
                         }
                     },
                     "400": {
@@ -156,7 +155,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/controllers.OAuthProviderResponse"
+                                "$ref": "#/definitions/auth.OAuthProviderResponse"
                             }
                         }
                     }
@@ -183,7 +182,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/controllers.VerifyBody"
+                            "$ref": "#/definitions/auth.VerifyBody"
                         }
                     }
                 ],
@@ -191,10 +190,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/auth.Session"
                         }
                     },
                     "400": {
@@ -223,7 +219,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/controllers.VerifyBody"
+                            "$ref": "#/definitions/auth.VerifyBody"
                         }
                     }
                 ],
@@ -231,7 +227,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/auth.Session"
                         }
                     },
                     "400": {
@@ -271,7 +267,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/controllers.OAuthLoginBody"
+                            "$ref": "#/definitions/auth.OAuthLoginBody"
                         }
                     }
                 ],
@@ -279,8 +275,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/auth.Session"
                         }
                     },
                     "400": {
@@ -356,7 +351,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Microprocessor"
+                                "$ref": "#/definitions/chip.Microprocessor"
                             }
                         }
                     },
@@ -404,7 +399,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Microprocessor"
+                            "$ref": "#/definitions/chip.Microprocessor"
                         }
                     },
                     "404": {
@@ -448,7 +443,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/controllers.ContactBody"
+                            "$ref": "#/definitions/contact.ContactBody"
                         }
                     }
                 ],
@@ -476,7 +471,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/controllers.HealthResponse"
+                            "$ref": "#/definitions/health.HealthResponse"
                         }
                     }
                 }
@@ -498,7 +493,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.HipparcosHR"
+                                "$ref": "#/definitions/hipparcos.HipparcosHR"
                             }
                         }
                     }
@@ -528,7 +523,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.HipparcosHR"
+                            "$ref": "#/definitions/hipparcos.HipparcosHR"
                         }
                     },
                     "400": {
@@ -568,7 +563,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Icon"
+                                "$ref": "#/definitions/icon.Icon"
                             }
                         }
                     },
@@ -652,7 +647,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.IconSearchResult"
+                            "$ref": "#/definitions/icon.IconSearchResult"
                         }
                     },
                     "400": {
@@ -778,7 +773,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.TodoPage"
+                            "$ref": "#/definitions/ormi.TodoPage"
                         }
                     },
                     "400": {
@@ -834,7 +829,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/controllers.TodoBody"
+                            "$ref": "#/definitions/ormi.TodoBody"
                         }
                     }
                 ],
@@ -842,7 +837,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.Todo"
+                            "$ref": "#/definitions/ormi.Todo"
                         }
                     },
                     "400": {
@@ -960,7 +955,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/controllers.TodoOrderBody"
+                            "$ref": "#/definitions/ormi.TodoOrderBody"
                         }
                     }
                 ],
@@ -1026,7 +1021,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.TodoStats"
+                            "$ref": "#/definitions/ormi.TodoStats"
                         }
                     },
                     "400": {
@@ -1096,7 +1091,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.TodoDayCount"
+                                "$ref": "#/definitions/ormi.TodoDayCount"
                             }
                         }
                     },
@@ -1158,7 +1153,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Todo"
+                            "$ref": "#/definitions/ormi.Todo"
                         }
                     },
                     "400": {
@@ -1292,7 +1287,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/controllers.PatchTodoBody"
+                            "$ref": "#/definitions/ormi.PatchTodoBody"
                         }
                     }
                 ],
@@ -1300,7 +1295,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Todo"
+                            "$ref": "#/definitions/ormi.Todo"
                         }
                     },
                     "400": {
@@ -1370,7 +1365,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/user.User"
                         }
                     },
                     "400": {
@@ -1450,7 +1445,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/controllers.PatchUserBody"
+                            "$ref": "#/definitions/user.PatchUserBody"
                         }
                     }
                 ],
@@ -1458,7 +1453,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/user.User"
                         }
                     },
                     "400": {
@@ -1501,7 +1496,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/user.User"
                         }
                     },
                     "400": {
@@ -1555,7 +1550,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/user.User"
                         }
                     },
                     "400": {
@@ -1616,7 +1611,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/controllers.PasskeyBeginResponse"
+                            "$ref": "#/definitions/auth.PasskeyBeginResponse"
                         }
                     },
                     "400": {
@@ -1681,7 +1676,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/controllers.PasskeyFinishBody"
+                            "$ref": "#/definitions/auth.PasskeyFinishBody"
                         }
                     }
                 ],
@@ -1689,7 +1684,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/user.User"
                         }
                     },
                     "400": {
@@ -1757,7 +1752,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/user.User"
                         }
                     },
                     "400": {
@@ -1792,42 +1787,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "controllers.ContactBody": {
-            "type": "object",
-            "required": [
-                "email",
-                "message",
-                "name"
-            ],
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "message": {
-                    "type": "string",
-                    "maxLength": 1000,
-                    "minLength": 10
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 100,
-                    "minLength": 2
-                },
-                "userId": {
-                    "type": "string"
-                }
-            }
-        },
-        "controllers.HealthResponse": {
-            "type": "object",
-            "properties": {
-                "status": {
-                    "type": "string",
-                    "example": "ok"
-                }
-            }
-        },
-        "controllers.LoginBody": {
+        "auth.LoginBody": {
             "type": "object",
             "required": [
                 "email"
@@ -1838,7 +1798,7 @@ const docTemplate = `{
                 }
             }
         },
-        "controllers.OAuthLoginBody": {
+        "auth.OAuthLoginBody": {
             "type": "object",
             "required": [
                 "code"
@@ -1852,7 +1812,7 @@ const docTemplate = `{
                 }
             }
         },
-        "controllers.OAuthProviderResponse": {
+        "auth.OAuthProviderResponse": {
             "type": "object",
             "properties": {
                 "authorizeUrl": {
@@ -1872,7 +1832,7 @@ const docTemplate = `{
                 }
             }
         },
-        "controllers.PasskeyBeginResponse": {
+        "auth.PasskeyBeginResponse": {
             "type": "object",
             "properties": {
                 "options": {},
@@ -1881,7 +1841,7 @@ const docTemplate = `{
                 }
             }
         },
-        "controllers.PasskeyFinishBody": {
+        "auth.PasskeyFinishBody": {
             "type": "object",
             "required": [
                 "credential",
@@ -1900,120 +1860,21 @@ const docTemplate = `{
                 }
             }
         },
-        "controllers.PatchTodoBody": {
+        "auth.Session": {
             "type": "object",
             "properties": {
-                "description": {
-                    "type": "string",
-                    "maxLength": 1000
-                },
-                "dueDate": {
-                    "type": "string",
-                    "format": "date-time"
-                },
-                "gitIssue": {
-                    "type": "integer",
-                    "minimum": 1
-                },
-                "gitURL": {
+                "accessToken": {
                     "type": "string"
                 },
-                "labels": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "state": {
-                    "type": "string",
-                    "enum": [
-                        "TODO",
-                        "IN_PROGRESS",
-                        "STANDBY",
-                        "DONE",
-                        "CANCELLED"
-                    ]
-                },
-                "title": {
-                    "type": "string",
-                    "maxLength": 100,
-                    "minLength": 2
-                }
-            }
-        },
-        "controllers.PatchUserBody": {
-            "type": "object",
-            "properties": {
-                "flavour": {
-                    "type": "string",
-                    "enum": [
-                        "latte",
-                        "frappe",
-                        "macchiato",
-                        "mocha"
-                    ]
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 100,
-                    "minLength": 2
-                },
-                "profilePicture": {
-                    "type": "string"
-                }
-            }
-        },
-        "controllers.TodoBody": {
-            "type": "object",
-            "required": [
-                "title"
-            ],
-            "properties": {
-                "description": {
-                    "type": "string",
-                    "maxLength": 1000
-                },
-                "dueDate": {
-                    "type": "string",
-                    "format": "date-time"
-                },
-                "gitIssue": {
-                    "type": "integer",
-                    "minimum": 1
-                },
-                "gitURL": {
+                "refreshToken": {
                     "type": "string"
                 },
-                "labels": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "title": {
-                    "type": "string",
-                    "maxLength": 100,
-                    "minLength": 2
+                "user": {
+                    "$ref": "#/definitions/user.User"
                 }
             }
         },
-        "controllers.TodoOrderBody": {
-            "type": "object",
-            "required": [
-                "ids"
-            ],
-            "properties": {
-                "ids": {
-                    "type": "array",
-                    "maxItems": 1000,
-                    "minItems": 1,
-                    "items": {
-                        "type": "string"
-                    }
-                }
-            }
-        },
-        "controllers.VerifyBody": {
+        "auth.VerifyBody": {
             "type": "object",
             "required": [
                 "token"
@@ -2024,104 +1885,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.HipparcosHR": {
-            "type": "object",
-            "properties": {
-                "Amag": {
-                    "type": "number"
-                },
-                "BV": {
-                    "type": "number"
-                },
-                "hip": {
-                    "type": "integer"
-                }
-            }
-        },
-        "models.Icon": {
-            "type": "object",
-            "properties": {
-                "hex": {
-                    "type": "string",
-                    "example": "ECD53F"
-                },
-                "id": {
-                    "type": "string",
-                    "example": "lucide:a-arrow-down"
-                },
-                "name": {
-                    "type": "string",
-                    "example": "a-arrow-down"
-                },
-                "source": {
-                    "type": "string",
-                    "example": "lucide"
-                },
-                "tags": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "title": {
-                    "type": "string",
-                    "example": "A Arrow Down"
-                }
-            }
-        },
-        "models.IconSearchResult": {
-            "type": "object",
-            "properties": {
-                "items": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Icon"
-                    }
-                },
-                "total": {
-                    "type": "integer",
-                    "example": 42
-                }
-            }
-        },
-        "models.Identity": {
-            "type": "object",
-            "properties": {
-                "avatarUrl": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "lastLogin": {
-                    "type": "string"
-                },
-                "linkedAt": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "profileUrl": {
-                    "type": "string"
-                },
-                "provider": {
-                    "type": "string",
-                    "enum": [
-                        "email",
-                        "github",
-                        "google"
-                    ]
-                },
-                "providerId": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.Microprocessor": {
+        "chip.Microprocessor": {
             "type": "object",
             "properties": {
                 "density": {
@@ -2170,7 +1934,102 @@ const docTemplate = `{
                 }
             }
         },
-        "models.OrmiEvent": {
+        "contact.ContactBody": {
+            "type": "object",
+            "required": [
+                "email",
+                "message",
+                "name"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 10
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 2
+                },
+                "userId": {
+                    "type": "string"
+                }
+            }
+        },
+        "health.HealthResponse": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "example": "ok"
+                }
+            }
+        },
+        "hipparcos.HipparcosHR": {
+            "type": "object",
+            "properties": {
+                "Amag": {
+                    "type": "number"
+                },
+                "BV": {
+                    "type": "number"
+                },
+                "hip": {
+                    "type": "integer"
+                }
+            }
+        },
+        "icon.Icon": {
+            "type": "object",
+            "properties": {
+                "hex": {
+                    "type": "string",
+                    "example": "ECD53F"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "lucide:a-arrow-down"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "a-arrow-down"
+                },
+                "source": {
+                    "type": "string",
+                    "example": "lucide"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "title": {
+                    "type": "string",
+                    "example": "A Arrow Down"
+                }
+            }
+        },
+        "icon.IconSearchResult": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/icon.Icon"
+                    }
+                },
+                "total": {
+                    "type": "integer",
+                    "example": 42
+                }
+            }
+        },
+        "ormi.OrmiEvent": {
             "type": "object",
             "properties": {
                 "newState": {
@@ -2187,24 +2046,48 @@ const docTemplate = `{
                 }
             }
         },
-        "models.Passkey": {
+        "ormi.PatchTodoBody": {
             "type": "object",
             "properties": {
-                "createdAt": {
+                "description": {
+                    "type": "string",
+                    "maxLength": 1000
+                },
+                "dueDate": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "gitIssue": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "gitURL": {
                     "type": "string"
                 },
-                "id": {
-                    "type": "string"
+                "labels": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
-                "lastUsed": {
-                    "type": "string"
+                "state": {
+                    "type": "string",
+                    "enum": [
+                        "TODO",
+                        "IN_PROGRESS",
+                        "STANDBY",
+                        "DONE",
+                        "CANCELLED"
+                    ]
                 },
-                "name": {
-                    "type": "string"
+                "title": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 2
                 }
             }
         },
-        "models.Todo": {
+        "ormi.Todo": {
             "type": "object",
             "properties": {
                 "createdAt": {
@@ -2227,7 +2110,7 @@ const docTemplate = `{
                 "history": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.OrmiEvent"
+                        "$ref": "#/definitions/ormi.OrmiEvent"
                     }
                 },
                 "id": {
@@ -2260,7 +2143,41 @@ const docTemplate = `{
                 }
             }
         },
-        "models.TodoDayCount": {
+        "ormi.TodoBody": {
+            "type": "object",
+            "required": [
+                "title"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "maxLength": 1000
+                },
+                "dueDate": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "gitIssue": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "gitURL": {
+                    "type": "string"
+                },
+                "labels": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 2
+                }
+            }
+        },
+        "ormi.TodoDayCount": {
             "type": "object",
             "properties": {
                 "count": {
@@ -2272,13 +2189,29 @@ const docTemplate = `{
                 }
             }
         },
-        "models.TodoPage": {
+        "ormi.TodoOrderBody": {
+            "type": "object",
+            "required": [
+                "ids"
+            ],
+            "properties": {
+                "ids": {
+                    "type": "array",
+                    "maxItems": 1000,
+                    "minItems": 1,
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "ormi.TodoPage": {
             "type": "object",
             "properties": {
                 "items": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.Todo"
+                        "$ref": "#/definitions/ormi.Todo"
                     }
                 },
                 "total": {
@@ -2287,7 +2220,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.TodoStats": {
+        "ormi.TodoStats": {
             "type": "object",
             "properties": {
                 "currentStreak": {
@@ -2296,7 +2229,7 @@ const docTemplate = `{
                 "days": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.TodoDayCount"
+                        "$ref": "#/definitions/ormi.TodoDayCount"
                     }
                 },
                 "firstYear": {
@@ -2320,7 +2253,83 @@ const docTemplate = `{
                 }
             }
         },
-        "models.User": {
+        "user.Identity": {
+            "type": "object",
+            "properties": {
+                "avatarUrl": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "lastLogin": {
+                    "type": "string"
+                },
+                "linkedAt": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "profileUrl": {
+                    "type": "string"
+                },
+                "provider": {
+                    "type": "string",
+                    "enum": [
+                        "email",
+                        "github",
+                        "google"
+                    ]
+                },
+                "providerId": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.Passkey": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "lastUsed": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.PatchUserBody": {
+            "type": "object",
+            "properties": {
+                "flavour": {
+                    "type": "string",
+                    "enum": [
+                        "latte",
+                        "frappe",
+                        "macchiato",
+                        "mocha"
+                    ]
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 2
+                },
+                "profilePicture": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.User": {
             "type": "object",
             "properties": {
                 "createdAt": {
@@ -2338,7 +2347,7 @@ const docTemplate = `{
                 "identities": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.Identity"
+                        "$ref": "#/definitions/user.Identity"
                     }
                 },
                 "lastLogin": {
@@ -2353,7 +2362,7 @@ const docTemplate = `{
                 "passkeys": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.Passkey"
+                        "$ref": "#/definitions/user.Passkey"
                     }
                 },
                 "profilePicture": {
