@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { Archive, ArrowRight, Plus } from 'lucide-svelte';
+	import { Archive, Plus } from 'lucide-svelte';
+	import SessionCard from './SessionCard.svelte';
 	import type { PageData } from './$types';
 	import Button from '$lib/components/Button.svelte';
 	import api from '$lib/api';
@@ -9,98 +10,72 @@
 	export let data: PageData;
 	let archived: ManagePageData[];
 
-	function loadArchived() {
-		api
-			.callWithAuth('GET', `/word-cloud?user=${$user.id}&status=closed`)
-			.then((res) => {
-				console.log(res);
-				archived = res.data as ManagePageData[] | [];
-				console.log(archived);
-			})
-			.catch((err) => {
-				console.error(err);
-			});
+	const fetchSessions = async (status: 'open' | 'closed') =>
+		((await api.callWithAuth('GET', `/word-cloud?user=${$user.id}&status=${status}`)).data ??
+			[]) as ManagePageData[];
+
+	async function loadArchived() {
+		archived = await fetchSessions('closed').catch(() => []);
+	}
+
+	async function refresh() {
+		data.sessions = await fetchSessions('open').catch(() => data.sessions);
+		if (archived !== undefined) await loadArchived();
 	}
 </script>
 
+<svelte:head>
+	<title>Your word clouds - Mathéo Galuba</title>
+</svelte:head>
+
 <section class="container mx-auto mb-32">
 	<hgroup>
-		<h1 class="mb-8 text-6xl font-bold text-center">
+		<h1 class="mb-8 text-4xl font-bold text-center">
 			<span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender">
-				Your sessions
+				Your word clouds
 			</span>
 		</h1>
+		<p class="text-center text-ctp-subtext0 mb-8">Open a session to follow its answers live.</p>
 	</hgroup>
-</section>
 
-<section class="container mx-auto">
-	<div class="mb-8 flex justify-left gap-4">
-		<h2 class="text-2xl font-bold text-ctp-lavender">Open sessions</h2>
-		<Button link="/tool/word-cloud/new">
-			<span>New session</span>
-			<Plus size="18" />
-		</Button>
-	</div>
-
-	<div class="mb-8 grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
-		{#if data.sessions.length === 0}
-			<p>You don't have any open session</p>
-		{:else}
-			{#each data.sessions as session}
-				<div class="p-8 bg-ctp-mantle rounded-md shadow-md shadow-ctp-crust">
-					<div class="flex justify-start items-baseline mb-4">
-						<div class="relative square-2 mr-2 bg-ctp-green rounded-full">
-							<span
-								class="animate-ping absolute top-0.5 right-0.5 block square-1 rounded-full ring-2 ring-ctp-green bg-ctp-green"
-							/>
-						</div>
-						<p class="text-ctp-subtext0 text-sm">Open</p>
-						<p class="ml-auto text-ctp-subtext0 text-sm">
-							{session.submitions} submition{session.submitions == 0 ? '' : 's'}
-						</p>
-					</div>
-					<a href="/tool/word-cloud/manage/{session.id}">
-						<h4 class="mb-4 text-2xl font-bold hover:opacity-75 transition-opacity">
-							{session.name}
-						</h4>
-					</a>
-					<p class="text-ctp-subtext0">{session.description}</p>
+	<div class="flex flex-col gap-8">
+		<div class="flex flex-col gap-4">
+			<div class="flex flex-wrap items-center justify-between gap-4">
+				<h2 class="text-2xl font-bold text-ctp-text">Open sessions</h2>
+				<Button link="/tool/word-cloud/new">
+					<Plus size="18" />
+					<span>New session</span>
+				</Button>
+			</div>
+			{#if data.sessions.length === 0}
+				<p class="text-ctp-subtext0">You don't have any open session.</p>
+			{:else}
+				<div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+					{#each data.sessions as session (session.id)}
+						<SessionCard {session} on:change={refresh} />
+					{/each}
 				</div>
-			{/each}
-		{/if}
-	</div>
+			{/if}
+		</div>
 
-	<div class="mb-8">
-		<h2 class="text-2xl font-bold text-ctp-lavender">Closed sessions</h2>
-	</div>
-	{#if archived === undefined}
-		<Button on:click={loadArchived}>
-			<span>Reveal closed sessions</span>
-			<Archive size="18" />
-		</Button>
-	{:else if archived.length > 0}
-		<div class="mb-8 grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
-			{#each archived as session}
-				<div class="p-8 bg-ctp-mantle rounded-md shadow-md shadow-ctp-crust">
-					<div class="flex justify-start items-baseline mb-4">
-						<div class="relative square-2 mr-2 bg-ctp-red rounded-full" />
-						<p class="text-ctp-subtext0 text-sm">Closed</p>
-						<p class="ml-auto text-ctp-subtext0 text-sm">
-							{session.submitions} submition{session.submitions == 0 ? '' : 's'}
-						</p>
-					</div>
-					<a href="/tool/word-cloud/manage/{session.id}">
-						<h4 class="mb-4 text-2xl font-bold hover:opacity-75 transition-opacity">
-							{session.name}
-						</h4>
-					</a>
-					<p class="text-ctp-subtext0">{session.description}</p>
+		<div class="flex flex-col gap-4">
+			<h2 class="text-2xl font-bold text-ctp-text">Closed sessions</h2>
+			{#if archived === undefined}
+				<div>
+					<Button on:click={loadArchived}>
+						<Archive size="18" />
+						<span>Show closed sessions</span>
+					</Button>
 				</div>
-			{/each}
+			{:else if archived.length === 0}
+				<p class="text-ctp-subtext0">You don't have any closed session.</p>
+			{:else}
+				<div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+					{#each archived as session (session.id)}
+						<SessionCard {session} on:change={refresh} />
+					{/each}
+				</div>
+			{/if}
 		</div>
-	{:else}
-		<div class="mb-8 grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
-			<p>You</p>
-		</div>
-	{/if}
+	</div>
 </section>

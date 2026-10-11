@@ -41,5 +41,16 @@
     ],
     "listed": false,
     "requiresAuth": false
+  },
+  {
+    "title": "Word cloud",
+    "slug": "word-cloud",
+    "description": "Collect your audience's answers live and watch them grow into a word cloud.",
+    "tags": [
+      "presentation",
+      "live"
+    ],
+    "listed": true,
+    "requiresAuth": false
   }
 ]

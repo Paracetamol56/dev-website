@@ -67,9 +67,15 @@ func InitRouter() *gin.Engine {
 			wordCloudGroup.GET("", wordCloud.GetWordCloud)
 			wordCloudGroup.GET("/:id", wordCloud.GetWordCloudById)
 			wordCloudGroup.GET("/:id/ws", wordCloud.WSWordCloud)
-			wordCloudGroup.POST("/:id/word", wordCloud.PostWordCloudWord)
+			// High ceiling: a whole audience can share one IP
+			wordCloudGroup.POST("/:id/participant", middlewares.RateLimitByIP(300, time.Minute), wordCloud.PostWordCloudParticipant)
+			wordCloudGroup.POST("/:id/word", middlewares.RateLimitByIP(300, time.Minute), wordCloud.PostWordCloudWord)
 			wordCloudGroup.POST("", middlewares.JwtAuthMiddleware(), wordCloud.PostWordCloud)
+			wordCloudGroup.PATCH("/:id", middlewares.JwtAuthMiddleware(), wordCloud.PatchWordCloud)
+			wordCloudGroup.POST("/:id/duplicate", middlewares.JwtAuthMiddleware(), wordCloud.PostWordCloudDuplicate)
 			wordCloudGroup.DELETE("/:id", middlewares.JwtAuthMiddleware(), wordCloud.DeleteWordCloud)
+			wordCloudGroup.PATCH("/:id/words/:wordId", middlewares.JwtAuthMiddleware(), wordCloud.PatchWord)
+			wordCloudGroup.POST("/:id/words/merge", middlewares.JwtAuthMiddleware(), wordCloud.PostMergeWords)
 		}
 		iconGroup := apiGroup.Group("/icons")
 		{
