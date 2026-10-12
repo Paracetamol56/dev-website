@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/Button.svelte';
+	import { Tone } from '$lib/components/ui/styles';
 	import { createDialog, melt } from '@melt-ui/svelte';
 	import { KeyRound, Send, X } from 'lucide-svelte';
 	import { isCancellation, loginWithPasskey, passkeysSupported } from '$lib/passkey';
@@ -105,28 +106,35 @@
 			<h2 use:melt={$title} class="m-0 text-lg font-medium text-ctp-text">Login</h2>
 
 			{#if providers.length > 0 || passkeysSupported()}
-				<div class="mt-6 flex flex-wrap justify-center gap-4">
+				<div class="mt-6 flex flex-col gap-3">
 					{#if passkeysSupported()}
-						<Button on:click={handlePasskey} data-umami-event="login-passkey">
+						<Button
+							class="w-full gap-2 !py-2"
+							tone={Tone.Neutral}
+							on:click={handlePasskey}
+							data-umami-event="login-passkey"
+						>
+							<KeyRound size="18" />
 							<span>Continue with a passkey</span>
-							<KeyRound size="16" />
 						</Button>
 					{/if}
 					{#each providers as provider}
 						<Button
+							class="w-full gap-2 !py-2"
+							tone={Tone.Neutral}
 							on:click={() => startOAuth(provider, window.location.pathname)}
 							data-umami-event="login-oauth"
 							data-umami-event-provider={provider.name}
 						>
+							<ProviderIcon provider={provider.name} size={18} />
 							<span>Continue with {providerLabels[provider.name] ?? provider.name}</span>
-							<ProviderIcon provider={provider.name} />
 						</Button>
 					{/each}
 				</div>
-				<div class="my-4 flex justify-between items-center">
-					<span class="w-full h-px bg-ctp-text opacity-20" />
-					<strong class="mx-4">OR</strong>
-					<span class="w-full h-px bg-ctp-text opacity-20" />
+				<div class="my-5 flex items-center gap-4 text-sm font-semibold text-ctp-subtext0">
+					<span class="h-px flex-1 bg-ctp-surface1" />
+					or
+					<span class="h-px flex-1 bg-ctp-surface1" />
 				</div>
 			{/if}
 
@@ -151,12 +159,10 @@
 					/>
 				</fieldset>
 				<p class="mb-4 text-right text-sm text-ctp-red">{emailError}</p>
-				<div class="mt-6 flex justify-center gap-4">
-					<Button type="submit" data-umami-event="login-email">
-						<span>Send the magic link</span>
-						<Send size="16" />
-					</Button>
-				</div>
+				<Button class="w-full gap-2 !py-2" type="submit" data-umami-event="login-email">
+					<Send size="18" />
+					<span>Send the magic link</span>
+				</Button>
 			</form>
 
 			<p class="text-right">
