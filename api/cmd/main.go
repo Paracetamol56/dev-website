@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"dev/internal/audit"
 	"dev/internal/chip"
 	"dev/internal/db"
 	"dev/internal/icon"
@@ -44,6 +45,9 @@ func main() {
 		log.Fatalln("Failed to migrate user identities:", err)
 	} else if migrated > 0 {
 		log.Printf("Migrated %d users to identities", migrated)
+	}
+	if err := audit.EnsureIndexes(context.Background()); err != nil {
+		log.Fatalln("Failed to create the audit indexes:", err)
 	}
 	icon.ScheduleIconRefresh()
 	chip.ScheduleMicroprocessorRefresh()
