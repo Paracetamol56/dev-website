@@ -44,7 +44,7 @@
 
 	<Navbar />
 
-	<main class="py-32 mb-auto">
+	<main class="relative isolate py-32 mb-auto">
 		<Transition url={data.url}>
 			<slot />
 		</Transition>

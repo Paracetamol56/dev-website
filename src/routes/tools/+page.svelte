@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Eraser } from 'lucide-svelte';
 	import PageDisplay from '$lib/components/PageDisplay.svelte';
+	import Hero from '$lib/components/ui/Hero.svelte';
 	import type { PageData } from './$types';
 	import type { Tool } from '$lib/page';
 	import { onMount } from 'svelte';
@@ -22,24 +23,17 @@
 	<title>Tools {tag ? `- #${tag}` : ''} - Mathéo Galuba</title>
 </svelte:head>
 
-<section class="container mx-auto mb-32">
-	<hgroup>
-		<h1 class="mb-8 text-6xl font-bold text-center">
-			<span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender">
-				Tools
-			</span>
-		</h1>
-		{#if tag}
-			<div class="flex flex-col items-center">
-				<h2 class="mb-2 text-xl font-semibold text-ctp-lavender">#{tag}</h2>
-				<a href="/tools" class="text-sm font-semibold text-ctp-lavender flex gap-2 items-center">
-					<Eraser size="16" />
-					<span>Clear filter</span>
-				</a>
-			</div>
-		{/if}
-	</hgroup>
-</section>
+<Hero class="mb-16" highlight="Tools">
+	{#if tag}
+		<div class="flex flex-col items-center">
+			<h2 class="mb-2 text-xl font-semibold text-ctp-lavender">#{tag}</h2>
+			<a href="/tools" class="text-sm font-semibold text-ctp-lavender flex gap-2 items-center">
+				<Eraser size="16" />
+				<span>Clear filter</span>
+			</a>
+		</div>
+	{/if}
+</Hero>
 
 <section class="relative container mx-auto mb-32">
 	<div class="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
