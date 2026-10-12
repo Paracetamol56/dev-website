@@ -4,7 +4,7 @@
 	import type { Writable } from 'svelte/store';
 	import type { UserSettings } from './userSettings';
 	import api from '$lib/api';
-	import Button from '$lib/components/Button.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
 	import ProviderIcon from '$lib/components/ProviderIcon.svelte';
 	import { getProviders, providerLabels, startOAuth, type OAuthProvider } from '$lib/oauth';
 	import { addToast } from '../+layout.svelte';

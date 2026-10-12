@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import Button from '$lib/components/Button.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
 	import { ArrowRight } from 'lucide-svelte';
 </script>
 
@@ -31,7 +31,7 @@
         </pre>
 			</div>
 			<div class="mt-10 flex items-center justify-center gap-x-6">
-				<Button link="/">
+				<Button href="/">
 					<span> Go back home </span>
 				</Button>
 				<a

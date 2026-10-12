@@ -4,7 +4,7 @@
 	import { AtSign, Save, User } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import { addToast } from '../+layout.svelte';
-	import Button from '$lib/components/Button.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
 	import type { Writable } from 'svelte/store';
 	import type { UserSettings } from './userSettings';
 	import api from '$lib/api';
@@ -116,12 +116,7 @@
 		<span class="text-left text-sm font-semibold text-ctp-red">{emailError}</span>
 	</fieldset>
 	<div class="flex justify-start">
-		<Button
-			type="submit"
-			data={{
-				'umami-event': 'save-profile'
-			}}
-		>
+		<Button type="submit" data-umami-event="save-profile">
 			<span>Save</span>
 			<Save size="16" />
 		</Button>

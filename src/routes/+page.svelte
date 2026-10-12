@@ -1,8 +1,9 @@
 <script lang="ts">
-	import Pagination from '$lib/components/Pagination.svelte';
+	import Hero from '$lib/components/ui/Hero.svelte';
+	import Pagination from '$lib/components/ui/Pagination.svelte';
 	import { writable, type Writable } from 'svelte/store';
 	import type { PageData } from './$types';
-	import PageDisplay from './PageDisplay.svelte';
+	import PageDisplay from '$lib/components/PageDisplay.svelte';
 	import { ArrowRight } from 'lucide-svelte';
 
 	export let data: PageData;
@@ -32,20 +33,11 @@
 	<title>Home - Mathéo Galuba</title>
 </svelte:head>
 
-<section class="relative isolate container mx-auto mb-32 pt-8 text-center">
-	<div
-		class="pointer-events-none absolute left-1/2 top-0 -z-10 h-72 w-[min(48rem,100%)] -translate-x-1/2
-					rounded-full bg-gradient-to-r from-ctp-mauve/25 to-ctp-blue/20 blur-3xl"
-	/>
-	<h1 class="mb-6 text-5xl font-bold sm:text-6xl lg:text-7xl">
-		<span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender"
-			>Welcome</span
-		> to my website
-	</h1>
-	<p class="mx-auto mb-8 max-w-2xl text-lg text-ctp-subtext0">
-		Write-ups, experiments and small tools from my side projects because I don't know what to do
-		with them.
-	</p>
+<Hero
+	highlight="Welcome"
+	title="to my website"
+	description="Write-ups, experiments and small tools from my side projects because I don't know what to do with them."
+>
 	{#if topics.length > 0}
 		<ul class="mx-auto flex max-w-2xl flex-wrap justify-center gap-2">
 			{#each topics as tag}
@@ -53,7 +45,7 @@
 					<a
 						class="block rounded-full bg-ctp-surface0 px-3 py-1 text-sm font-semibold text-ctp-lavender
 									transition-colors hover:bg-ctp-surface1"
-						href="/page?tag={tag}"
+						href="/pages?tag={tag}"
 					>
 						#{tag}
 					</a>
@@ -61,7 +53,7 @@
 			{/each}
 		</ul>
 	{/if}
-</section>
+</Hero>
 
 <section class="relative container mx-auto mb-32" bind:this={section1}>
 	<span
@@ -90,7 +82,7 @@
 			<Pagination page={pageNumber} count={data.pages.length} perPage={6} />
 			<a
 				class="flex items-center gap-2 font-semibold text-ctp-mauve hover:opacity-75 transition-opacity"
-				href="/page"
+				href="/pages"
 			>
 				All {data.pages.length} pages
 				<ArrowRight size="18" />
@@ -119,7 +111,12 @@
 	{:else}
 		<div class="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
 			{#each data.tools as tool (tool.slug)}
-				<PageDisplay page={tool} path="/tool" requiresAuth={tool.requiresAuth} />
+				<PageDisplay
+					page={tool}
+					path="/tools"
+					requiresAuth={tool.requiresAuth}
+					content={tool.content}
+				/>
 			{/each}
 		</div>
 	{/if}

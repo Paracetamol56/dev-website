@@ -1,14 +1,21 @@
-interface Page {
+import type { Component } from 'svelte';
+
+interface Content {
 	title: string;
 	slug: string;
 	description: string;
 	tags: string[];
-	release: Date;
 	listed: boolean;
 }
 
-interface Tool extends Page {
+interface Page extends Content {
+	release: Date;
+}
+
+interface Tool extends Content {
+	order: number;
 	requiresAuth: boolean;
+	content?: Component;
 }
 
 export type { Page, Tool };

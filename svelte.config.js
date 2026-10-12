@@ -12,14 +12,16 @@ import remarkMath from 'remark-math';
 import rehypeSlug from 'rehype-slug';
 import rehypeKatex from 'rehype-katex-svelte';
 
+const highlighterPromise = shiki.getHighlighter({
+	theme: JSON.parse(fs.readFileSync('./src/themes/mocha.json', 'utf-8'))
+});
+
 /** @type {import('mdsvex').MdsvexOptions} */
 const mdsvexOptions = {
 	extensions: ['.md'],
 	highlight: {
 		highlighter: async (code, lang = 'text') => {
-			const highlighter = await shiki.getHighlighter({
-				theme: JSON.parse(fs.readFileSync('./src/themes/mocha.json', 'utf-8'))
-			});
+			const highlighter = await highlighterPromise;
 			let html = escapeSvelte(highlighter.codeToHtml(code, { lang }));
 			html = html.replace('<pre ', '<pre data-lang="' + lang + '" ');
 			return `{@html \`${html}\` }`;
@@ -48,45 +50,40 @@ const config = {
 			entries: [
 				'/',
 				'/contact',
-				'/embed/mars-missions',
 				'/embed/moore-s-law',
-				'/embed/sync-vs-async',
-				'/presentation/la-monture-equatoriale-la-moins-chere-du-monde',
-				'/page',
-				'/page/ai-activation-functions',
-				'/page/ai-activation-functions/og.png',
-				'/page/barnes-hut',
-				'/page/barnes-hut/og.png',
-				'/page/boids',
-				'/page/boids/og.png',
-				'/page/convolution',
-				'/page/convolution/og.png',
-				'/page/hertzsprung-russell-diagram',
-				'/page/hertzsprung-russell-diagram/og.png',
-				'/page/l-informatique-dans-la-conquete-spatiale-et-l-astronomie',
-				'/page/l-informatique-dans-la-conquete-spatiale-et-l-astronomie/og.png',
-				'/page/maze-solving',
-				'/page/maze-solving/og.png',
-				'/page/mnist-classification',
-				'/page/mnist-classification/og.png',
-				'/page/moore-s-law',
-				'/page/moore-s-law/og.png',
-				'/page/privacy-policy',
-				'/page/privacy-policy/og.png',
-				'/page/raspberry-pi-fan-controller',
-				'/page/raspberry-pi-fan-controller/og.png',
-				'/page/what-s-on-my-homelab-part-1',
-				'/page/what-s-on-my-homelab-part-1/og.png',
-				'/page/what-s-on-my-homelab-part-2',
-				'/page/what-s-on-my-homelab-part-2/og.png',
-				'/page/what-s-on-my-homelab-part-3',
-				'/page/what-s-on-my-homelab-part-3/og.png',
-				'/page/what-s-on-my-homelab-part-4',
-				'/page/what-s-on-my-homelab-part-4/og.png',
-				'/page/wikipedia-graph-view',
-				'/page/wikipedia-graph-view/og.png',
+				'/pages',
+				'/pages/ai-activation-functions',
+				'/pages/ai-activation-functions/og.png',
+				'/pages/barnes-hut',
+				'/pages/barnes-hut/og.png',
+				'/pages/boids',
+				'/pages/boids/og.png',
+				'/pages/convolution',
+				'/pages/convolution/og.png',
+				'/pages/hertzsprung-russell-diagram',
+				'/pages/hertzsprung-russell-diagram/og.png',
+				'/pages/maze-solving',
+				'/pages/maze-solving/og.png',
+				'/pages/mnist-classification',
+				'/pages/mnist-classification/og.png',
+				'/pages/moore-s-law',
+				'/pages/moore-s-law/og.png',
+				'/pages/privacy-policy',
+				'/pages/privacy-policy/og.png',
+				'/pages/raspberry-pi-fan-controller',
+				'/pages/raspberry-pi-fan-controller/og.png',
+				'/pages/what-s-on-my-homelab-part-1',
+				'/pages/what-s-on-my-homelab-part-1/og.png',
+				'/pages/what-s-on-my-homelab-part-2',
+				'/pages/what-s-on-my-homelab-part-2/og.png',
+				'/pages/what-s-on-my-homelab-part-3',
+				'/pages/what-s-on-my-homelab-part-3/og.png',
+				'/pages/what-s-on-my-homelab-part-4',
+				'/pages/what-s-on-my-homelab-part-4/og.png',
+				'/pages/wikipedia-graph-view',
+				'/pages/wikipedia-graph-view/og.png',
 				'/settings',
-				'/tool',
+				'/tools',
 				'/verify/email',
 				'/verify/github',
 				'/verify/google'

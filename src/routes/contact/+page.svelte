@@ -4,7 +4,8 @@
 	import { Send } from 'lucide-svelte';
 	import { addToast } from '../+layout.svelte';
 	import { user } from '$lib/store';
-	import Button from '$lib/components/Button.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
+	import Hero from '$lib/components/ui/Hero.svelte';
 
 	let email: string = '';
 	let name: string = '';
@@ -125,12 +126,9 @@
 	<title>Contact - Mathéo Galuba</title>
 </svelte:head>
 
+<Hero class="mb-10" highlight="Contact" />
+
 <section class="container mx-auto">
-	<h1 class="mb-8 text-6xl font-bold text-center">
-		<span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender"
-			>Contact</span
-		>
-	</h1>
 	<form class="mx-auto max-w-xl" on:submit={handleSubmit}>
 		<div class="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
 			<fieldset class="w-full">
@@ -189,12 +187,7 @@
 				<p class="text-left text-sm font-semibold text-ctp-red">{privacyError}</p>
 			</fieldset>
 			<div class="sm:col-span-2 flex justify-end">
-				<Button
-					type="submit"
-					data={{
-						'umami-event': 'contact'
-					}}
-				>
+				<Button type="submit" data-umami-event="contact">
 					<span>Send</span>
 					<Send size="16" />
 				</Button>
