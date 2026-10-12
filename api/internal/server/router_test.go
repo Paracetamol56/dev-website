@@ -60,6 +60,9 @@ func TestHealthAndRequestId(t *testing.T) {
 	assert.Equal(t, http.StatusOK, recorder.Code)
 	assert.JSONEq(t, `{"status": "ok"}`, recorder.Body.String())
 	assert.NotEmpty(t, recorder.Header().Get("x-request-id"))
+
+	recorder = request(InitRouter(), http.MethodGet, "/not-an-api-route", nil)
+	assert.NotEmpty(t, recorder.Header().Get("x-request-id"))
 }
 
 func TestProtectedRoutesRequireAToken(t *testing.T) {

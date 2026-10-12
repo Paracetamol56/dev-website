@@ -98,8 +98,10 @@ func TestCORPMiddleware(t *testing.T) {
 }
 
 func TestRequestIdMiddleware(t *testing.T) {
-	first, _ := serve(RequestIdMiddleware(), nil)
+	first, c := serve(RequestIdMiddleware(), nil)
 	second, _ := serve(RequestIdMiddleware(), nil)
+
+	assert.Equal(t, first.Header().Get("x-request-id"), utils.RequestId(c))
 
 	id, err := uuid.FromString(first.Header().Get("x-request-id"))
 	assert.NoError(t, err)

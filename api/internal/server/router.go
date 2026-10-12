@@ -27,6 +27,7 @@ func InitRouter() *gin.Engine {
 	r := gin.New()
 	// The reverse proxy reaches the API from a private network, clients cannot spoof X-Forwarded-For
 	r.SetTrustedProxies([]string{"127.0.0.0/8", "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "::1/128", "fc00::/7"})
+	r.Use(middlewares.RequestIdMiddleware())
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 	r.Use(cors.New(cors.Config{
@@ -48,7 +49,6 @@ func InitRouter() *gin.Engine {
 
 	apiGroup := r.Group("/api")
 	{
-		apiGroup.Use(middlewares.RequestIdMiddleware())
 		apiGroup.GET("/doc/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 		apiGroup.GET("/health", healthController.GetHealth)
 		apiGroup.POST("/contact", middlewares.RateLimitByIP(5, time.Hour), contactController.PostContact)
