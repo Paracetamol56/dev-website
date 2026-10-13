@@ -119,6 +119,13 @@ type User struct {
 	ProfilePicture string             `json:"profilePicture,omitempty" bson:"profilePicture,omitempty"`
 	Identities     []Identity         `json:"identities" bson:"identities"`
 	Passkeys       []Passkey          `json:"passkeys" bson:"passkeys"`
+	Role           string             `json:"role,omitempty" bson:"role,omitempty" enums:"admin"`
+}
+
+const RoleAdmin = "admin"
+
+func (user *User) IsAdmin() bool {
+	return user.Role == RoleAdmin
 }
 
 // Users created before createdAt was stored fall back to the timestamp embedded in their id

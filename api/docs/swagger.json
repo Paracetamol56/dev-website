@@ -18,6 +18,305 @@
 	"host": "localhost:8080",
 	"basePath": "/api",
 	"paths": {
+		"/admin/audit": {
+			"get": {
+				"security": [
+					{
+						"Bearer": []
+					}
+				],
+				"description": "List what users did, newest first. With a user, the entries are the ones of that user and the ones about them.",
+				"produces": ["application/json"],
+				"tags": ["admin"],
+				"summary": "List audit entries",
+				"parameters": [
+					{
+						"type": "string",
+						"description": "User ID",
+						"name": "userId",
+						"in": "query"
+					},
+					{
+						"type": "string",
+						"description": "Action, such as auth.login",
+						"name": "action",
+						"in": "query"
+					},
+					{
+						"type": "integer",
+						"description": "Page, from 1",
+						"name": "page",
+						"in": "query"
+					},
+					{
+						"type": "integer",
+						"description": "Entries per page, 25 by default, 100 at most",
+						"name": "limit",
+						"in": "query"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/admin.AuditPage"
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"schema": {
+							"type": "object",
+							"additionalProperties": {
+								"type": "string"
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden",
+						"schema": {
+							"type": "object",
+							"additionalProperties": {
+								"type": "string"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/admin/users": {
+			"get": {
+				"security": [
+					{
+						"Bearer": []
+					}
+				],
+				"description": "List the users whose email or name contains the search, newest first",
+				"produces": ["application/json"],
+				"tags": ["admin"],
+				"summary": "List users",
+				"parameters": [
+					{
+						"type": "string",
+						"description": "Part of an email or a name",
+						"name": "search",
+						"in": "query"
+					},
+					{
+						"type": "integer",
+						"description": "Page, from 1",
+						"name": "page",
+						"in": "query"
+					},
+					{
+						"type": "integer",
+						"description": "Users per page, 25 by default, 100 at most",
+						"name": "limit",
+						"in": "query"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/admin.UsersPage"
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"schema": {
+							"type": "object",
+							"additionalProperties": {
+								"type": "string"
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden",
+						"schema": {
+							"type": "object",
+							"additionalProperties": {
+								"type": "string"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/admin/users/{id}": {
+			"get": {
+				"security": [
+					{
+						"Bearer": []
+					}
+				],
+				"description": "Get the whole account of any user",
+				"produces": ["application/json"],
+				"tags": ["admin"],
+				"summary": "Get a user",
+				"parameters": [
+					{
+						"type": "string",
+						"description": "User ID",
+						"name": "id",
+						"in": "path",
+						"required": true
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/user.User"
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"schema": {
+							"type": "object",
+							"additionalProperties": {
+								"type": "string"
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden",
+						"schema": {
+							"type": "object",
+							"additionalProperties": {
+								"type": "string"
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"schema": {
+							"type": "object",
+							"additionalProperties": {
+								"type": "string"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"security": [
+					{
+						"Bearer": []
+					}
+				],
+				"description": "Delete the account of a user, who is told by email. Admins cannot delete their own account here nor the one of the site owner.",
+				"tags": ["admin"],
+				"summary": "Delete a user",
+				"parameters": [
+					{
+						"type": "string",
+						"description": "User ID",
+						"name": "id",
+						"in": "path",
+						"required": true
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"400": {
+						"description": "Bad Request",
+						"schema": {
+							"type": "object",
+							"additionalProperties": {
+								"type": "string"
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden",
+						"schema": {
+							"type": "object",
+							"additionalProperties": {
+								"type": "string"
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"schema": {
+							"type": "object",
+							"additionalProperties": {
+								"type": "string"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/admin/users/{id}/role": {
+			"patch": {
+				"security": [
+					{
+						"Bearer": []
+					}
+				],
+				"description": "Make a user an admin, or a regular user with an empty role. Admins cannot change their own role nor the one of the site owner.",
+				"consumes": ["application/json"],
+				"produces": ["application/json"],
+				"tags": ["admin"],
+				"summary": "Change the role of a user",
+				"parameters": [
+					{
+						"type": "string",
+						"description": "User ID",
+						"name": "id",
+						"in": "path",
+						"required": true
+					},
+					{
+						"description": "Role",
+						"name": "body",
+						"in": "body",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/admin.RoleBody"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/user.User"
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"schema": {
+							"type": "object",
+							"additionalProperties": {
+								"type": "string"
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden",
+						"schema": {
+							"type": "object",
+							"additionalProperties": {
+								"type": "string"
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"schema": {
+							"type": "object",
+							"additionalProperties": {
+								"type": "string"
+							}
+						}
+					}
+				}
+			}
+		},
 		"/auth/login": {
 			"post": {
 				"description": "Login or register a user by email",
@@ -1606,6 +1905,168 @@
 		}
 	},
 	"definitions": {
+		"admin.AuditPage": {
+			"type": "object",
+			"properties": {
+				"entries": {
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/audit.Entry"
+					}
+				},
+				"limit": {
+					"type": "integer"
+				},
+				"page": {
+					"type": "integer"
+				},
+				"total": {
+					"type": "integer"
+				},
+				"users": {
+					"type": "object",
+					"additionalProperties": {
+						"$ref": "#/definitions/admin.UserSummary"
+					}
+				}
+			}
+		},
+		"admin.RoleBody": {
+			"type": "object",
+			"properties": {
+				"role": {
+					"type": "string",
+					"enum": ["admin"]
+				}
+			}
+		},
+		"admin.UserSummary": {
+			"type": "object",
+			"properties": {
+				"email": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				}
+			}
+		},
+		"admin.UsersPage": {
+			"type": "object",
+			"properties": {
+				"limit": {
+					"type": "integer"
+				},
+				"page": {
+					"type": "integer"
+				},
+				"total": {
+					"type": "integer"
+				},
+				"users": {
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/user.User"
+					}
+				}
+			}
+		},
+		"audit.Action": {
+			"type": "string",
+			"enum": [
+				"auth.link_requested",
+				"auth.login",
+				"auth.login_failed",
+				"user.created",
+				"user.identity_linked",
+				"user.identity_unlinked",
+				"user.passkey_added",
+				"user.passkey_removed",
+				"user.profile_updated",
+				"user.data_exported",
+				"user.deleted",
+				"wordcloud.created",
+				"wordcloud.duplicated",
+				"wordcloud.updated",
+				"wordcloud.deleted",
+				"wordcloud.word_hidden",
+				"wordcloud.words_merged",
+				"contact.sent",
+				"admin.role_changed",
+				"access.denied",
+				"access.rate_limited"
+			],
+			"x-enum-varnames": [
+				"AuthLinkRequested",
+				"AuthLogin",
+				"AuthLoginFailed",
+				"UserCreated",
+				"UserIdentityLinked",
+				"UserIdentityUnlinked",
+				"UserPasskeyAdded",
+				"UserPasskeyRemoved",
+				"UserProfileUpdated",
+				"UserDataExported",
+				"UserDeleted",
+				"WordCloudCreated",
+				"WordCloudDuplicated",
+				"WordCloudUpdated",
+				"WordCloudDeleted",
+				"WordCloudWordHidden",
+				"WordCloudWordsMerged",
+				"ContactSent",
+				"AdminRoleChanged",
+				"AccessDenied",
+				"AccessRateLimited"
+			]
+		},
+		"audit.Entry": {
+			"type": "object",
+			"properties": {
+				"action": {
+					"$ref": "#/definitions/audit.Action"
+				},
+				"createdAt": {
+					"type": "string"
+				},
+				"id": {
+					"type": "string"
+				},
+				"ip": {
+					"type": "string"
+				},
+				"meta": {
+					"$ref": "#/definitions/audit.Meta"
+				},
+				"requestId": {
+					"type": "string"
+				},
+				"target": {
+					"$ref": "#/definitions/audit.Target"
+				},
+				"userAgent": {
+					"type": "string"
+				},
+				"userId": {
+					"type": "string"
+				}
+			}
+		},
+		"audit.Meta": {
+			"type": "object",
+			"additionalProperties": {}
+		},
+		"audit.Target": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				}
+			}
+		},
 		"auth.LoginBody": {
 			"type": "object",
 			"required": ["email"],
@@ -2148,6 +2609,10 @@
 				},
 				"profilePicture": {
 					"type": "string"
+				},
+				"role": {
+					"type": "string",
+					"enum": ["admin"]
 				}
 			}
 		}

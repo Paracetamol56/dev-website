@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { createPopover, melt } from '@melt-ui/svelte';
 	import { fade } from 'svelte/transition';
-	import { Cog, LogOut, User, X } from 'lucide-svelte';
+	import { Cog, LogOut, ShieldCheck, User, X } from 'lucide-svelte';
 	import { user } from '$lib/store';
 	import { addToast } from '$lib/toast';
 
@@ -58,6 +58,14 @@
 						<span>Settings</span>
 					</a>
 				</li>
+				{#if $user.role === 'admin'}
+					<li class="mb-2 text-ctp-text hover:text-ctp-blue transition-colors">
+						<a href="/admin" class="flex justify-start items-center gap-2">
+							<ShieldCheck size="18" stroke-width="3" />
+							<span>Admin</span>
+						</a>
+					</li>
+				{/if}
 				<li class="mb-2 text-ctp-text hover:text-ctp-blue transition-colors">
 					<button
 						type="button"

@@ -9,6 +9,7 @@ type UserStore = {
 	id: string | null;
 	email: string | null;
 	flavour: keyof typeof variants;
+	role?: string | null;
 };
 const user: Writable<UserStore> = initUserStore();
 
@@ -23,13 +24,16 @@ function initUserStore(): Writable<UserStore> {
 	if (browser) {
 		const cookie = document.cookie.split('; ').find((row) => row.startsWith('user='));
 		if (cookie) {
-			const { id, accessToken, refreshToken, email, flavour } = JSON.parse(cookie.split('=')[1]);
+			const { id, accessToken, refreshToken, email, flavour, role } = JSON.parse(
+				cookie.split('=')[1]
+			);
 			value = {
 				id: id || null,
 				accessToken: accessToken || null,
 				refreshToken: refreshToken || null,
 				email: email || null,
-				flavour: flavour || 'mocha'
+				flavour: flavour || 'mocha',
+				role: role || null
 			};
 			applyUserTheme(flavour || 'mocha');
 		}

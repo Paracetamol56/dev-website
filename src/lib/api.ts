@@ -68,7 +68,8 @@ function persistUser(apiResponse: any) {
 		refreshToken: apiResponse.data.refreshToken,
 		id: apiResponse.data.user.id,
 		email: apiResponse.data.user.email,
-		flavour: apiResponse.data.user.flavour
+		flavour: apiResponse.data.user.flavour,
+		role: apiResponse.data.user.role ?? null
 	});
 
 	addToast({
@@ -86,7 +87,8 @@ function logout() {
 		...get(user),
 		id: null,
 		accessToken: null,
-		refreshToken: null
+		refreshToken: null,
+		role: null
 	});
 	if (browser) {
 		window.location.reload();
