@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 	"time"
 
+	"dev/internal/testutil"
 	"dev/internal/utils"
 
 	"github.com/gin-gonic/gin"
@@ -20,10 +20,7 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	gin.SetMode(gin.TestMode)
-	os.Setenv("ACCESS_TOKEN_SECRET", "test-access-secret")
-	os.Setenv("REFRESH_TOKEN_SECRET", "test-refresh-secret")
-	os.Exit(m.Run())
+	testutil.Main(m)
 }
 
 func serve(handler gin.HandlerFunc, configure func(*http.Request)) (*httptest.ResponseRecorder, *gin.Context) {
@@ -110,6 +107,8 @@ func TestRequestIdMiddleware(t *testing.T) {
 }
 
 func TestRateLimitByIP(t *testing.T) {
+	testutil.Clean(t)
+	rateLimitRecords = utils.NewRateLimiter(1, 10*time.Minute)
 	engine := gin.New()
 	engine.GET("/", RateLimitByIP(2, time.Hour), func(c *gin.Context) { c.Status(http.StatusNoContent) })
 	get := func(remoteAddr string) *httptest.ResponseRecorder {
@@ -127,6 +126,13 @@ func TestRateLimitByIP(t *testing.T) {
 	assert.Equal(t, "3600", limited.Header().Get("Retry-After"))
 	assert.JSONEq(t, `{"error": "Too many requests, please try again later"}`, limited.Body.String())
 	assert.Equal(t, http.StatusNoContent, get("203.0.113.8:1000").Code, "another address has its own budget")
+
+	assert.Equal(t, http.StatusTooManyRequests, get("203.0.113.7:4000").Code)
+	entries := testutil.Audit(t)
+	require.Len(t, entries, 1, "repeated refusals leave a single entry")
+	assert.Equal(t, "access.rate_limited", entries[0].Action)
+	assert.Equal(t, "203.0.113.7", entries[0].Ip)
+	assert.Equal(t, "GET /", entries[0].Meta["route"])
 }
 
 func TestAbortTooManyRequests(t *testing.T) {

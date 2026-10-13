@@ -15,6 +15,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const (
@@ -170,4 +171,39 @@ func AddedContacts(internet *Internet) []string {
 		}
 	}
 	return contacts
+}
+
+type AuditEntry struct {
+	Action    string
+	UserId    primitive.ObjectID `bson:"userId"`
+	Ip        string
+	RequestId string `bson:"requestId"`
+	Target    struct {
+		Type string
+		Id   string
+	}
+	Meta bson.M
+}
+
+func Audit(t testing.TB) []AuditEntry {
+	t.Helper()
+	ctx := context.Background()
+	cursor, err := db.GetDB().Collection("audit").Find(ctx, bson.M{}, options.Find().SetSort(bson.M{"_id": 1}))
+	if err != nil {
+		t.Fatal(err)
+	}
+	entries := []AuditEntry{}
+	if err := cursor.All(ctx, &entries); err != nil {
+		t.Fatal(err)
+	}
+	return entries
+}
+
+func AuditActions(t testing.TB) []string {
+	t.Helper()
+	actions := []string{}
+	for _, entry := range Audit(t) {
+		actions = append(actions, entry.Action)
+	}
+	return actions
 }

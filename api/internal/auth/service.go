@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"dev/internal/audit"
 	users "dev/internal/user"
 	"dev/internal/utils"
 	"encoding/json"
@@ -303,6 +304,7 @@ func newSession(ctx context.Context, user *users.User) (*Session, error) {
 // RequestLoginLink emails a single-use login link, creating the user on their first visit
 func RequestLoginLink(ctx context.Context, email string, origin string, referer string) error {
 	if allowed, retryAfter := loginEmailLimiter.Allow(strings.ToLower(email)); !allowed {
+		audit.Record(ctx, audit.Entry{Action: audit.AccessRateLimited, Meta: audit.Meta{"limit": "login_email", "email": email}})
 		return utils.TooManyRequests(retryAfter)
 	}
 
@@ -315,6 +317,7 @@ func RequestLoginLink(ctx context.Context, email string, origin string, referer 
 		if user, err = users.GetFullUserById(ctx, result.InsertedID.(primitive.ObjectID)); err != nil {
 			return err
 		}
+		audit.Record(ctx, audit.Entry{Action: audit.UserCreated, UserId: &user.Id, Meta: audit.Meta{"via": users.IdentityProviderEmail}})
 	}
 
 	token, err := CreateLoginToken(ctx, user.Id)
@@ -325,17 +328,31 @@ func RequestLoginLink(ctx context.Context, email string, origin string, referer 
 	if err != nil {
 		return utils.Invalid(err.Error())
 	}
-	return SendVerificationEmail(ctx, user, link)
+	if err := SendVerificationEmail(ctx, user, link); err != nil {
+		return err
+	}
+	audit.Record(ctx, audit.Entry{Action: audit.AuthLinkRequested, UserId: &user.Id})
+	return nil
+}
+
+func loginFailed(ctx context.Context, method string, reason string, userId *primitive.ObjectID) {
+	audit.Record(ctx, audit.Entry{Action: audit.AuthLoginFailed, UserId: userId, Meta: audit.Meta{"method": method, "reason": reason}})
+}
+
+func loggedIn(ctx context.Context, user *users.User, meta audit.Meta) {
+	audit.Record(ctx, audit.Entry{Action: audit.AuthLogin, UserId: &user.Id, Meta: meta})
 }
 
 // VerifyLoginLink consumes the token of a login link and logs its user in
 func VerifyLoginLink(ctx context.Context, token string) (*Session, error) {
 	userId, err := ConsumeLoginToken(ctx, token)
 	if err != nil {
+		loginFailed(ctx, users.IdentityProviderEmail, "invalid_link", nil)
 		return nil, utils.Invalid(err.Error())
 	}
 	user, err := users.GetFullUserById(ctx, userId)
 	if err != nil {
+		loginFailed(ctx, users.IdentityProviderEmail, "unknown_user", &userId)
 		return nil, utils.Invalid(err.Error())
 	}
 
@@ -353,6 +370,7 @@ func VerifyLoginLink(ctx context.Context, token string) (*Session, error) {
 	if _, err = users.UpdateUser(ctx, userId, user); err != nil {
 		return nil, err
 	}
+	loggedIn(ctx, user, audit.Meta{"method": users.IdentityProviderEmail})
 	return newSession(ctx, user)
 }
 
@@ -390,28 +408,38 @@ func LoginWithProvider(ctx context.Context, provider *OAuthProvider, code string
 	if accessToken != "" {
 		userId, err := utils.ExtractID(accessToken, os.Getenv("ACCESS_TOKEN_SECRET"))
 		if err != nil {
+			loginFailed(ctx, provider.Name, "invalid_access_token", nil)
 			return nil, utils.Unauthorized(err.Error())
 		}
 		if user, err = users.GetFullUserById(ctx, userId); err != nil {
+			loginFailed(ctx, provider.Name, "unknown_user", &userId)
 			return nil, utils.Unauthorized("unauthorized")
 		}
 	}
+	linking := user != nil
 
 	identity, err := provider.Authenticate(ctx, code, redirectURI)
 	if err != nil {
 		log.Printf("Failed to authenticate with %s: %v", provider.Name, err)
+		var userId *primitive.ObjectID
+		if user != nil {
+			userId = &user.Id
+		}
+		loginFailed(ctx, provider.Name, "provider_refused", userId)
 		return nil, utils.Invalid("Failed to authenticate with " + provider.Name)
 	}
 
 	if user != nil {
 		if !strings.EqualFold(user.Email, identity.Email) {
+			loginFailed(ctx, provider.Name, "email_mismatch", &user.Id)
 			return nil, utils.Conflict("This account uses another email address (" + identity.Email + ")")
 		}
 	} else if user, err = users.GetFullUserByEmail(ctx, identity.Email); err != nil {
 		return nil, err
 	}
 
-	if user == nil {
+	created := user == nil
+	if created {
 		result, err := users.CreateUser(ctx, &users.User{Email: identity.Email, Flavour: "mocha"})
 		if err != nil {
 			return nil, err
@@ -419,6 +447,7 @@ func LoginWithProvider(ctx context.Context, provider *OAuthProvider, code string
 		if user, err = users.GetFullUserById(ctx, result.InsertedID.(primitive.ObjectID)); err != nil {
 			return nil, err
 		}
+		audit.Record(ctx, audit.Entry{Action: audit.UserCreated, UserId: &user.Id, Meta: audit.Meta{"via": provider.Name}})
 		if err := utils.AddEmailContact(ctx, user.Email); err != nil {
 			log.Printf("Failed to add %s to the contact list: %v", user.Email, err)
 		}
@@ -427,6 +456,7 @@ func LoginWithProvider(ctx context.Context, provider *OAuthProvider, code string
 	if err := users.DetachIdentity(ctx, identity.Provider, identity.ProviderId, user.Id); err != nil {
 		return nil, err
 	}
+	newIdentity := !created && user.GetIdentity(identity.Provider) == nil
 	user.SetIdentity(*identity)
 	if user.Name == "" {
 		user.Name = identity.Name
@@ -439,8 +469,16 @@ func LoginWithProvider(ctx context.Context, provider *OAuthProvider, code string
 	if _, err := users.UpdateUser(ctx, user.Id, user); err != nil {
 		return nil, err
 	}
+	if newIdentity {
+		audit.Record(ctx, audit.Entry{Action: audit.UserIdentityLinked, UserId: &user.Id, Meta: audit.Meta{"provider": identity.Provider}})
+	}
+	if !linking {
+		loggedIn(ctx, user, audit.Meta{"method": provider.Name})
+	}
 	return newSession(ctx, user)
 }
+
+const passkeyMethod = "passkey"
 
 func WebAuthnFor(origin string) (*webauthn.WebAuthn, error) {
 	webAuthn, err := NewWebAuthn(origin)
@@ -466,10 +504,12 @@ func BeginPasskeyLogin(ctx context.Context, webAuthn *webauthn.WebAuthn) (*Passk
 func FinishPasskeyLogin(ctx context.Context, webAuthn *webauthn.WebAuthn, body PasskeyFinishBody) (*Session, error) {
 	session, err := ConsumePasskeyChallenge(ctx, body.SessionId)
 	if err != nil {
+		loginFailed(ctx, passkeyMethod, "invalid_challenge", nil)
 		return nil, utils.Invalid(err.Error())
 	}
 	assertion, err := protocol.ParseCredentialRequestResponseBytes(body.Credential)
 	if err != nil {
+		loginFailed(ctx, passkeyMethod, "invalid_response", nil)
 		return nil, utils.Invalid("Invalid passkey response")
 	}
 
@@ -482,12 +522,14 @@ func FinishPasskeyLogin(ctx context.Context, webAuthn *webauthn.WebAuthn, body P
 	owner, credential, err := webAuthn.ValidatePasskeyLogin(findUser, *session, assertion)
 	if err != nil {
 		log.Printf("Passkey login refused: %v", err)
+		loginFailed(ctx, passkeyMethod, "not_recognized", nil)
 		return nil, utils.Unauthorized("This passkey is not recognized")
 	}
 	user := owner.(*users.User)
 
 	passkey := user.GetPasskey(users.PasskeyId(credential))
 	if passkey == nil {
+		loginFailed(ctx, passkeyMethod, "not_recognized", &user.Id)
 		return nil, utils.Unauthorized("This passkey is not recognized")
 	}
 	// The stored credential carries the signature counter used to detect cloned authenticators
@@ -501,6 +543,7 @@ func FinishPasskeyLogin(ctx context.Context, webAuthn *webauthn.WebAuthn, body P
 	if _, err := users.UpdateUser(ctx, user.Id, user); err != nil {
 		return nil, err
 	}
+	loggedIn(ctx, user, audit.Meta{"method": passkeyMethod, "passkeyId": passkey.Id})
 	return newSession(ctx, user)
 }
 
@@ -550,6 +593,7 @@ func FinishPasskeyRegistration(ctx context.Context, webAuthn *webauthn.WebAuthn,
 	if _, err := users.UpdateUser(ctx, user.Id, user); err != nil {
 		return nil, err
 	}
+	audit.Record(ctx, audit.Entry{Action: audit.UserPasskeyAdded, UserId: &user.Id, Meta: audit.Meta{"passkeyId": passkey.Id, "name": passkey.Name}})
 	return user, nil
 }
 
@@ -560,5 +604,6 @@ func RemovePasskey(ctx context.Context, user *users.User, passkeyId string) (*us
 	if _, err := users.UpdateUser(ctx, user.Id, user); err != nil {
 		return nil, err
 	}
+	audit.Record(ctx, audit.Entry{Action: audit.UserPasskeyRemoved, UserId: &user.Id, Meta: audit.Meta{"passkeyId": passkeyId}})
 	return user, nil
 }

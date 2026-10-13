@@ -154,7 +154,7 @@ func (controller *Controller) GetExport(c *gin.Context) {
 		return
 	}
 
-	user, err := GetOwnUser(c, c.MustGet("x-user-id").(primitive.ObjectID), userId)
+	user, err := ExportData(c, c.MustGet("x-user-id").(primitive.ObjectID), userId)
 	if err != nil {
 		middlewares.RespondError(c, err)
 		return

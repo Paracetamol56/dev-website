@@ -3,6 +3,7 @@ package audit
 import (
 	"dev/internal/testutil"
 	"dev/internal/utils"
+	"strings"
 	"testing"
 	"time"
 
@@ -37,4 +38,22 @@ func TestRecord(t *testing.T) {
 
 	testutil.BreakDB(t)
 	assert.NotPanics(t, func() { Record(testutil.Context(), Entry{Action: AuthLogin}) })
+}
+
+func TestRecordReadsTheRequest(t *testing.T) {
+	testutil.Clean(t)
+	userId, otherId := primitive.NewObjectID(), primitive.NewObjectID()
+	c := testutil.Context()
+	c.Request.RemoteAddr = "203.0.113.7:4000"
+	c.Request.Header.Set("User-Agent", strings.Repeat("a", 300))
+	c.Set("x-user-id", userId)
+
+	Record(c, Entry{Action: UserDataExported})
+	Record(c, Entry{Action: AccessDenied, UserId: &otherId})
+
+	entries, err := GetEntriesByUserId(ctx, userId)
+	require.NoError(t, err)
+	require.Len(t, entries, 1, "an explicit user wins over the one of the request")
+	assert.Equal(t, "203.0.113.7", entries[0].Ip)
+	assert.Len(t, entries[0].UserAgent, maxUserAgentLength)
 }

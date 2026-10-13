@@ -15,7 +15,6 @@ const (
 	AuthLinkRequested Action = "auth.link_requested"
 	AuthLogin         Action = "auth.login"
 	AuthLoginFailed   Action = "auth.login_failed"
-	AuthRateLimited   Action = "auth.rate_limited"
 
 	UserCreated          Action = "user.created"
 	UserIdentityLinked   Action = "user.identity_linked"
@@ -33,8 +32,10 @@ const (
 	WordCloudWordHidden  Action = "wordcloud.word_hidden"
 	WordCloudWordsMerged Action = "wordcloud.words_merged"
 
-	ContactSent  Action = "contact.sent"
-	AccessDenied Action = "access.denied"
+	ContactSent Action = "contact.sent"
+
+	AccessDenied      Action = "access.denied"
+	AccessRateLimited Action = "access.rate_limited"
 )
 
 const (
@@ -42,6 +43,8 @@ const (
 	TargetWordCloud = "wordcloud"
 	TargetContact   = "contact"
 )
+
+type Meta = map[string]any
 
 type Target struct {
 	Type string `json:"type" bson:"type"`
@@ -57,5 +60,5 @@ type Entry struct {
 	UserAgent string              `json:"userAgent,omitempty" bson:"userAgent,omitempty"`
 	RequestId string              `json:"requestId,omitempty" bson:"requestId,omitempty"`
 	Target    *Target             `json:"target,omitempty" bson:"target,omitempty"`
-	Meta      map[string]any      `json:"meta,omitempty" bson:"meta,omitempty"`
+	Meta      Meta                `json:"meta,omitempty" bson:"meta,omitempty"`
 }

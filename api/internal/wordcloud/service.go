@@ -5,6 +5,7 @@ import (
 	"crypto/hmac"
 	"crypto/rand"
 	"crypto/sha256"
+	"dev/internal/audit"
 	"dev/internal/utils"
 	"embed"
 	"encoding/base64"
@@ -375,12 +376,21 @@ func GetSession(ctx context.Context, id primitive.ObjectID) (*WordCloud, error) 
 	return wordCloud, sessionError(err)
 }
 
+func target(id primitive.ObjectID) *audit.Target {
+	return &audit.Target{Type: audit.TargetWordCloud, Id: id.Hex()}
+}
+
+func recordSession(ctx context.Context, action audit.Action, wordCloud *WordCloud, meta audit.Meta) {
+	audit.Record(ctx, audit.Entry{Action: action, UserId: &wordCloud.UserId, Target: target(wordCloud.Id), Meta: meta})
+}
+
 func GetOwnedSession(ctx context.Context, id primitive.ObjectID, userId primitive.ObjectID) (*WordCloud, error) {
 	wordCloud, err := GetSession(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 	if wordCloud.UserId != userId {
+		audit.Record(ctx, audit.Entry{Action: audit.AccessDenied, UserId: &userId, Target: target(id)})
 		return nil, utils.Forbidden("forbidden")
 	}
 	return wordCloud, nil
@@ -477,12 +487,20 @@ func CreateSession(ctx context.Context, userId primitive.ObjectID, body PostWord
 	if body.Settings != nil {
 		settings = *body.Settings
 	}
-	return createSession(ctx, userId, body.Name, body.Description, settings)
+	id, err := createSession(ctx, userId, body.Name, body.Description, settings)
+	if err == nil {
+		audit.Record(ctx, audit.Entry{Action: audit.WordCloudCreated, UserId: &userId, Target: target(id), Meta: audit.Meta{"name": body.Name}})
+	}
+	return id, err
 }
 
 // DuplicateSession starts an empty session with the same name, description and settings
 func DuplicateSession(ctx context.Context, wordCloud *WordCloud) (primitive.ObjectID, error) {
-	return createSession(ctx, wordCloud.UserId, wordCloud.Name, wordCloud.Description, wordCloud.Settings)
+	id, err := createSession(ctx, wordCloud.UserId, wordCloud.Name, wordCloud.Description, wordCloud.Settings)
+	if err == nil {
+		audit.Record(ctx, audit.Entry{Action: audit.WordCloudDuplicated, UserId: &wordCloud.UserId, Target: target(id), Meta: audit.Meta{"from": wordCloud.Id.Hex()}})
+	}
+	return id, err
 }
 
 func createSession(ctx context.Context, userId primitive.ObjectID, name string, description string, settings Settings) (primitive.ObjectID, error) {
@@ -515,19 +533,25 @@ func ChangeSession(ctx context.Context, wordCloud *WordCloud, body PatchWordClou
 	}
 
 	set, unset := bson.M{}, bson.M{}
+	changed := []string{}
 	if body.Name != nil {
 		wordCloud.Name = *body.Name
 		set["name"] = wordCloud.Name
+		changed = append(changed, "name")
 	}
 	if body.Description != nil {
 		wordCloud.Description = *body.Description
 		set["description"] = wordCloud.Description
+		changed = append(changed, "description")
 	}
 	if body.Settings != nil {
 		wordCloud.Settings = *body.Settings
 		set["settings"] = wordCloud.Settings
+		changed = append(changed, "settings")
 	}
+	meta := audit.Meta{}
 	if body.Open != nil && *body.Open != isOpen(wordCloud) {
+		meta["open"] = *body.Open
 		if *body.Open {
 			inUse, err := IsCodeInUse(ctx, wordCloud.Code)
 			if err == nil && inUse {
@@ -549,6 +573,12 @@ func ChangeSession(ctx context.Context, wordCloud *WordCloud, body PatchWordClou
 	if err := UpdateWordCloud(ctx, wordCloud.Id, set, unset); err != nil {
 		return nil, err
 	}
+	if len(changed) > 0 {
+		meta["fields"] = changed
+	}
+	if len(meta) > 0 {
+		recordSession(ctx, audit.WordCloudUpdated, wordCloud, meta)
+	}
 	go broadcastSession(wordCloud)
 	return wordCloud, nil
 }
@@ -557,6 +587,7 @@ func RemoveSession(ctx context.Context, wordCloud *WordCloud) error {
 	if err := DeleteWordCloud(ctx, wordCloud.Id); err != nil {
 		return err
 	}
+	recordSession(ctx, audit.WordCloudDeleted, wordCloud, audit.Meta{"name": wordCloud.Name})
 	event := map[string]any{"type": "session", "session": nil}
 	go broadcast(wordCloud.Id, event, event)
 	return nil
@@ -570,6 +601,7 @@ func HideWord(ctx context.Context, wordCloud *WordCloud, wordId primitive.Object
 	if !found {
 		return nil, utils.NotFound("word not found")
 	}
+	recordSession(ctx, audit.WordCloudWordHidden, wordCloud, audit.Meta{"wordId": wordId.Hex(), "hidden": hidden})
 	return moderatedWords(ctx, wordCloud.Id)
 }
 
@@ -582,6 +614,7 @@ func MergeInto(ctx context.Context, wordCloud *WordCloud, from []string, into st
 	if err := MergeWords(ctx, wordCloud.Id, from, into); err != nil {
 		return nil, err
 	}
+	recordSession(ctx, audit.WordCloudWordsMerged, wordCloud, audit.Meta{"from": from, "into": into})
 	return moderatedWords(ctx, wordCloud.Id)
 }
 

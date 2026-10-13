@@ -8,14 +8,14 @@ import (
 	"strings"
 	"testing"
 
+	"dev/internal/testutil"
+
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestMain(m *testing.M) {
-	gin.SetMode(gin.TestMode)
-	os.Setenv("ACCESS_TOKEN_SECRET", "test-access-secret")
-	os.Exit(m.Run())
+	testutil.Main(m)
 }
 
 func request(router *gin.Engine, method string, path string, configure func(*http.Request)) *httptest.ResponseRecorder {

@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"dev/internal/audit"
 	"dev/internal/utils"
 	"errors"
 	"log"
@@ -59,9 +60,18 @@ func notFound(err error) error {
 	return err
 }
 
+func denied(ctx context.Context, requester primitive.ObjectID, id primitive.ObjectID) {
+	audit.Record(ctx, audit.Entry{
+		Action: audit.AccessDenied,
+		UserId: &requester,
+		Target: &audit.Target{Type: audit.TargetUser, Id: id.Hex()},
+	})
+}
+
 // GetOwnUser returns the user only to themselves
 func GetOwnUser(ctx context.Context, requester primitive.ObjectID, id primitive.ObjectID) (*User, error) {
 	if id != requester {
+		denied(ctx, requester, id)
 		return nil, utils.Forbidden("Forbidden")
 	}
 	user, err := GetFullUserById(ctx, id)
@@ -84,18 +94,24 @@ func UpdateProfile(ctx context.Context, requester primitive.ObjectID, id primiti
 		return nil, err
 	}
 
-	if changes.Name != "" {
+	changed := []string{}
+	if changes.Name != "" && changes.Name != user.Name {
 		user.Name = changes.Name
+		changed = append(changed, "name")
 	}
 	if changes.Flavour != "" {
 		user.Flavour = changes.Flavour
 	}
-	if changes.ProfilePicture != "" {
+	if changes.ProfilePicture != "" && changes.ProfilePicture != user.ProfilePicture {
 		user.ProfilePicture = changes.ProfilePicture
+		changed = append(changed, "profilePicture")
 	}
 
 	if _, err := UpdateUser(ctx, id, user); err != nil {
 		return nil, err
+	}
+	if len(changed) > 0 {
+		audit.Record(ctx, audit.Entry{Action: audit.UserProfileUpdated, UserId: &id, Meta: audit.Meta{"fields": changed}})
 	}
 	return user, nil
 }
@@ -103,6 +119,7 @@ func UpdateProfile(ctx context.Context, requester primitive.ObjectID, id primiti
 // UnlinkIdentity never removes the email identity, so the user can always log in with a magic link
 func UnlinkIdentity(ctx context.Context, requester primitive.ObjectID, id primitive.ObjectID, provider string) (*User, error) {
 	if id != requester {
+		denied(ctx, requester, id)
 		return nil, utils.Forbidden("Forbidden")
 	}
 	if provider == IdentityProviderEmail {
@@ -119,6 +136,16 @@ func UnlinkIdentity(ctx context.Context, requester primitive.ObjectID, id primit
 	if _, err := UpdateUser(ctx, id, user); err != nil {
 		return nil, err
 	}
+	audit.Record(ctx, audit.Entry{Action: audit.UserIdentityUnlinked, UserId: &id, Meta: audit.Meta{"provider": provider}})
+	return user, nil
+}
+
+func ExportData(ctx context.Context, requester primitive.ObjectID, id primitive.ObjectID) (*User, error) {
+	user, err := GetOwnUser(ctx, requester, id)
+	if err != nil {
+		return nil, err
+	}
+	audit.Record(ctx, audit.Entry{Action: audit.UserDataExported, UserId: &id})
 	return user, nil
 }
 
@@ -135,6 +162,7 @@ func DeleteAccount(ctx context.Context, requester primitive.ObjectID, id primiti
 	if result.MatchedCount == 0 {
 		return utils.NotFound("User not found")
 	}
+	audit.Record(ctx, audit.Entry{Action: audit.UserDeleted, UserId: &id, Meta: audit.Meta{"by": "user"}})
 
 	// The account is already deleted: a notice that cannot be sent must not report a failure
 	if err := SendDeletionEmail(ctx, user); err != nil {
