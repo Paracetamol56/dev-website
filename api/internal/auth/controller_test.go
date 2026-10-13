@@ -199,7 +199,8 @@ func TestPostVerifyRejections(t *testing.T) {
 }
 
 func TestPostRefresh(t *testing.T) {
-	userId := primitive.NewObjectID()
+	testutil.Clean(t)
+	userId := createUser(t, users.User{}).Id
 	refresh, err := utils.SignRefreshToken(userId.Hex(), 168)
 	require.NoError(t, err)
 
@@ -223,6 +224,14 @@ func TestPostRefresh(t *testing.T) {
 	} {
 		assert.Equal(t, http.StatusBadRequest, do(t, http.MethodPost, "/auth/refresh", body).Code, name)
 	}
+
+	_, err = users.DeleteUser(ctx, userId)
+	require.NoError(t, err)
+	gone := do(t, http.MethodPost, "/auth/refresh", map[string]string{"token": refresh})
+	assert.Equal(t, http.StatusBadRequest, gone.Code, "a deleted account cannot keep its session alive")
+
+	testutil.BreakDB(t)
+	assert.Equal(t, http.StatusInternalServerError, do(t, http.MethodPost, "/auth/refresh", map[string]string{"token": refresh}).Code)
 }
 
 func TestGetOAuthProviders(t *testing.T) {

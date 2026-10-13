@@ -46,3 +46,38 @@ func GetEntriesByUserId(ctx context.Context, userId primitive.ObjectID) ([]Entry
 	err = cursor.All(ctx, &entries)
 	return entries, err
 }
+
+type Filter struct {
+	UserId *primitive.ObjectID
+	Action Action
+}
+
+// ListEntries returns a page of the entries matching the filter, newest first
+func ListEntries(ctx context.Context, filter Filter, page int, limit int) ([]Entry, int64, error) {
+	collection := db.GetDB().Collection(collectionName)
+	query := bson.M{}
+	if filter.UserId != nil {
+		query["$or"] = bson.A{
+			bson.M{"userId": *filter.UserId},
+			bson.M{"target.type": TargetUser, "target.id": filter.UserId.Hex()},
+		}
+	}
+	if filter.Action != "" {
+		query["action"] = filter.Action
+	}
+
+	total, err := collection.CountDocuments(ctx, query)
+	if err != nil {
+		return nil, 0, err
+	}
+	cursor, err := collection.Find(ctx, query, options.Find().
+		SetSort(bson.D{{Key: "createdAt", Value: -1}, {Key: "_id", Value: -1}}).
+		SetSkip(int64((page-1)*limit)).
+		SetLimit(int64(limit)))
+	if err != nil {
+		return nil, 0, err
+	}
+	entries := []Entry{}
+	err = cursor.All(ctx, &entries)
+	return entries, total, err
+}

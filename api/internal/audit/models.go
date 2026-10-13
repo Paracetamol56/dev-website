@@ -34,6 +34,8 @@ const (
 
 	ContactSent Action = "contact.sent"
 
+	AdminRoleChanged Action = "admin.role_changed"
+
 	AccessDenied      Action = "access.denied"
 	AccessRateLimited Action = "access.rate_limited"
 )
@@ -42,6 +44,7 @@ const (
 	TargetUser      = "user"
 	TargetWordCloud = "wordcloud"
 	TargetContact   = "contact"
+	TargetAdmin     = "admin"
 )
 
 type Meta = map[string]any

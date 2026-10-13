@@ -3,6 +3,7 @@ package server
 import (
 	"time"
 
+	"dev/internal/admin"
 	"dev/internal/auth"
 	"dev/internal/chip"
 	"dev/internal/contact"
@@ -37,6 +38,7 @@ func InitRouter() *gin.Engine {
 	}))
 	r.Use(middlewares.CORPMiddleware())
 
+	adminController := new(admin.Controller)
 	authController := new(auth.Controller)
 	contactController := new(contact.Controller)
 	healthController := new(health.Controller)
@@ -117,6 +119,15 @@ func InitRouter() *gin.Engine {
 			userGroup.POST("/:id/passkeys/begin", authController.PostPasskeyRegisterBegin)
 			userGroup.POST("/:id/passkeys/finish", authController.PostPasskeyRegisterFinish)
 			userGroup.DELETE("/:id/passkeys/:passkeyId", authController.DeletePasskey)
+		}
+		adminGroup := apiGroup.Group("/admin")
+		{
+			adminGroup.Use(middlewares.JwtAuthMiddleware(), admin.RequireAdmin())
+			adminGroup.GET("/users", adminController.GetUsers)
+			adminGroup.GET("/users/:id", adminController.GetUser)
+			adminGroup.PATCH("/users/:id/role", adminController.PatchUserRole)
+			adminGroup.DELETE("/users/:id", adminController.DeleteUser)
+			adminGroup.GET("/audit", adminController.GetAudit)
 		}
 	}
 

@@ -21,6 +21,7 @@ import (
 	"github.com/go-webauthn/webauthn/protocol"
 	"github.com/go-webauthn/webauthn/webauthn"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 var oauthClient = &http.Client{Timeout: 10 * time.Second}
@@ -340,6 +341,9 @@ func loginFailed(ctx context.Context, method string, reason string, userId *prim
 }
 
 func loggedIn(ctx context.Context, user *users.User, meta audit.Meta) {
+	if err := users.PromoteRootAdmin(ctx, user); err != nil {
+		log.Printf("Failed to promote the root admin: %v", err)
+	}
 	audit.Record(ctx, audit.Entry{Action: audit.AuthLogin, UserId: &user.Id, Meta: meta})
 }
 
@@ -383,6 +387,13 @@ func RefreshSession(ctx context.Context, refreshToken string) (*Session, error) 
 	userId, err := utils.ExtractID(refreshToken, secret)
 	if err != nil {
 		return nil, utils.Invalid(err.Error())
+	}
+
+	if _, err := users.GetFullUserById(ctx, userId); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, utils.Invalid("this account no longer exists")
+		}
+		return nil, err
 	}
 
 	newRefreshToken, accessToken, err := SignTokenPair(ctx, userId.Hex())

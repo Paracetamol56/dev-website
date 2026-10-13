@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"dev/internal/db"
+	"regexp"
 	"strconv"
 	"time"
 
@@ -112,6 +113,63 @@ func DeleteUser(c context.Context, id primitive.ObjectID) (*mongo.UpdateResult, 
 		},
 	})
 	return result, err
+}
+
+// SetUserRole gives the role to the user, an empty role taking it back
+func SetUserRole(ctx context.Context, id primitive.ObjectID, role string) error {
+	update := bson.M{"$set": bson.M{"role": role}}
+	if role == "" {
+		update = bson.M{"$unset": bson.M{"role": ""}}
+	}
+	result, err := db.GetDB().Collection("users").UpdateOne(ctx, bson.M{"_id": id, "deletedAt": bson.M{"$exists": false}}, update)
+	if err == nil && result.MatchedCount == 0 {
+		return mongo.ErrNoDocuments
+	}
+	return err
+}
+
+// GetUsersByIds also returns deleted users, so that what they did can still be attributed
+func GetUsersByIds(ctx context.Context, ids []primitive.ObjectID) ([]User, error) {
+	users := []User{}
+	if len(ids) == 0 {
+		return users, nil
+	}
+	cursor, err := db.GetDB().Collection("users").Find(ctx, bson.M{"_id": bson.M{"$in": ids}})
+	if err != nil {
+		return nil, err
+	}
+	err = cursor.All(ctx, &users)
+	return users, err
+}
+
+// ListUsers returns a page of the users whose email or name contains the search, newest first
+func ListUsers(ctx context.Context, search string, page int, limit int) ([]User, int64, error) {
+	collection := db.GetDB().Collection("users")
+	filter := bson.M{"deletedAt": bson.M{"$exists": false}}
+	if search != "" {
+		pattern := primitive.Regex{Pattern: regexp.QuoteMeta(search), Options: "i"}
+		filter["$or"] = bson.A{bson.M{"email": pattern}, bson.M{"name": pattern}}
+	}
+
+	total, err := collection.CountDocuments(ctx, filter)
+	if err != nil {
+		return nil, 0, err
+	}
+	cursor, err := collection.Find(ctx, filter, options.Find().
+		SetSort(bson.D{{Key: "_id", Value: -1}}).
+		SetSkip(int64((page-1)*limit)).
+		SetLimit(int64(limit)))
+	if err != nil {
+		return nil, 0, err
+	}
+	users := []User{}
+	if err := cursor.All(ctx, &users); err != nil {
+		return nil, 0, err
+	}
+	for i := range users {
+		users[i].fillCreatedAt()
+	}
+	return users, total, nil
 }
 
 // DeleteOldUsers deletes old users from the database.

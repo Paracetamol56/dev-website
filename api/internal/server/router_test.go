@@ -48,6 +48,8 @@ func TestRoutes(t *testing.T) {
 		"GET /api/users/:id", "PATCH /api/users/:id", "DELETE /api/users/:id", "GET /api/users/:id/export",
 		"DELETE /api/users/:id/identities/:provider", "POST /api/users/:id/passkeys/begin", "POST /api/users/:id/passkeys/finish",
 		"DELETE /api/users/:id/passkeys/:passkeyId",
+		"GET /api/admin/users", "GET /api/admin/users/:id", "PATCH /api/admin/users/:id/role", "DELETE /api/admin/users/:id",
+		"GET /api/admin/audit",
 	} {
 		assert.True(t, registered[route], route)
 		delete(registered, route)
@@ -76,6 +78,8 @@ func TestProtectedRoutesRequireAToken(t *testing.T) {
 		"GET /api/users/" + id, "PATCH /api/users/" + id, "DELETE /api/users/" + id, "GET /api/users/" + id + "/export",
 		"DELETE /api/users/" + id + "/identities/github", "POST /api/users/" + id + "/passkeys/begin",
 		"POST /api/users/" + id + "/passkeys/finish", "DELETE /api/users/" + id + "/passkeys/key",
+		"GET /api/admin/users", "GET /api/admin/users/" + id, "PATCH /api/admin/users/" + id + "/role",
+		"DELETE /api/admin/users/" + id, "GET /api/admin/audit",
 	} {
 		method, path, _ := strings.Cut(route, " ")
 		assert.Equal(t, http.StatusUnauthorized, request(router, method, path, nil).Code, route)

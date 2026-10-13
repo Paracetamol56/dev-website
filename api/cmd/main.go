@@ -49,6 +49,10 @@ func main() {
 	if err := audit.EnsureIndexes(context.Background()); err != nil {
 		log.Fatalln("Failed to create the audit indexes:", err)
 	}
+	if err := user.EnsureRootAdmin(context.Background()); err != nil {
+		log.Fatalln("Failed to promote the root admin:", err)
+	}
+	user.ScheduleAccountDeletion()
 	icon.ScheduleIconRefresh()
 	chip.ScheduleMicroprocessorRefresh()
 	server.Run()

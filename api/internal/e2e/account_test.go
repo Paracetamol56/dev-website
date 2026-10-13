@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"net/url"
 	"strings"
 	"testing"
 
@@ -227,4 +228,49 @@ func TestPasskeys(t *testing.T) {
 	assert.Empty(t, remaining["passkeys"])
 	rejected := signIn().expect(http.StatusUnauthorized)
 	assert.Equal(t, "This passkey is not recognized", rejected.error())
+}
+
+func TestAdministration(t *testing.T) {
+	app := start(t)
+	owner := app.visitor()
+	owner.login(testutil.AdminEmail)
+	ada := app.visitor()
+	ada.login(app.address("ada"))
+	grace := app.visitor()
+	grace.login(app.address("grace"))
+
+	app.visitor().get("/admin/users").expect(http.StatusUnauthorized)
+	ada.get("/admin/users").expect(http.StatusForbidden)
+	ada.patch("/admin/users/"+ada.userId+"/role", map[string]string{"role": "admin"}).expect(http.StatusForbidden)
+	assert.Equal(t, "admin", owner.get("/users/" + owner.userId).expect(http.StatusOK).object()["role"])
+
+	listed := owner.get("/admin/users?search=" + url.QueryEscape(app.address("ada"))).expect(http.StatusOK).object()
+	assert.EqualValues(t, 1, listed["total"])
+	assert.EqualValues(t, 3, owner.get("/admin/users").expect(http.StatusOK).object()["total"])
+	assert.Equal(t, app.address("ada"), owner.get("/admin/users/" + ada.userId).expect(http.StatusOK).object()["email"])
+
+	owner.patch("/admin/users/"+ada.userId+"/role", map[string]string{"role": "admin"}).expect(http.StatusOK)
+	ada.get("/admin/users").expect(http.StatusOK)
+	ada.delete("/admin/users/" + owner.userId).expect(http.StatusForbidden)
+	ada.patch("/admin/users/"+owner.userId+"/role", map[string]string{"role": ""}).expect(http.StatusForbidden)
+	ada.patch("/admin/users/"+ada.userId+"/role", map[string]string{"role": ""}).expect(http.StatusBadRequest)
+	owner.patch("/admin/users/"+ada.userId+"/role", map[string]string{"role": ""}).expect(http.StatusOK)
+	ada.get("/admin/users").expect(http.StatusForbidden)
+
+	owner.delete("/admin/users/" + grace.userId).expect(http.StatusNoContent)
+	notices := app.inbox(app.address("grace"))
+	assert.Equal(t, "Your account has been deleted", notices[len(notices)-1].Subject)
+	grace.get("/users/" + grace.userId).expect(http.StatusNotFound)
+	grace.post("/auth/refresh", map[string]string{"token": grace.refreshToken}).expect(http.StatusBadRequest)
+	assert.EqualValues(t, 2, owner.get("/admin/users").expect(http.StatusOK).object()["total"])
+
+	activity := owner.get("/admin/audit?userId=" + ada.userId).expect(http.StatusOK).object()
+	actions := []string{}
+	for _, entry := range activity["entries"].([]any) {
+		actions = append(actions, entry.(map[string]any)["action"].(string))
+	}
+	assert.Equal(t, []string{"access.denied", "admin.role_changed", "admin.role_changed", "access.denied", "access.denied",
+		"auth.login", "auth.link_requested", "user.created"}, actions)
+	deleted := owner.get("/admin/audit?action=user.deleted").expect(http.StatusOK).object()
+	assert.EqualValues(t, 1, deleted["total"])
 }

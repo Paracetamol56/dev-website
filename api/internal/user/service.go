@@ -6,6 +6,8 @@ import (
 	"dev/internal/utils"
 	"errors"
 	"log"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/go-co-op/gocron"
@@ -51,6 +53,43 @@ func SendDeletionEmail(c context.Context, user *User) error {
 	`,
 	})
 	return err
+}
+
+// IsRootAdmin tells whether the email is the one of the site owner, who is always an admin
+func IsRootAdmin(email string) bool {
+	root := os.Getenv("ADMIN_EMAIL")
+	return root != "" && strings.EqualFold(email, root)
+}
+
+// PromoteRootAdmin makes the site owner an admin. It must only be called for a user whose
+// email is proven: at startup for an existing account, then after a login.
+func PromoteRootAdmin(ctx context.Context, user *User) error {
+	if user == nil || user.IsAdmin() || !IsRootAdmin(user.Email) {
+		return nil
+	}
+	if err := SetUserRole(ctx, user.Id, RoleAdmin); err != nil {
+		return err
+	}
+	user.Role = RoleAdmin
+	audit.Record(ctx, audit.Entry{
+		Action: audit.AdminRoleChanged,
+		UserId: &user.Id,
+		Target: &audit.Target{Type: audit.TargetUser, Id: user.Id.Hex()},
+		Meta:   audit.Meta{"role": RoleAdmin, "by": "root"},
+	})
+	return nil
+}
+
+func EnsureRootAdmin(ctx context.Context) error {
+	email := os.Getenv("ADMIN_EMAIL")
+	if email == "" {
+		return nil
+	}
+	user, err := GetFullUserByEmail(ctx, email)
+	if err != nil {
+		return err
+	}
+	return PromoteRootAdmin(ctx, user)
 }
 
 func notFound(err error) error {

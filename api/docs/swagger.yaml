@@ -1,5 +1,126 @@
 basePath: /api
 definitions:
+  admin.AuditPage:
+    properties:
+      entries:
+        items:
+          $ref: '#/definitions/audit.Entry'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      users:
+        additionalProperties:
+          $ref: '#/definitions/admin.UserSummary'
+        type: object
+    type: object
+  admin.RoleBody:
+    properties:
+      role:
+        enum:
+        - admin
+        type: string
+    type: object
+  admin.UserSummary:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+    type: object
+  admin.UsersPage:
+    properties:
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      users:
+        items:
+          $ref: '#/definitions/user.User'
+        type: array
+    type: object
+  audit.Action:
+    enum:
+    - auth.link_requested
+    - auth.login
+    - auth.login_failed
+    - user.created
+    - user.identity_linked
+    - user.identity_unlinked
+    - user.passkey_added
+    - user.passkey_removed
+    - user.profile_updated
+    - user.data_exported
+    - user.deleted
+    - wordcloud.created
+    - wordcloud.duplicated
+    - wordcloud.updated
+    - wordcloud.deleted
+    - wordcloud.word_hidden
+    - wordcloud.words_merged
+    - contact.sent
+    - admin.role_changed
+    - access.denied
+    - access.rate_limited
+    type: string
+    x-enum-varnames:
+    - AuthLinkRequested
+    - AuthLogin
+    - AuthLoginFailed
+    - UserCreated
+    - UserIdentityLinked
+    - UserIdentityUnlinked
+    - UserPasskeyAdded
+    - UserPasskeyRemoved
+    - UserProfileUpdated
+    - UserDataExported
+    - UserDeleted
+    - WordCloudCreated
+    - WordCloudDuplicated
+    - WordCloudUpdated
+    - WordCloudDeleted
+    - WordCloudWordHidden
+    - WordCloudWordsMerged
+    - ContactSent
+    - AdminRoleChanged
+    - AccessDenied
+    - AccessRateLimited
+  audit.Entry:
+    properties:
+      action:
+        $ref: '#/definitions/audit.Action'
+      createdAt:
+        type: string
+      id:
+        type: string
+      ip:
+        type: string
+      meta:
+        $ref: '#/definitions/audit.Meta'
+      requestId:
+        type: string
+      target:
+        $ref: '#/definitions/audit.Target'
+      userAgent:
+        type: string
+      userId:
+        type: string
+    type: object
+  audit.Meta:
+    additionalProperties: {}
+    type: object
+  audit.Target:
+    properties:
+      id:
+        type: string
+      type:
+        type: string
+    type: object
   auth.LoginBody:
     properties:
       email:
@@ -398,6 +519,10 @@ definitions:
         type: array
       profilePicture:
         type: string
+      role:
+        enum:
+        - admin
+        type: string
     type: object
 host: localhost:8080
 info:
@@ -413,6 +538,214 @@ info:
   title: Dev Website API
   version: "1.0"
 paths:
+  /admin/audit:
+    get:
+      description: List what users did, newest first. With a user, the entries are
+        the ones of that user and the ones about them.
+      parameters:
+      - description: User ID
+        in: query
+        name: userId
+        type: string
+      - description: Action, such as auth.login
+        in: query
+        name: action
+        type: string
+      - description: Page, from 1
+        in: query
+        name: page
+        type: integer
+      - description: Entries per page, 25 by default, 100 at most
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/admin.AuditPage'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: List audit entries
+      tags:
+      - admin
+  /admin/users:
+    get:
+      description: List the users whose email or name contains the search, newest
+        first
+      parameters:
+      - description: Part of an email or a name
+        in: query
+        name: search
+        type: string
+      - description: Page, from 1
+        in: query
+        name: page
+        type: integer
+      - description: Users per page, 25 by default, 100 at most
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/admin.UsersPage'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: List users
+      tags:
+      - admin
+  /admin/users/{id}:
+    delete:
+      description: Delete the account of a user, who is told by email. Admins cannot
+        delete their own account here nor the one of the site owner.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Delete a user
+      tags:
+      - admin
+    get:
+      description: Get the whole account of any user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.User'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get a user
+      tags:
+      - admin
+  /admin/users/{id}/role:
+    patch:
+      consumes:
+      - application/json
+      description: Make a user an admin, or a regular user with an empty role. Admins
+        cannot change their own role nor the one of the site owner.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Role
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/admin.RoleBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.User'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Change the role of a user
+      tags:
+      - admin
   /auth/{provider}:
     post:
       consumes:
