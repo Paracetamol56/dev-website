@@ -1,5 +1,5 @@
 <script lang="ts">
-	import MeltTooltip from '$lib/components/MeltTooltip.svelte';
+	import Tooltip from '$lib/components/ui/Tooltip.svelte';
 	import { Dice5 } from 'lucide-svelte';
 	import PaletteWheel from './PaletteWheel.svelte';
 	import { writable, type Writable } from 'svelte/store';
@@ -82,7 +82,7 @@
 						Transparent
 					</button>
 				{/if}
-				<MeltTooltip text="Random palette colour">
+				<Tooltip text="Random palette colour">
 					<button
 						type="button"
 						aria-label="Random {label.toLowerCase()} from the palette"
@@ -91,7 +91,7 @@
 					>
 						<Dice5 size="16" />
 					</button>
-				</MeltTooltip>
+				</Tooltip>
 			</div>
 		</div>
 	</div>

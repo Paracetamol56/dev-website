@@ -1,19 +1,31 @@
 <script lang="ts">
-	import { createSwitch, melt, type CreateSwitchProps } from '@melt-ui/svelte';
 	import axios from 'axios';
 	import { Send } from 'lucide-svelte';
-	import { addToast } from '../+layout.svelte';
+	import { writable } from 'svelte/store';
 	import { user } from '$lib/store';
-	import Button from '$lib/components/Button.svelte';
+	import { addToast } from '$lib/toast';
+	import Button from '$lib/components/ui/Button.svelte';
+	import Heading from '$lib/components/ui/Heading.svelte';
+	import Hero from '$lib/components/ui/Hero.svelte';
+	import Switch from '$lib/components/ui/Switch.svelte';
+	import Text from '$lib/components/ui/Text.svelte';
+	import Textarea from '$lib/components/ui/Textarea.svelte';
+	import TextInput from '$lib/components/ui/TextInput.svelte';
+	import { TextColor, TextSize } from '$lib/components/ui/typography';
 
-	let email: string = '';
-	let name: string = '';
-	let message: string = '';
+	const MESSAGE_MAX = 1000;
+
+	const email = writable('');
+	const name = writable('');
+	const message = writable('');
+	const privacy = writable(false);
 
 	let emailError: string = '';
 	let nameError: string = '';
 	let messageError: string = '';
 	let privacyError: string = '';
+	let submitted: boolean = false;
+	let sending: boolean = false;
 
 	const validateEmail = (email: string) => {
 		if (email.length === 0) {
@@ -52,25 +64,20 @@
 			messageError = 'Message must be at least 10 characters long';
 			return false;
 		}
-		if (message.length > 1000) {
-			messageError = 'Message must be less than 1000 characters long';
+		if (message.length > MESSAGE_MAX) {
+			messageError = `Message must be less than ${MESSAGE_MAX} characters long`;
 			return false;
 		}
 		messageError = '';
 		return true;
 	};
-	const validatePrivacy: CreateSwitchProps['onCheckedChange'] = ({ curr, next }) => {
-		if (!next) {
-			privacyError = 'This field is required';
-		} else {
-			privacyError = '';
-		}
-		return next;
-	};
 
-	const handleSubmit = (e: Event) => {
-		e.preventDefault();
-		if (!validateEmail(email) || !validateName(name) || !validateMessage(message) || !$checked) {
+	$: privacyError = submitted && !$privacy ? 'This field is required' : '';
+
+	const handleSubmit = () => {
+		submitted = true;
+		const valid = [validateEmail($email), validateName($name), validateMessage($message), $privacy];
+		if (!valid.every(Boolean)) {
 			addToast({
 				data: {
 					title: 'Invalid form',
@@ -81,12 +88,13 @@
 			return;
 		}
 
+		sending = true;
 		axios
 			.post('/api/contact', {
 				userId: $user?.id ?? null,
-				email,
-				name,
-				message
+				email: $email,
+				name: $name,
+				message: $message
 			})
 			.then(() => {
 				addToast({
@@ -96,9 +104,10 @@
 						color: 'bg-ctp-green'
 					}
 				});
-				email = '';
-				name = '';
-				message = '';
+				email.set('');
+				name.set('');
+				message.set('');
+				submitted = false;
 			})
 			.catch(() => {
 				addToast({
@@ -108,93 +117,72 @@
 						color: 'bg-ctp-red'
 					}
 				});
-			});
+			})
+			.finally(() => (sending = false));
 	};
-
-	const {
-		elements: { root, input },
-		states: { checked }
-	} = createSwitch({
-		name: 'privacy',
-		defaultChecked: false,
-		onCheckedChange: validatePrivacy
-	});
 </script>
 
 <svelte:head>
 	<title>Contact - Mathéo Galuba</title>
 </svelte:head>
 
-<section class="container mx-auto">
-	<h1 class="mb-8 text-6xl font-bold text-center">
-		<span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender"
-			>Contact</span
-		>
-	</h1>
-	<form class="mx-auto max-w-xl" on:submit={handleSubmit}>
-		<div class="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
-			<fieldset class="w-full">
-				<label for="email" class="mb-2 text-sm font-semibold"> Email </label>
-				<input
-					id="email"
-					type="email"
-					name="email"
-					class="flex h-8 w-full items-center justify-between rounded-md bg-ctp-surface0
-                shadow-md shadow-ctp-crust px-3 pr-12 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
-					bind:value={email}
-					on:blur={() => validateEmail(email)}
-				/>
-				<p class="text-left text-sm font-semibold text-ctp-red">{emailError}</p>
-			</fieldset>
-			<fieldset class="w-full">
-				<label for="name" class="mb-2 text-sm font-semibold"> Name </label>
-				<input
-					id="name"
-					type="text"
-					name="name"
-					class="flex h-8 w-full items-center justify-between rounded-md bg-ctp-surface0
-                shadow-md shadow-ctp-crust px-3 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
-					bind:value={name}
-					on:blur={() => validateName(name)}
-				/>
-				<p class="text-left text-sm font-semibold text-ctp-red">{nameError}</p>
-			</fieldset>
-			<fieldset class="sm:col-span-2">
-				<label for="message" class="mb-2 text-sm font-semibold"> Message </label>
-				<textarea
-					id="message"
+<Hero
+	class="mb-12"
+	highlight="Contact"
+	description="A question, a bug to report or a project to talk about? Send me a message."
+/>
+
+<section class="container mx-auto mb-16 max-w-2xl">
+	<form
+		class="rounded-md border-2 border-transparent bg-ctp-crust/50 p-6 shadow-md shadow-ctp-crust backdrop-blur-sm
+			transition-colors focus-within:border-ctp-mauve sm:p-8"
+		novalidate
+		on:submit|preventDefault={handleSubmit}
+	>
+		<Heading level={2} size={TextSize.Xl2} class="mb-1">Send a message</Heading>
+		<div class="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
+			<TextInput
+				value={name}
+				label="Name"
+				name="name"
+				autocomplete="name"
+				error={nameError}
+				on:blur={() => validateName($name)}
+			/>
+			<TextInput
+				value={email}
+				type="email"
+				label="Email"
+				name="email"
+				autocomplete="email"
+				error={emailError}
+				on:blur={() => validateEmail($email)}
+			/>
+			<div class="sm:col-span-2">
+				<Textarea
+					value={message}
+					rows={8}
+					label="Message"
 					name="message"
-					class="flex h-32 w-full items-center justify-between rounded-md bg-ctp-surface0
-                shadow-md shadow-ctp-crust px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ctp-mauve"
-					bind:value={message}
-					on:blur={() => validateMessage(message)}
+					error={messageError}
+					hint="{$message.length} / {MESSAGE_MAX}"
+					on:blur={() => validateMessage($message)}
 				/>
-				<p class="text-left text-sm font-semibold text-ctp-red">{messageError}</p>
-			</fieldset>
-			<fieldset class="sm:col-span-2">
-				<div class="flex items-center justify-start">
-					<button
-						use:melt={$root}
-						class="switch relative h-5 min-w-[2.25rem] cursor-default rounded-full bg-ctp-surface0
-                  shadow-md shadow-ctp-crust transition-colors data-[state=checked]:bg-ctp-mauve"
-						id="privacy"
-					>
-						<span class="thumb block rounded-full bg-ctp-text transition" />
-					</button>
-					<input use:melt={$input} />
-					<label class="pl-4 leading-none text-sm font-semibold" for="privacy">
-						By checking this box, you agree to share your data with me.
-					</label>
-				</div>
-				<p class="text-left text-sm font-semibold text-ctp-red">{privacyError}</p>
-			</fieldset>
-			<div class="sm:col-span-2 flex justify-end">
-				<Button
-					type="submit"
-					data={{
-						'umami-event': 'contact'
-					}}
-				>
+			</div>
+			<div class="sm:col-span-2">
+				<Switch
+					checked={privacy}
+					name="privacy"
+					label="By checking this box, you agree to share your data with me."
+				/>
+				{#if privacyError}
+					<Text size={TextSize.Sm} color={TextColor.Danger} class="mt-1 font-semibold">
+						{privacyError}
+					</Text>
+				{/if}
+			</div>
+			<div class="flex justify-end sm:col-span-2">
+				<Button type="submit" loading={sending} data-umami-event="contact">
 					<span>Send</span>
 					<Send size="16" />
 				</Button>
@@ -202,22 +190,3 @@
 		</div>
 	</form>
 </section>
-
-<style>
-	.switch {
-		--w: 2.25rem;
-		--padding: 0.125rem;
-		width: var(--w);
-	}
-
-	.thumb {
-		--size: 1rem;
-		width: var(--size);
-		height: var(--size);
-		transform: translateX(var(--padding));
-	}
-
-	:global([data-state='checked']) .thumb {
-		transform: translateX(calc(var(--w) - var(--size) - var(--padding)));
-	}
-</style>

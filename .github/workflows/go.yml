@@ -11,11 +11,13 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        go-version:
-          - '1.22'
-          - '1.23'
+    services:
+      mongo:
+        image: mongo:8
+        ports:
+          - 27017:27017
+    env:
+      TEST_DB_URI: mongodb://localhost:27017
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -23,10 +25,14 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: ${{ matrix.go-version }}
+          go-version-file: api/go.mod
+          cache-dependency-path: api/go.sum
 
       - name: Build
         run: go build -C api -v cmd/main.go
 
-      # - name: Test
-      #   uses: robherley/go-test-action@v0
+      - name: Unit tests
+        run: make -C api coverage
+
+      - name: End-to-end tests
+        run: make -C api coverage-e2e

@@ -2,11 +2,16 @@ package main
 
 import (
 	"context"
+	"dev/internal/audit"
+	"dev/internal/chip"
 	"dev/internal/db"
-	"dev/internal/models"
+	"dev/internal/icon"
 	"dev/internal/server"
-	"dev/internal/utils"
+	"dev/internal/user"
 	"log"
+
+	// The production image ships without a timezone database
+	_ "time/tzdata"
 
 	_ "dev/docs"
 
@@ -36,12 +41,15 @@ import (
 func main() {
 	godotenv.Load()
 	db.Init()
-	if migrated, err := models.MigrateUserIdentities(context.Background()); err != nil {
+	if migrated, err := user.MigrateUserIdentities(context.Background()); err != nil {
 		log.Fatalln("Failed to migrate user identities:", err)
 	} else if migrated > 0 {
 		log.Printf("Migrated %d users to identities", migrated)
 	}
-	utils.ScheduleIconRefresh()
-	utils.ScheduleMicroprocessorRefresh()
+	if err := audit.EnsureIndexes(context.Background()); err != nil {
+		log.Fatalln("Failed to create the audit indexes:", err)
+	}
+	icon.ScheduleIconRefresh()
+	chip.ScheduleMicroprocessorRefresh()
 	server.Run()
 }

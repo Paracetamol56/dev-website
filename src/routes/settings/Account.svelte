@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Button from '$lib/components/Button.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
 	import { user } from '$lib/store';
 	import axios from 'axios';
 	import { Archive, Download, Trash2, UserX, X } from 'lucide-svelte';
@@ -118,12 +118,7 @@
 			<Archive size="18" /> Export your data
 		</h4>
 		<div class="flex justify-start">
-			<Button
-				on:click={handleExport}
-				data={{
-					'umami-event': 'export-data'
-				}}
-			>
+			<Button on:click={handleExport} data-umami-event="export-data">
 				<span>Export</span>
 				<Download size="16" />
 			</Button>

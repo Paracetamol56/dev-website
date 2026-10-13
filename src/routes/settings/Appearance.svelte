@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Button from '$lib/components/Button.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
 	import { user } from '$lib/store';
 	import { variants } from '@catppuccin/palette';
 	import { melt, createRadioGroup, type CreateRadioGroupProps } from '@melt-ui/svelte';
@@ -67,7 +67,10 @@
 			<Palette size="16" />
 			<span>Flavour</span>
 		</label>
-		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 rounded-lg bg-ctp-base gap-3" use:melt={$root}>
+		<div
+			class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 rounded-lg bg-ctp-base gap-3"
+			use:melt={$root}
+		>
 			{#each Object.keys(variants) as variant, i}
 				<div
 					class="{variantsClasses[
@@ -128,10 +131,8 @@
 	<div class="flex justify-start">
 		<Button
 			type="submit"
-			data={{
-				'umami-event': 'save-theme',
-				'umami-event-properties': '{ "data-umami-event"="Signup button" }'
-			}}
+			data-umami-event="save-theme"
+			data-umami-event-properties={'{ "data-umami-event"="Signup button" }'}
 		>
 			<span>Save</span>
 			<Save size="16" />

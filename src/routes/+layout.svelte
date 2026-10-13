@@ -1,23 +1,16 @@
 <script lang="ts" context="module">
-	const {
-		elements,
-		helpers: { addToast },
-		states: { toasts },
-		actions: { portal }
-	} = createToaster<ToastData>();
+	import { addToast, elements, portal, toasts } from '$lib/toast';
 
 	export { addToast };
 </script>
 
 <script lang="ts">
 	import '../app.postcss';
-	import { createToaster } from '@melt-ui/svelte';
-	import type { ToastData } from '$lib/toastData';
 	import { flip } from 'svelte/animate';
-	import Toast from './Toast.svelte';
-	import Navbar from './Navbar.svelte';
-	import Transition from './Transition.svelte';
-	import Footer from './Footer.svelte';
+	import Toast from '$lib/components/Toast.svelte';
+	import Navbar from '$lib/components/Navbar.svelte';
+	import Transition from '$lib/components/Transition.svelte';
+	import Footer from '$lib/components/Footer.svelte';
 
 	export let data;
 </script>
@@ -51,7 +44,7 @@
 
 	<Navbar />
 
-	<main class="py-32 mb-auto">
+	<main class="relative isolate py-32 mb-auto">
 		<Transition url={data.url}>
 			<slot />
 		</Transition>

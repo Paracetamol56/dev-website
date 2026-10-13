@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Hero from '$lib/components/ui/Hero.svelte';
 	import { user } from '$lib/store';
 	import { goto } from '$app/navigation';
 	import { addToast } from '../+layout.svelte';
@@ -13,7 +14,7 @@
 	import api from '$lib/api';
 	import type { UserSettings } from './userSettings';
 	import { CheckCircle, CircleDotDashed } from 'lucide-svelte';
-	import BarChart from '../../content/mnist-classification/BarChart.svelte';
+	import BarChart from '../../content/pages/mnist-classification/BarChart.svelte';
 
 	const userSettings: Writable<UserSettings | null> = writable(null);
 
@@ -89,13 +90,7 @@
 	});
 </script>
 
-<hgroup>
-	<h1 class="mb-8 text-6xl font-bold text-center">
-		<span class="text-transparent bg-clip-text bg-gradient-to-r from-ctp-mauve to-ctp-lavender">
-			Settings
-		</span>
-	</h1>
-</hgroup>
+<Hero class="mb-10" highlight="Settings" />
 
 <section class="container mx-auto">
 	{#if $userSettings !== null}
