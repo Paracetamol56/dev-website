@@ -28,6 +28,12 @@ func TestPostContact(t *testing.T) {
 	require.Len(t, emails, 1)
 	assert.Equal(t, testutil.AdminEmail, emails[0].To[0].Email, "the message goes to the admin")
 	assert.Equal(t, "ada@example.test", emails[0].ReplyTo.Email)
+
+	entries := testutil.Audit(t)
+	require.Len(t, entries, 1)
+	assert.Equal(t, "contact.sent", entries[0].Action)
+	assert.Equal(t, "contact", entries[0].Target.Type)
+	assert.True(t, entries[0].UserId.IsZero(), "the user id of the form is not trusted")
 	assert.Equal(t, "Ada Lovelace", emails[0].ReplyTo.Name)
 	assert.Contains(t, emails[0].TextContent, "I found a bug in the engine.")
 	assert.Contains(t, emails[0].TextContent, userId.Hex())

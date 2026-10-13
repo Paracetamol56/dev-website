@@ -2,6 +2,7 @@ package contact
 
 import (
 	"context"
+	"dev/internal/audit"
 	"dev/internal/utils"
 	"errors"
 	"os"
@@ -22,7 +23,7 @@ func SendMessage(ctx context.Context, message ContactBody) error {
 		return errors.New("Error while sending email")
 	}
 
-	_, err = CreateContact(ctx, Contact{
+	id, err := CreateContact(ctx, Contact{
 		UserId:    message.UserId,
 		Name:      message.Name,
 		Email:     message.Email,
@@ -30,5 +31,9 @@ func SendMessage(ctx context.Context, message ContactBody) error {
 		MailId:    mailId,
 		CreatedAt: primitive.NewDateTimeFromTime(time.Now()),
 	})
-	return err
+	if err != nil {
+		return err
+	}
+	audit.Record(ctx, audit.Entry{Action: audit.ContactSent, Target: &audit.Target{Type: audit.TargetContact, Id: id.Hex()}})
+	return nil
 }

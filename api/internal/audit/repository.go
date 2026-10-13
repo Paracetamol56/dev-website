@@ -33,7 +33,6 @@ func CreateEntry(ctx context.Context, entry *Entry) error {
 	return nil
 }
 
-// GetEntriesByUserId returns the entries of a user, newest first
 func GetEntriesByUserId(ctx context.Context, userId primitive.ObjectID) ([]Entry, error) {
 	cursor, err := db.GetDB().Collection(collectionName).Find(
 		ctx,
