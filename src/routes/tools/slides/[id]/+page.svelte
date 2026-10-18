@@ -11,9 +11,9 @@
 		SlidersHorizontal,
 		WifiOff
 	} from 'lucide-svelte';
-	import { onDestroy, onMount } from 'svelte';
+	import { onDestroy, onMount, tick } from 'svelte';
 	import { writable } from 'svelte/store';
-	import Slides from '$lib/components/deck/Slides.svelte';
+	import Slides, { type SlideEdit } from '$lib/components/deck/Slides.svelte';
 	import type { DeckSettings } from '$lib/components/deck/settings';
 	import Button from '$lib/components/ui/Button.svelte';
 	import ResizeHandle from '$lib/components/ui/ResizeHandle.svelte';
@@ -24,8 +24,6 @@
 	import type { Indices } from '../types';
 	import CodeEditor from './CodeEditor.svelte';
 	import SettingsPanel from './SettingsPanel.svelte';
-	import SlidePreview from './SlidePreview.svelte';
-	import { DebouncedOutlineGenerator } from './outlineGenerator';
 	import { DeckSocket } from './socket';
 	import { peerColour, type Peer } from './presence';
 	import type { PageData } from './$types';
@@ -35,8 +33,8 @@
 	let title = data.deck.title;
 	let settings: DeckSettings = data.deck.settings;
 	let settingsTimer: ReturnType<typeof setTimeout> | undefined;
-	let content = data.deck.content;
-	let preview = content;
+	let preview = '';
+	let editingSlide = false;
 	let previewTimer: ReturnType<typeof setTimeout>;
 	let pending = false;
 	let peers: Peer[] = [];
@@ -48,16 +46,8 @@
 
 	const layoutKey = 'slides:layout';
 	const defaultCode = 0.5;
-	const defaultStrip = 104;
 	const codeWidth = writable(defaultCode);
-	const stripHeight = writable(defaultStrip);
 	let resizing = false;
-
-	$: if ($stripHeight > 0 && $stripHeight < 60) stripHeight.set(0);
-	$: collapsed = $stripHeight === 0;
-	const outlineGenerator = new DebouncedOutlineGenerator(300);
-	const outline = outlineGenerator.store ?? writable(null);
-	outlineGenerator.executeNow(content);
 
 	const socket = new DeckSocket(data.deck.id, () => editor?.syncedVersion() ?? data.deck.revision);
 	const connection = socket.connection;
@@ -87,11 +77,30 @@
 		error: (message) => notifyError(message.error)
 	});
 
-	function onChange(event: CustomEvent<string>) {
-		content = event.detail;
-		outlineGenerator.execute(content);
+	// The preview keeps its html while a text is edited in it, so its ids stay valid
+	function refreshPreview() {
 		clearTimeout(previewTimer);
-		previewTimer = setTimeout(() => (preview = content), 300);
+		if (!editingSlide && editor) preview = editor.annotate();
+	}
+
+	function onChange() {
+		clearTimeout(previewTimer);
+		previewTimer = setTimeout(refreshPreview, 300);
+	}
+
+	async function onSelect(event: CustomEvent<number>) {
+		panel = 'code';
+		await tick();
+		editor.reveal(event.detail);
+	}
+
+	function onEdit(event: CustomEvent<SlideEdit>) {
+		editor.replace(event.detail);
+	}
+
+	function onEditing(event: CustomEvent<boolean>) {
+		editingSlide = event.detail;
+		if (!editingSlide) refreshPreview();
 	}
 
 	function sendSettings() {
@@ -121,7 +130,7 @@
 		else if (!confirm('Your last changes are not saved yet. Leave anyway?')) navigation.cancel();
 	});
 
-	function readLayout(): { code?: unknown; strip?: unknown } | null {
+	function readLayout(): { code?: unknown } | null {
 		try {
 			return JSON.parse(localStorage.getItem(layoutKey) ?? 'null');
 		} catch {
@@ -131,7 +140,7 @@
 
 	function writeLayout() {
 		try {
-			localStorage.setItem(layoutKey, JSON.stringify({ code: $codeWidth, strip: $stripHeight }));
+			localStorage.setItem(layoutKey, JSON.stringify({ code: $codeWidth }));
 			return true;
 		} catch {
 			return false;
@@ -141,17 +150,16 @@
 	onMount(() => {
 		const saved = readLayout();
 		if (typeof saved?.code === 'number') codeWidth.set(Math.min(0.8, Math.max(0.2, saved.code)));
-		if (typeof saved?.strip === 'number') stripHeight.set(Math.min(320, Math.max(0, saved.strip)));
-		const unsubscribe = [codeWidth.subscribe(writeLayout), stripHeight.subscribe(writeLayout)];
+		const unsubscribe = codeWidth.subscribe(writeLayout);
+		refreshPreview();
 		socket.connect();
-		return () => unsubscribe.forEach((stop) => stop());
+		return unsubscribe;
 	});
 
 	onDestroy(() => {
 		socket.close();
 		clearTimeout(previewTimer);
 		clearTimeout(settingsTimer);
-		outlineGenerator.cleanup();
 	});
 </script>
 
@@ -247,6 +255,7 @@
 					on:change={onChange}
 					on:pending={(event) => (pending = event.detail)}
 					on:peers={(event) => (peers = event.detail)}
+					on:cursor={(event) => slides.show(event.detail)}
 				/>
 			</div>
 			<div
@@ -272,28 +281,16 @@
 			class="aspect-video overflow-hidden rounded-md bg-ctp-base shadow-md shadow-ctp-crust lg:aspect-auto"
 			class:pointer-events-none={resizing}
 		>
-			<Slides bind:this={slides} content={preview} {settings} slide={current} />
+			<Slides
+				bind:this={slides}
+				content={preview}
+				{settings}
+				slide={current}
+				on:select={onSelect}
+				on:edit={onEdit}
+				on:editing={onEditing}
+			/>
 		</section>
-	</div>
-
-	<ResizeHandle
-		value={stripHeight}
-		min={0}
-		max={320}
-		defaultValue={defaultStrip}
-		unit="px"
-		orientation="horizontal"
-		invert
-		label="Resize the slide list"
-		class="-my-3 hidden lg:flex"
-		on:dragging={(event) => (resizing = event.detail)}
-	/>
-	<div
-		class="shrink-0 overflow-hidden rounded-md bg-ctp-crust/50 shadow-md shadow-ctp-crust lg:h-[var(--strip)]"
-		class:lg:hidden={collapsed}
-		style:--strip="{$stripHeight}px"
-	>
-		<SlidePreview {outline} {current} />
 	</div>
 </div>
 

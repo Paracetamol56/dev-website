@@ -13,6 +13,12 @@ export const frameDocument = `<!doctype html>
 <link rel="stylesheet" href="${revealCss}">
 <style id="theme"></style>
 <style id="highlight"></style>
+<style>
+.slides [data-hover]:not(section, [contenteditable]) { outline: 2px dashed rgba(203, 166, 247, 0.7); outline-offset: 6px; cursor: pointer; }
+.slides [data-selected]:not(section) { outline: 2px solid rgba(203, 166, 247, 0.9); outline-offset: 6px; }
+.slides [contenteditable] { outline: 3px solid rgb(203, 166, 247); outline-offset: 6px; cursor: text; }
+.presenting .slides [data-hover], .presenting .slides [data-selected] { outline: none; cursor: auto; }
+</style>
 </head>
 <body>
 <div class="reveal"><div class="slides"></div></div>

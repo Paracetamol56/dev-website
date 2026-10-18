@@ -15,13 +15,27 @@
 	import { user } from '$lib/store';
 	import { collaboration } from './collab';
 	import { presence, type Peer } from './presence';
+	import {
+		annotate as annotateText,
+		elementById,
+		innermostAt,
+		setSourceElements,
+		sourceElements,
+		withStyle
+	} from './sourceMap';
 	import type { DeckSocket } from './socket';
+	import type { SlideEdit } from '$lib/components/deck/Slides.svelte';
 
 	export let value: string;
 	export let version: number;
 	export let socket: DeckSocket;
 
-	const dispatch = createEventDispatcher<{ change: string; pending: boolean; peers: Peer[] }>();
+	const dispatch = createEventDispatcher<{
+		change: string;
+		pending: boolean;
+		peers: Peer[];
+		cursor: number | null;
+	}>();
 	const themes = {
 		latte: catppuccinLatte,
 		frappe: catppuccinFrappe,
@@ -45,6 +59,7 @@
 				EditorView.theme({ '&': { height: '100%' }, '.cm-scroller': { overflow: 'auto' } }),
 				theme.of(themes[$user.flavour] ?? catppuccinMocha),
 				presence,
+				sourceElements,
 				collaboration(
 					socket,
 					startVersion,
@@ -52,6 +67,10 @@
 					(peers) => dispatch('peers', peers)
 				),
 				EditorView.updateListener.of((update) => {
+					if (update.selectionSet && update.view.hasFocus) {
+						const elements = update.state.field(sourceElements);
+						dispatch('cursor', innermostAt(elements, update.state.selection.main.head));
+					}
 					if (!update.docChanged) return;
 					value = update.state.doc.toString();
 					dispatch('change', value);
@@ -74,6 +93,39 @@
 		dispatch('peers', []);
 		value = doc;
 		dispatch('change', doc);
+	}
+
+	// Gives the preview's html, with each element pointing back to its place in the code
+	export function annotate(): string {
+		if (!view) return value;
+		const { html, elements } = annotateText(view.state.doc.toString());
+		view.dispatch({ effects: setSourceElements.of(elements) });
+		return html;
+	}
+
+	export function reveal(id: number) {
+		const element = view && elementById(view.state, id);
+		if (!view || !element) return;
+		view.dispatch({
+			selection: { anchor: element.from, head: element.to },
+			effects: EditorView.scrollIntoView(element.from, { y: 'center' })
+		});
+	}
+
+	export function replace({ id, html, align, tag }: SlideEdit) {
+		const element = view && elementById(view.state, id);
+		if (!view || !element || element.contentFrom === element.from) return;
+		const changes = [];
+		if (align || tag) {
+			let open = view.state.sliceDoc(element.from, element.contentFrom);
+			if (tag) open = open.replace(/^<[^\s/>]+/, `<${tag}`);
+			if (align) open = withStyle(open, 'text-align', align);
+			changes.push({ from: element.from, to: element.contentFrom, insert: open });
+		}
+		if (html !== null)
+			changes.push({ from: element.contentFrom, to: element.contentTo, insert: html });
+		if (tag) changes.push({ from: element.contentTo, to: element.to, insert: `</${tag}>` });
+		if (changes.length) view.dispatch({ changes, userEvent: 'input.preview' });
 	}
 
 	onMount(() => {
