@@ -50,6 +50,16 @@
 		mocha: catppuccinMocha
 	};
 	const theme = new Compartment();
+	// The current line is see-through, otherwise it hides the selection drawn behind the text
+	const selectionTheme = EditorView.theme({
+		'.cm-selectionBackground, .cm-content ::selection': {
+			backgroundColor: 'rgba(var(--ctp-mauve), 0.25)'
+		},
+		'&.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground, &.cm-focused .cm-content ::selection':
+			{ backgroundColor: 'rgba(var(--ctp-mauve), 0.4)' },
+		'.cm-activeLine': { backgroundColor: 'rgba(var(--ctp-surface0), 0.4)' },
+		'.cm-activeLineGutter': { backgroundColor: 'rgba(var(--ctp-surface0), 0.6)' }
+	});
 	const access = new Compartment();
 	const keys = new Compartment();
 	const layout = new Compartment();
@@ -80,6 +90,7 @@
 				layout.of(layoutFor(options)),
 				EditorView.theme({ '&': { height: '100%' }, '.cm-scroller': { overflow: 'auto' } }),
 				theme.of(themes[$user.flavour] ?? catppuccinMocha),
+				Prec.highest(selectionTheme),
 				access.of(EditorState.readOnly.of(readonly)),
 				presence,
 				sourceElements,
