@@ -11,7 +11,8 @@
 	import ExportPanel from './ExportPanel.svelte';
 	import TopoMap from './TopoMap.svelte';
 	import { computeContours, renderSvg } from './contours';
-	import { fetchRaster, findPlace, loadDem, type Place } from './elevation';
+	import { fetchRaster, loadDem } from './elevation';
+	import { findPlace, type Place } from '$lib/place';
 	import { DEFAULT_STYLE, contourSpacing, resolveStyle, type OutputStyle } from './style';
 	import { user } from '$lib/store';
 	import catppuccin from '@catppuccin/palette';

@@ -35,14 +35,17 @@
 		<span class="block h-1 w-full rounded bg-ctp-mauve/20">
 			<span use:melt={$range} class="h-1 rounded bg-ctp-mauve" />
 		</span>
-		<span
-			use:melt={$thumbs[0]}
-			aria-label={label}
-			aria-valuetext={format($value[0])}
-			class="block square-3 rounded-full bg-ctp-mauve outline-none {disabled
-				? ''
-				: 'focus:ring-4 focus:ring-ctp-mauve/20'}"
-		/>
+		<!-- A value with two numbers is a range, with a start and an end thumb -->
+		{#each $thumbs as thumb, i}
+			<span
+				use:melt={thumb}
+				aria-label={$thumbs.length > 1 ? `${label} ${i === 0 ? 'start' : 'end'}` : label}
+				aria-valuetext={format($value[i])}
+				class="block square-3 rounded-full bg-ctp-mauve outline-none {disabled
+					? ''
+					: 'focus:ring-4 focus:ring-ctp-mauve/20'}"
+			/>
+		{/each}
 	</span>
 	{#if ticks.length}
 		<span class="mt-1 flex justify-between text-[10px] {TextColor.Muted}" aria-hidden="true">
@@ -51,6 +54,6 @@
 			{/each}
 		</span>
 	{:else}
-		<span class={TextSize.Sm}>{format($value[0])}</span>
+		<span class={TextSize.Sm}>{$value.map(format).join(' – ')}</span>
 	{/if}
 </div>
