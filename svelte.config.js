@@ -72,6 +72,8 @@ const config = {
 				'/pages/privacy-policy/og.png',
 				'/pages/raspberry-pi-fan-controller',
 				'/pages/raspberry-pi-fan-controller/og.png',
+				'/pages/temperature-history',
+				'/pages/temperature-history/og.png',
 				'/pages/what-s-on-my-homelab-part-1',
 				'/pages/what-s-on-my-homelab-part-1/og.png',
 				'/pages/what-s-on-my-homelab-part-2',

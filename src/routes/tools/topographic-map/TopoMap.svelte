@@ -2,14 +2,8 @@
 	import 'maplibre-gl/dist/maplibre-gl.css';
 	import type { Map as MapLibreMap, Marker, VectorTileSource } from 'maplibre-gl';
 	import { onDestroy, onMount } from 'svelte';
-	import {
-		DEM_MAX_ZOOM,
-		elevationAt,
-		loadDem,
-		type Bounds,
-		type DemSource,
-		type Place
-	} from './elevation';
+	import { DEM_MAX_ZOOM, elevationAt, loadDem, type Bounds, type DemSource } from './elevation';
+	import type { Place } from '$lib/place';
 	import {
 		OSM_ATTRIBUTION,
 		OSM_TILES_URL,
