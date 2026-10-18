@@ -6,6 +6,8 @@
 
 <script lang="ts">
 	import '../app.postcss';
+	import { page } from '$app/stores';
+	import { defaultShell } from '$lib/shell';
 	import { flip } from 'svelte/animate';
 	import Toast from '$lib/components/Toast.svelte';
 	import Navbar from '$lib/components/Navbar.svelte';
@@ -14,7 +16,7 @@
 
 	export let data;
 
-	$: workspace = /^\/tools\/slides\/[^/]+/.test(data.url);
+	$: shell = { ...defaultShell, ...$page.data.shell };
 </script>
 
 <svelte:head>
@@ -44,15 +46,17 @@
 		{/each}
 	</div>
 
-	<Navbar />
+	{#if shell.navbar}
+		<Navbar />
+	{/if}
 
-	<main class="relative isolate mb-auto {workspace ? 'pt-[4.25rem]' : 'py-32'}">
+	<main class="relative isolate mb-auto {shell.navbar ? 'py-32' : ''}">
 		<Transition url={data.url}>
 			<slot />
 		</Transition>
 	</main>
 
-	{#if !workspace}
+	{#if shell.footer}
 		<Footer />
 	{/if}
 {/if}

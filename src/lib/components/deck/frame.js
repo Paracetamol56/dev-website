@@ -33,7 +33,7 @@ async function render(indices) {
 	deck.sync();
 	const last = Math.max(deck.getHorizontalSlides().length - 1, 0);
 	deck.slide(Math.min(indices.h, last), indices.v);
-	send({ type: 'slide', indices: deck.getIndices() });
+	sendSlide();
 	if (selected !== null) mark(selected);
 }
 
@@ -47,6 +47,13 @@ let presenting = false;
 let selected = null;
 let editing = null;
 let deferred = false;
+
+function sendSlide() {
+	const slide = deck.getCurrentSlide();
+	const stack = slide?.closest('.slides > section');
+	const source = (element) => (element?.hasAttribute('data-cm') ? idOf(element) : null);
+	send({ type: 'slide', indices: deck.getIndices(), slide: source(slide), stack: source(stack) });
+}
 
 const sourceOf = (node) => node?.closest?.('.slides [data-cm]') ?? null;
 const idOf = (element) => Number(element.getAttribute('data-cm'));
@@ -178,10 +185,14 @@ function report() {
 	});
 }
 
-function startEditing(element) {
+function startEditing(element, selectAll = false) {
 	mark(idOf(element));
 	const selection = getSelection();
-	const range = selection.rangeCount ? selection.getRangeAt(0) : null;
+	let range = selection.rangeCount ? selection.getRangeAt(0) : null;
+	if (selectAll) {
+		range = document.createRange();
+		range.selectNodeContents(element);
+	}
 	editing = {
 		element,
 		source: element,
@@ -365,6 +376,14 @@ addEventListener('message', (event) => {
 		if (!editing && message.id !== null) show(message.id);
 	} else if (message.type === 'format') {
 		format(message.command, message.value);
+	} else if (message.type === 'start') {
+		enqueue(() => {
+			const element = slides.querySelector(`[data-cm="${message.id}"]`);
+			if (presenting || !element) return;
+			stopEditing(true);
+			show(message.id);
+			if (editable(element)) startEditing(element, true);
+		});
 	} else if (message.type === 'commit') {
 		stopEditing(true);
 	} else if (message.type === 'present') {
@@ -379,6 +398,8 @@ addEventListener('message', (event) => {
 });
 
 deck.initialize().then(() => {
-	deck.on('slidechanged', () => send({ type: 'slide', indices: deck.getIndices() }));
+	deck.on('slidechanged', sendSlide);
+	deck.on('slidetransitionend', report);
+	deck.on('resize', report);
 	send({ type: 'ready' });
 });

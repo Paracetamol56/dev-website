@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { basicSetup } from 'codemirror';
 	import { getSyncedVersion, sendableUpdates } from '@codemirror/collab';
-	import { indentWithTab } from '@codemirror/commands';
+	import { indentWithTab, redo as redoCommand, undo as undoCommand } from '@codemirror/commands';
 	import { html } from '@codemirror/lang-html';
 	import { Compartment, EditorState, Prec } from '@codemirror/state';
 	import { EditorView, keymap } from '@codemirror/view';
@@ -24,7 +24,8 @@
 		withStyle
 	} from './sourceMap';
 	import type { DeckSocket } from './socket';
-	import type { SlideEdit } from '$lib/components/deck/Slides.svelte';
+	import type { CurrentSlide, SlideEdit } from '$lib/components/deck/Slides.svelte';
+	import { insertion, type BlockKind } from './blocks';
 
 	export let value: string;
 	export let version: number;
@@ -126,6 +127,47 @@
 			changes.push({ from: element.contentFrom, to: element.contentTo, insert: html });
 		if (tag) changes.push({ from: element.contentTo, to: element.to, insert: `</${tag}>` });
 		if (changes.length) view.dispatch({ changes, userEvent: 'input.preview' });
+	}
+
+	// Gives the position of the element to edit in the slide, or selects the new code
+	export function insert(kind: BlockKind, current: CurrentSlide): number | null {
+		if (!view) return null;
+		const { from, insert, focus } = insertion(view.state, kind, current);
+		view.dispatch({
+			changes: { from, insert },
+			selection: focus === null ? { anchor: from + 1, head: from + insert.length } : undefined,
+			effects: EditorView.scrollIntoView(from, { y: 'center' }),
+			userEvent: 'input.preview'
+		});
+		if (focus === null) view.focus();
+		return focus;
+	}
+
+	export function elementAt(position: number): number | null {
+		const index = view?.state
+			.field(sourceElements)
+			.findIndex((element) => element.from === position);
+		return index === undefined || index < 0 ? null : index;
+	}
+
+	export function text(): string {
+		return view ? view.state.doc.toString() : value;
+	}
+
+	export function moveTo(position: number) {
+		if (!view) return;
+		view.dispatch({
+			selection: { anchor: Math.min(position, view.state.doc.length) },
+			effects: EditorView.scrollIntoView(position, { y: 'start', yMargin: 20 })
+		});
+	}
+
+	export function undo() {
+		if (view) undoCommand(view);
+	}
+
+	export function redo() {
+		if (view) redoCommand(view);
 	}
 
 	onMount(() => {

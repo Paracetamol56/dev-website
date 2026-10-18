@@ -19,5 +19,5 @@ export const load: PageLoad = async ({ params }) => {
 		if (status === 400 || status === 404) error(404, 'This slide deck does not exist');
 		error(500, 'The slide deck could not be loaded');
 	}
-	return { deck };
+	return { deck, shell: { navbar: false, footer: false } };
 };

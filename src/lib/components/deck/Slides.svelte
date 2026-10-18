@@ -5,6 +5,8 @@
 		align: string | null;
 		tag: string | null;
 	};
+	// Source ids of the slide on screen and of its top-level section
+	export type CurrentSlide = { slide: number | null; stack: number | null };
 </script>
 
 <script lang="ts">
@@ -26,6 +28,7 @@
 
 	let frame: HTMLIFrameElement;
 	let ready = false;
+	let currentSlide: CurrentSlide = { slide: null, stack: null };
 	let editing: { id: number; rect: Rect; format: TextFormat } | null = null;
 	let toolbar: HTMLDivElement;
 	let width = 0;
@@ -57,6 +60,14 @@
 
 	export function show(id: number | null) {
 		post({ type: 'show', id });
+	}
+
+	export function current(): CurrentSlide {
+		return currentSlide;
+	}
+
+	export function startEditing(id: number) {
+		post({ type: 'start', id });
 	}
 
 	export function commit() {
@@ -97,6 +108,7 @@
 				editing = event.data.id === null ? null : event.data;
 				if (wasEditing !== (editing !== null)) dispatch('editing', editing !== null);
 			} else if (event.data?.type === 'slide') {
+				currentSlide = { slide: event.data.slide ?? null, stack: event.data.stack ?? null };
 				const { h, v, f } = event.data.indices as Indices;
 				const current = get(slide);
 				if (current.h !== h || current.v !== v || current.f !== f) slide.set({ h, v, f });
