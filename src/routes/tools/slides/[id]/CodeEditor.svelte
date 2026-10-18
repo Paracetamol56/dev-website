@@ -3,7 +3,7 @@
 	import { getSyncedVersion, sendableUpdates } from '@codemirror/collab';
 	import { indentWithTab, redo as redoCommand, undo as undoCommand } from '@codemirror/commands';
 	import { html } from '@codemirror/lang-html';
-	import { Compartment, EditorState, Prec } from '@codemirror/state';
+	import { Compartment, EditorState, Prec, Transaction } from '@codemirror/state';
 	import { EditorView, keymap } from '@codemirror/view';
 	import {
 		catppuccinFrappe,
@@ -36,6 +36,7 @@
 		pending: boolean;
 		peers: Peer[];
 		cursor: number | null;
+		tooLong: void;
 	}>();
 	const themes = {
 		latte: catppuccinLatte,
@@ -44,6 +45,7 @@
 		mocha: catppuccinMocha
 	};
 	const theme = new Compartment();
+	const maxLength = 500_000;
 
 	let parent: HTMLDivElement;
 	let view: EditorView | null = null;
@@ -61,6 +63,19 @@
 				theme.of(themes[$user.flavour] ?? catppuccinMocha),
 				presence,
 				sourceElements,
+				// The server refuses a longer deck, and would throw away every unsent change with it
+				EditorState.transactionFilter.of((transaction) => {
+					if (
+						!transaction.docChanged ||
+						transaction.annotation(Transaction.remote) ||
+						transaction.newDoc.length <= maxLength ||
+						transaction.newDoc.length <= transaction.startState.doc.length
+					) {
+						return transaction;
+					}
+					dispatch('tooLong');
+					return [];
+				}),
 				collaboration(
 					socket,
 					startVersion,

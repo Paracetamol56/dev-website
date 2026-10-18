@@ -178,8 +178,10 @@ func TestSocketPush(t *testing.T) {
 	assert.EqualValues(t, 1, alice.expect("updates")["version"])
 
 	alice.send(push(3, update("alice", `[3]`)))
-	assert.Contains(t, alice.expect("error")["error"], "do not match")
-	assert.Equal(t, false, alice.expect("pushed")["ok"])
+	reset := alice.expect("reset")
+	assert.Contains(t, reset["error"], "do not match")
+	assert.EqualValues(t, 3, reset["version"])
+	assert.Equal(t, "> hello world!", reset["doc"], "the client starts again from the server's document")
 
 	alice.send(map[string]any{"type": "pull", "version": 1})
 	pulled := alice.expect("updates")
@@ -193,6 +195,28 @@ func TestSocketPush(t *testing.T) {
 
 	again := open(t, server, deck.Id, owner, 3)
 	assert.Empty(t, again.expect("updates")["updates"], "a new hub starts from the saved version")
+}
+
+func TestSocketRefusesTooLongDeck(t *testing.T) {
+	testutil.Clean(t)
+	server := serve(t)
+	owner := primitive.NewObjectID()
+	deck := postDeck(t, owner, map[string]any{"title": "Long", "content": "hello"})
+
+	alice := open(t, server, deck.Id, owner, 0)
+	alice.expect("updates")
+	long, err := json.Marshal(strings.Repeat("a", maxContentLength))
+	require.NoError(t, err)
+	alice.send(push(0, update("alice", `[5, [0, `+string(long)+`]]`)))
+	reset := alice.expect("reset")
+	assert.Contains(t, reset["error"], "too long")
+	assert.EqualValues(t, 0, reset["version"])
+	assert.Equal(t, "hello", reset["doc"])
+
+	alice.send(push(0, update("alice", `[5, [0, "!"]]`)))
+	alice.expect("updates")
+	assert.Equal(t, true, alice.expect("pushed")["ok"], "the deck still takes changes under the limit")
+	closeAll(t, deck.Id, alice)
 }
 
 func TestSocketConcurrentPushes(t *testing.T) {

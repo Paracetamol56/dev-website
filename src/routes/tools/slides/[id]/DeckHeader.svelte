@@ -84,9 +84,9 @@
 			{:else if $connection === 'connecting'}
 				<Loader2 size="14" class="animate-spin" /> Connecting…
 			{:else if unsaved}
-				<Loader2 size="14" class="animate-spin" />
+				<Loader2 size="14" class="animate-spin" /> <span class="sr-only">Saving…</span>
 			{:else}
-				<Check size="14" class="text-ctp-green" />
+				<Check size="14" class="text-ctp-green" /> <span class="sr-only">Saved</span>
 			{/if}
 		</p>
 

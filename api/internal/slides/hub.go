@@ -283,14 +283,12 @@ func (h *hub) push(c *client, version int64, updates []Update) {
 			doc, err = applyChanges(doc, update.Changes)
 		}
 		if err != nil {
-			c.send(message("error", map[string]any{"error": "These changes do not match the document"}))
-			c.send(message("pushed", map[string]any{"ok": false}))
+			h.refuse(c, "These changes do not match the document, they were not kept")
 			return
 		}
 	}
 	if len(doc) > maxContentLength {
-		c.send(message("error", map[string]any{"error": "The deck is too long"}))
-		c.send(message("pushed", map[string]any{"ok": false}))
+		h.refuse(c, "The deck is too long, your last changes were not kept")
 		return
 	}
 
@@ -304,6 +302,11 @@ func (h *hub) push(c *client, version int64, updates []Update) {
 	}
 	c.send(message("pushed", map[string]any{"ok": true}))
 	h.schedule(saveDelay)
+}
+
+// refuse sends the server's document back: pushing the same changes again would fail again
+func (h *hub) refuse(c *client, reason string) {
+	c.send(message("reset", map[string]any{"version": h.version, "doc": decodeText(h.doc), "error": reason}))
 }
 
 // relayPresence passes a selection on to the other clients; it is never stored

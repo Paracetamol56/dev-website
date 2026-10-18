@@ -69,7 +69,9 @@
 			if (!settingsTimer) settings = message.settings;
 		},
 		reset: (message) => {
-			if (editor.hasPending()) {
+			if (message.error) {
+				notifyError(message.error);
+			} else if (editor.hasPending()) {
 				notifyError('Your last changes could not be kept, the deck was reloaded from the server');
 			}
 			editor.reset(message.doc, message.version);
@@ -283,6 +285,7 @@
 					on:pending={(event) => (pending = event.detail)}
 					on:peers={(event) => (peers = event.detail)}
 					on:cursor={(event) => slides.show(event.detail)}
+					on:tooLong={() => notifyError('The deck is too long, this change was not made')}
 				/>
 			</div>
 			<div

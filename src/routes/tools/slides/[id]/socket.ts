@@ -8,7 +8,7 @@ export type WireRange = { anchor: number; head: number };
 export type ServerMessage =
 	| { type: 'state'; title: string; settings: DeckSettings; peer: number }
 	| { type: 'updates'; version: number; updates: WireUpdate[] }
-	| { type: 'reset'; version: number; doc: string }
+	| { type: 'reset'; version: number; doc: string; error?: string }
 	| { type: 'pushed'; ok: boolean }
 	| { type: 'title'; title: string }
 	| { type: 'settings'; settings: DeckSettings }
