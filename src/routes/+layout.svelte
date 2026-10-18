@@ -13,6 +13,8 @@
 	import Footer from '$lib/components/Footer.svelte';
 
 	export let data;
+
+	$: workspace = /^\/tools\/slides\/[^/]+/.test(data.url);
 </script>
 
 <svelte:head>
@@ -25,14 +27,14 @@
 	<meta name="description" content="A showcase of my little dev projects" />
 </svelte:head>
 
-{#if data.url.includes('/embed')}
+{#if data.url.includes('/embed') || data.url.includes('/presentation')}
 	<slot />
 {:else}
 	<!-- Toast list -->
 	<div
 		class="fixed right-0 top-0 z-50 m-4
-          flex flex-col items-end gap-2
-          md:bottom-0 md:top-auto"
+					flex flex-col items-end gap-2
+					md:bottom-0 md:top-auto"
 		use:portal
 	>
 		{#each $toasts as toast (toast.id)}
@@ -44,19 +46,13 @@
 
 	<Navbar />
 
-	{#if data.url.includes('/tool/slides')}
-		<main class="pt-[4.25rem] mb-auto">
-			<Transition url={data.url}>
-				<slot />
-			</Transition>
-		</main>
-	{:else}
-		<main class="py-32 mb-auto">
-			<Transition url={data.url}>
-				<slot />
-			</Transition>
-		</main>
+	<main class="relative isolate mb-auto {workspace ? 'pt-[4.25rem]' : 'py-32'}">
+		<Transition url={data.url}>
+			<slot />
+		</Transition>
+	</main>
 
+	{#if !workspace}
 		<Footer />
 	{/if}
 {/if}

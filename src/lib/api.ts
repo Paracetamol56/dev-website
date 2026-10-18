@@ -132,20 +132,19 @@ async function refreshAccessToken() {
 		});
 }
 
+async function accessToken(): Promise<string | null> {
+	const current = get(user).accessToken;
+	if (!current || isExpired(current)) await refreshAccessToken();
+	return get(user).accessToken;
+}
+
 async function callWithAuth(method: string, path: string, json?: any) {
-	let accessToken = get(user).accessToken;
-	if (!accessToken) {
-		await refreshAccessToken();
-		accessToken = get(user).accessToken;
-	} else {
-		isExpired(accessToken) && (await refreshAccessToken());
-		accessToken = get(user).accessToken;
-	}
+	const token = await accessToken();
 	return axios({
 		method,
 		url: `/api${path}`,
 		headers: {
-			Authorization: `Bearer ${accessToken}`
+			Authorization: `Bearer ${token}`
 		},
 		data: json
 	});
@@ -159,4 +158,4 @@ async function call(method: string, path: string, json?: any) {
 	});
 }
 
-export default { login, verify, persistUser, logout, callWithAuth, call };
+export default { login, verify, persistUser, logout, accessToken, callWithAuth, call };
