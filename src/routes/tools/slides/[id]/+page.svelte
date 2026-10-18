@@ -9,12 +9,13 @@
 	import { addToast } from '$lib/toast';
 	import TitleDialog from '../TitleDialog.svelte';
 	import { notifyError } from '../actions';
-	import type { Indices } from '../types';
+	import type { Indices, Role } from '../types';
 	import CodeEditor from './CodeEditor.svelte';
 	import DeckHeader from './DeckHeader.svelte';
 	import type { BlockKind } from './blocks';
 	import OutlinePanel from './OutlinePanel.svelte';
 	import SettingsPanel from './SettingsPanel.svelte';
+	import ShareDialog from './ShareDialog.svelte';
 	import { buildOutline, type OutlineSlide } from './outline';
 	import { DeckSocket } from './socket';
 	import type { Peer } from './presence';
@@ -22,6 +23,11 @@
 	import Button from '$lib/components/ui/Button.svelte';
 
 	export let data: PageData;
+
+	let role: Role = data.deck.role;
+	$: readonly = role === 'viewer';
+	const sharing = writable(false);
+	let removed = false;
 
 	let title = data.deck.title;
 	let settings: DeckSettings = data.deck.settings;
@@ -61,10 +67,24 @@
 	socket.on({
 		state: (message) => {
 			title = message.title;
+			role = message.role;
 			if (settingsTimer) sendSettings();
 			else settings = message.settings;
 		},
 		title: (message) => (title = message.title),
+		role: (message) => {
+			role = message.role;
+			addToast({
+				data: {
+					title: 'Your access changed',
+					description:
+						message.role === 'viewer'
+							? 'You can now only view this deck'
+							: 'You can now edit this deck',
+					color: 'bg-ctp-blue'
+				}
+			});
+		},
 		settings: (message) => {
 			if (!settingsTimer) settings = message.settings;
 		},
@@ -110,7 +130,7 @@
 	}
 
 	function onEdit(event: CustomEvent<SlideEdit>) {
-		editor.replace(event.detail);
+		if (!readonly) editor.replace(event.detail);
 	}
 
 	async function onInsert(event: CustomEvent<BlockKind | 'image'>) {
@@ -124,6 +144,7 @@
 			});
 			return;
 		}
+		if (readonly) return;
 		slides.commit();
 		const focus = editor.insert(event.detail, slides.current());
 		refreshPreview();
@@ -149,6 +170,7 @@
 	}
 
 	function onSettings(event: CustomEvent<DeckSettings>) {
+		if (readonly) return;
 		settings = event.detail;
 		clearTimeout(settingsTimer);
 		settingsTimer = setTimeout(sendSettings, 300);
@@ -162,8 +184,14 @@
 
 	$: unsaved = pending || settingsTimer !== undefined;
 
+	$: if ($connection === 'removed' && !removed) {
+		removed = true;
+		notifyError('Your access to this deck was removed');
+		goto('/tools/slides');
+	}
+
 	beforeNavigate((navigation) => {
-		if (!unsaved) return;
+		if (!unsaved || removed) return;
 		if (navigation.willUnload) navigation.cancel();
 		else if (!confirm('Your last changes are not saved yet. Leave anyway?')) navigation.cancel();
 	});
@@ -212,6 +240,8 @@
 		{connection}
 		{unsaved}
 		{peers}
+		{role}
+		on:share={() => sharing.set(true)}
 		on:rename={() => renaming.set(true)}
 		on:present={() => slides.present()}
 		on:insert={onInsert}
@@ -277,6 +307,8 @@
 			</div>
 			<div role="tabpanel" aria-label="Code" class="min-h-0 flex-1" class:hidden={panel !== 'code'}>
 				<CodeEditor
+					{readonly}
+					options={settings.editor}
 					bind:this={editor}
 					value={data.deck.content}
 					version={data.deck.revision}
@@ -302,7 +334,7 @@
 				class="min-h-0 flex-1 overflow-y-auto"
 				class:hidden={panel !== 'settings'}
 			>
-				<SettingsPanel {settings} on:change={onSettings} />
+				<SettingsPanel {settings} disabled={readonly} on:change={onSettings} />
 			</div>
 		</section>
 		<ResizeHandle
@@ -320,6 +352,7 @@
 			class:pointer-events-none={resizing}
 		>
 			<Slides
+				{readonly}
 				bind:this={slides}
 				content={preview}
 				{settings}
@@ -331,6 +364,10 @@
 		</section>
 	</div>
 </div>
+
+{#if role === 'owner'}
+	<ShareDialog open={sharing} deckId={data.deck.id} />
+{/if}
 
 <TitleDialog
 	open={renaming}

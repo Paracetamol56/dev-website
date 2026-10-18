@@ -119,6 +119,12 @@ func InitRouter() *gin.Engine {
 			slidesGroup.GET("/:id", slidesController.GetDeck)
 			slidesGroup.POST("/:id/duplicate", slidesController.PostDeckDuplicate)
 			slidesGroup.DELETE("/:id", slidesController.DeleteDeck)
+			slidesGroup.POST("/join", slidesController.PostDeckJoin)
+			slidesGroup.PUT("/:id/links/:role", slidesController.PutDeckLink)
+			slidesGroup.DELETE("/:id/links/:role", slidesController.DeleteDeckLink)
+			slidesGroup.POST("/:id/links/:role/email", slidesController.PostDeckLinkEmail)
+			slidesGroup.PATCH("/:id/members/:userId", slidesController.PatchDeckMember)
+			slidesGroup.DELETE("/:id/members/:userId", slidesController.DeleteDeckMember)
 		}
 		userGroup := apiGroup.Group("/users")
 		{

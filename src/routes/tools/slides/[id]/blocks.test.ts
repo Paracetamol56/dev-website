@@ -1,10 +1,14 @@
+import { indentUnit } from '@codemirror/language';
 import { EditorState } from '@codemirror/state';
 import { describe, expect, it } from 'vitest';
 import { insertion } from './blocks';
 import { annotate, setSourceElements, sourceElements } from './sourceMap';
 
-function stateOf(text: string) {
-	const state = EditorState.create({ doc: text, extensions: sourceElements });
+function stateOf(text: string, unit: string) {
+	const state = EditorState.create({
+		doc: text,
+		extensions: [sourceElements, indentUnit.of(unit)]
+	});
 	return state.update({ effects: setSourceElements.of(annotate(text).elements) }).state;
 }
 
@@ -12,9 +16,10 @@ function apply(
 	text: string,
 	kind: Parameters<typeof insertion>[1],
 	slide: number | null,
-	stack = slide
+	stack = slide,
+	unit = '\t'
 ) {
-	const state = stateOf(text);
+	const state = stateOf(text, unit);
 	const { from, insert, focus } = insertion(state, kind, { slide, stack });
 	const result = state.update({ changes: { from, insert } }).state.doc.toString();
 	return { result, focused: focus === null ? null : result.slice(focus, focus + 4) };
@@ -53,5 +58,15 @@ describe('insertion', () => {
 	it('wraps a block in a new slide when no slide is on screen', () => {
 		expect(apply('', 'heading', null).result).toBe('<section>\n\t<h2>New heading</h2>\n</section>');
 		expect(apply('', 'slide', null).focused).toBe('<h2>');
+	});
+
+	it('indents with the unit of the editor', () => {
+		const spaced = '<section>\n  <h2>One</h2>\n</section>';
+		expect(apply(spaced, 'list', 0, 0, '  ').result).toBe(
+			'<section>\n  <h2>One</h2>\n  <ul>\n    <li>First item</li>\n    <li>Second item</li>\n  </ul>\n</section>'
+		);
+		expect(apply('', 'slide', null, null, '    ').result).toBe(
+			'<section>\n    <h2>New slide</h2>\n</section>'
+		);
 	});
 });

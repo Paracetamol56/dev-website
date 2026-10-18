@@ -19,8 +19,9 @@ import (
 )
 
 type socket struct {
-	t    *testing.T
-	conn *websocket.Conn
+	t     *testing.T
+	conn  *websocket.Conn
+	state map[string]any
 }
 
 func serve(t *testing.T) *httptest.Server {
@@ -48,7 +49,8 @@ func open(t *testing.T, server *httptest.Server, id primitive.ObjectID, userId p
 	require.NoError(t, err)
 	opened := &socket{t: t, conn: conn}
 	opened.send(map[string]any{"type": "auth", "token": testutil.AccessToken(t, userId), "version": version})
-	assert.Equal(t, "state", opened.next()["type"])
+	opened.state = opened.next()
+	assert.Equal(t, "state", opened.state["type"])
 	return opened
 }
 
@@ -310,6 +312,18 @@ func TestSocketTitleAndSettings(t *testing.T) {
 	bob.send(map[string]any{"type": "settings", "settings": invalid})
 	assert.Contains(t, bob.expect("error")["error"], "settings")
 	assert.Equal(t, "moon", storedDeck(t, deck.Id).Settings.Theme)
+	for _, broken := range []EditorSettings{{FontSize: 9, Indent: "tab"}, {FontSize: 14, Indent: "8"}} {
+		invalid = settings
+		invalid.Editor = broken
+		bob.send(map[string]any{"type": "settings", "settings": invalid})
+		assert.Contains(t, bob.expect("error")["error"], "settings")
+	}
+	editor := settings
+	editor.Editor = EditorSettings{Vim: true, FontSize: 16, Indent: "2"}
+	bob.send(map[string]any{"type": "settings", "settings": editor})
+	assert.Equal(t, true, alice.expect("settings")["settings"].(map[string]any)["editor"].(map[string]any)["vim"])
+	bob.expect("settings")
+	assert.Equal(t, editor.Editor, storedDeck(t, deck.Id).Settings.Editor, "the editor settings are saved with the deck")
 
 	bob.send(map[string]any{"type": "dance"})
 	assert.Contains(t, bob.expect("error")["error"], "Unknown")
@@ -409,4 +423,82 @@ func TestSocketPresence(t *testing.T) {
 
 	closeAll(t, deck.Id, alice)
 	assert.Equal(t, "hello world!", storedDeck(t, deck.Id).Content, "selections are not saved")
+}
+
+// closedWith reads until the server closes the connection, and gives the close code
+func (s *socket) closedWith() int {
+	s.t.Helper()
+	for {
+		s.conn.SetReadDeadline(time.Now().Add(3 * time.Second))
+		var message map[string]any
+		err := s.conn.ReadJSON(&message)
+		if closed, ok := err.(*websocket.CloseError); ok {
+			return closed.Code
+		}
+		require.NoError(s.t, err)
+	}
+}
+
+func TestSocketRoles(t *testing.T) {
+	testutil.Clean(t)
+	server := serve(t)
+	owner := insertUser(t, "Owner")
+	ada := insertUser(t, "Ada")
+	bob := insertUser(t, "Bob")
+	deck := postDeck(t, owner, map[string]any{"title": "Shared", "content": "hello"})
+	join(t, ada, createLink(t, owner, deck.Id, RoleEditor))
+	join(t, bob, createLink(t, owner, deck.Id, RoleViewer))
+
+	ownerSocket := open(t, server, deck.Id, owner, 0)
+	ownerSocket.expect("updates")
+	adaSocket := open(t, server, deck.Id, ada, 0)
+	adaSocket.expect("updates")
+	bobSocket := open(t, server, deck.Id, bob, 0)
+	bobSocket.expect("updates")
+	assert.Equal(t, "owner", ownerSocket.state["role"])
+	assert.Equal(t, "editor", adaSocket.state["role"])
+	assert.Equal(t, "viewer", bobSocket.state["role"])
+
+	adaSocket.send(push(0, update("ada", `[5, [0, "!"]]`)))
+	adaSocket.expect("updates")
+	assert.Equal(t, true, adaSocket.expect("pushed")["ok"], "editors can edit")
+	bobSocket.expect("updates")
+	ownerSocket.expect("updates")
+
+	bobSocket.send(push(1, update("bob", `[6, [0, "?"]]`)))
+	refused := bobSocket.expect("reset")
+	assert.Contains(t, refused["error"], "only view")
+	assert.Equal(t, "hello!", refused["doc"])
+	bobSocket.send(map[string]any{"type": "title", "title": "Mine now"})
+	assert.Contains(t, bobSocket.expect("error")["error"], "only view")
+	bobSocket.send(map[string]any{"type": "presence", "version": 1, "ranges": []Range{{Anchor: 1, Head: 2}}})
+	assert.Equal(t, "Bob", ownerSocket.expect("presence")["name"], "viewers still show where they look")
+	adaSocket.expect("presence")
+
+	adaSocket.send(map[string]any{"type": "title", "title": "Renamed by Ada"})
+	assert.Equal(t, "Renamed by Ada", ownerSocket.expect("title")["title"], "editors can rename")
+	adaSocket.expect("title")
+	bobSocket.expect("title")
+
+	response := do(t, http.MethodPatch, "/slides/"+deck.Id.Hex()+"/members/"+bob.Hex(), map[string]any{"role": "editor"}, testutil.As(owner))
+	require.Equal(t, http.StatusNoContent, response.Code)
+	assert.Equal(t, "editor", bobSocket.expect("role")["role"])
+	bobSocket.send(push(1, update("bob", `[6, [0, "?"]]`)))
+	bobSocket.expect("updates")
+	assert.Equal(t, true, bobSocket.expect("pushed")["ok"], "a new editor can edit straight away")
+
+	response = do(t, http.MethodDelete, "/slides/"+deck.Id.Hex()+"/members/"+ada.Hex(), nil, testutil.As(owner))
+	require.Equal(t, http.StatusNoContent, response.Code)
+	assert.Equal(t, closeRemoved, adaSocket.closedWith())
+	ownerSocket.expect("updates")
+	assert.Equal(t, "left", ownerSocket.next()["type"])
+
+	conn, err := dial(t, server, deck.Id, testutil.Origin)
+	require.NoError(t, err)
+	again := &socket{t: t, conn: conn}
+	again.send(map[string]any{"type": "auth", "token": testutil.AccessToken(t, ada), "version": 0})
+	assert.Equal(t, closeNotFound, again.closedWith(), "a removed member cannot come back")
+
+	closeAll(t, deck.Id, ownerSocket, bobSocket)
+	assert.Equal(t, "Renamed by Ada", storedDeck(t, deck.Id).Title)
 }

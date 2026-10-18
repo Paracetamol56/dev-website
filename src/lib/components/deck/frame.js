@@ -44,6 +44,7 @@ const inline = new Set(
 );
 const opaque = 'pre, script, style, template, textarea, svg, math, iframe, video, audio, canvas';
 let presenting = false;
+let readonly = false;
 let selected = null;
 let editing = null;
 let deferred = false;
@@ -275,7 +276,7 @@ slides.addEventListener('click', (event) => {
 });
 
 slides.addEventListener('dblclick', (event) => {
-	if (presenting || editing) return;
+	if (presenting || readonly || editing) return;
 	const element = editableFrom(event.target);
 	if (element) startEditing(element);
 });
@@ -379,7 +380,7 @@ addEventListener('message', (event) => {
 	} else if (message.type === 'start') {
 		enqueue(() => {
 			const element = slides.querySelector(`[data-cm="${message.id}"]`);
-			if (presenting || !element) return;
+			if (presenting || readonly || !element) return;
 			stopEditing(true);
 			show(message.id);
 			if (editable(element)) startEditing(element, true);
@@ -390,6 +391,9 @@ addEventListener('message', (event) => {
 		presenting = message.on;
 		document.documentElement.classList.toggle('presenting', presenting);
 		if (presenting) stopEditing(true);
+	} else if (message.type === 'readonly') {
+		readonly = message.on;
+		if (readonly) stopEditing(false);
 	} else if (message.type === 'slide') {
 		const current = deck.getIndices();
 		const { h, v, f } = message.indices;

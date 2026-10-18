@@ -23,6 +23,7 @@
 	export let slide: Writable<Indices> = writable({ h: 0, v: 0 });
 	export let settings: DeckSettings = defaultSettings;
 	export let title = 'Slides preview';
+	export let readonly = false;
 
 	const dispatch = createEventDispatcher<{ select: number; edit: SlideEdit; editing: boolean }>();
 
@@ -121,6 +122,7 @@
 	$: if (ready) configure(settings).catch(console.error);
 	$: if (ready) render(content);
 	$: if (ready) post({ type: 'slide', indices: $slide });
+	$: if (ready) post({ type: 'readonly', on: readonly });
 </script>
 
 <svelte:window on:pointerdown={onPointerDown} />

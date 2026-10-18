@@ -1,12 +1,14 @@
 import { writable } from 'svelte/store';
 import api from '$lib/api';
 import type { DeckSettings } from '$lib/components/deck/settings';
+import type { Role } from '../types';
 
 export type WireUpdate = { clientID: string; changes: unknown };
 export type WireRange = { anchor: number; head: number };
 
 export type ServerMessage =
-	| { type: 'state'; title: string; settings: DeckSettings; peer: number }
+	| { type: 'state'; title: string; settings: DeckSettings; peer: number; role: Role }
+	| { type: 'role'; role: Role }
 	| { type: 'updates'; version: number; updates: WireUpdate[] }
 	| { type: 'reset'; version: number; doc: string; error?: string }
 	| { type: 'pushed'; ok: boolean }
@@ -30,10 +32,11 @@ type Handlers = {
 };
 type Listener = (message: ServerMessage) => void;
 
-export type Connection = 'connecting' | 'open' | 'closed' | 'refused';
+export type Connection = 'connecting' | 'open' | 'closed' | 'refused' | 'removed';
 
 // The server closes with these codes when retrying cannot help
-const final = new Set([4401, 4404, 4410]);
+const final = new Set([4401, 4403, 4404, 4410]);
+const removed = 4403;
 
 export class DeckSocket {
 	readonly connection = writable<Connection>('connecting');
@@ -79,7 +82,9 @@ export class DeckSocket {
 			if (this.socket !== socket) return;
 			this.ready = false;
 			if (this.stopped || final.has(event.code)) {
-				this.connection.set(final.has(event.code) ? 'refused' : 'closed');
+				this.connection.set(
+					event.code === removed ? 'removed' : final.has(event.code) ? 'refused' : 'closed'
+				);
 				return;
 			}
 			this.connection.set('closed');

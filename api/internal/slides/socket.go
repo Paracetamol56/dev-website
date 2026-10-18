@@ -26,6 +26,7 @@ const (
 	closeNotFound = 4404
 	closeAuth     = 4401
 	closeDeleted  = 4410
+	closeRemoved  = 4403
 )
 
 var upgrader = websocket.Upgrader{
@@ -55,6 +56,7 @@ type client struct {
 	once   sync.Once
 	peer   int
 	name   string
+	role   string
 }
 
 // send never blocks the hub: a client that cannot keep up is disconnected
@@ -111,9 +113,9 @@ func refuse(conn *websocket.Conn, code int, reason string) {
 // WSDeck godoc
 //
 //	@Summary		Edit a slide deck live
-//	@Description	WebSocket for the owner of a deck. The first message is {"type": "auth", "token": accessToken, "version": n}, n being the version the client has. The server answers {"type": "state", "title", "settings"} then the updates since n, or {"type": "reset", "version", "doc"} when they are not kept.
+//	@Description	WebSocket for the owner and the members of a deck. The first message is {"type": "auth", "token": accessToken, "version": n}, n being the version the client has. The server answers {"type": "state", "title", "settings", "peer", "role"} then the updates since n, or {"type": "reset", "version", "doc"} when they are not kept.
 //	@Description	Clients send {"type": "push", "version", "updates": [{"clientID", "changes"}]}, {"type": "pull", "version"}, {"type": "title", "title"}, {"type": "settings", "settings"} and {"type": "presence", "version", "ranges": [{"anchor", "head"}]}.
-//	@Description	The server sends {"type": "updates", "version", "updates"} to every client, {"type": "pushed", "ok"} to the sender of a push, {"type": "title"}, {"type": "settings"}, {"type": "presence", "peer", "name", "version", "ranges"}, {"type": "joined", "peer", "name"}, {"type": "left", "peer"}, {"type": "deleted"} and {"type": "error", "error"}.
+//	@Description	The server sends {"type": "updates", "version", "updates"} to every client, {"type": "pushed", "ok"} to the sender of a push, {"type": "title"}, {"type": "settings"}, {"type": "presence", "peer", "name", "version", "ranges"}, {"type": "joined", "peer", "name"}, {"type": "left", "peer"}, {"type": "role", "role"} when the role of the client changes, {"type": "deleted"} and {"type": "error", "error"}. A refused push is answered with {"type": "reset", "version", "doc", "error"}. Viewers can only pull and send their presence.
 //	@Tags			slides
 //	@Param			id	path	string	true	"Deck ID"
 //	@Success		101
@@ -147,7 +149,7 @@ func (controller *Controller) WSDeck(c *gin.Context) {
 		refuse(conn, closeAuth, "invalid token")
 		return
 	}
-	if _, err := GetDeck(c, userId, id); err != nil {
+	if _, _, err := deckAccess(c, userId, id); err != nil {
 		refuse(conn, closeNotFound, "deck not found")
 		return
 	}

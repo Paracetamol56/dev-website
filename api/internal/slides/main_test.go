@@ -23,6 +23,12 @@ func newEngine() *gin.Engine {
 	engine.GET("/slides/:id/ws", controller.WSDeck)
 	group.POST("/:id/duplicate", controller.PostDeckDuplicate)
 	group.DELETE("/:id", controller.DeleteDeck)
+	group.POST("/join", controller.PostDeckJoin)
+	group.PUT("/:id/links/:role", controller.PutDeckLink)
+	group.DELETE("/:id/links/:role", controller.DeleteDeckLink)
+	group.POST("/:id/links/:role/email", controller.PostDeckLinkEmail)
+	group.PATCH("/:id/members/:userId", controller.PatchDeckMember)
+	group.DELETE("/:id/members/:userId", controller.DeleteDeckMember)
 	return engine
 }
 

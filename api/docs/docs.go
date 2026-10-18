@@ -1663,7 +1663,7 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "List a page of the slide decks of the authenticated user, without their content, last updated first",
+                "description": "List a page of the slide decks the authenticated user owns or is a member of, without their content, last updated first",
                 "produces": [
                     "application/json"
                 ],
@@ -1797,6 +1797,81 @@ const docTemplate = `{
                 }
             }
         },
+        "/slides/join": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Become a member of the deck of a share link, with the role of the link. An editor link upgrades a viewer; nothing changes for the owner.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "slides"
+                ],
+                "summary": "Join a slide deck",
+                "parameters": [
+                    {
+                        "description": "Token of the link",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/slides.JoinBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/slides.JoinedDeck"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/slides/{id}": {
             "get": {
                 "security": [
@@ -1804,7 +1879,7 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Get a slide deck of the authenticated user, with its content",
+                "description": "Get a slide deck the authenticated user owns or is a member of, with its content and their role. The owner also gets the share links and the members.",
                 "produces": [
                     "application/json"
                 ],
@@ -1825,7 +1900,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/slides.Deck"
+                            "$ref": "#/definitions/slides.DeckView"
                         }
                     },
                     "400": {
@@ -1908,6 +1983,15 @@ const docTemplate = `{
                             }
                         }
                     },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
                     "404": {
                         "description": "Not Found",
                         "schema": {
@@ -1936,7 +2020,7 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Create a copy of a slide deck of the authenticated user",
+                "description": "Create a copy, owned by the authenticated user, of a deck they own or edit",
                 "produces": [
                     "application/json"
                 ],
@@ -1978,6 +2062,462 @@ const docTemplate = `{
                             }
                         }
                     },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/slides/{id}/links/{role}": {
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Turn on the share link giving a role in a deck, or replace its token so the previous link stops working. Only the owner can do this.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "slides"
+                ],
+                "summary": "Create a share link",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Deck ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "editor",
+                            "viewer"
+                        ],
+                        "type": "string",
+                        "description": "Role given by the link",
+                        "name": "role",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/slides.Links"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Turn off the share link giving a role in a deck. The members who joined through it keep their access. Only the owner can do this.",
+                "tags": [
+                    "slides"
+                ],
+                "summary": "Turn off a share link",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Deck ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "editor",
+                            "viewer"
+                        ],
+                        "type": "string",
+                        "description": "Role given by the link",
+                        "name": "role",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/slides/{id}/links/{role}/email": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Send the share link giving a role in a deck to an email address, turning the link on if needed. Only the owner can do this, a few times per hour.",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "slides"
+                ],
+                "summary": "Email a share link",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Deck ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "editor",
+                            "viewer"
+                        ],
+                        "type": "string",
+                        "description": "Role given by the link",
+                        "name": "role",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Recipient",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/slides.EmailLinkBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/slides/{id}/members/{userId}": {
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Take a member out of a deck: the owner can remove anyone, and a member can leave. A removed member is disconnected from the live deck.",
+                "tags": [
+                    "slides"
+                ],
+                "summary": "Remove a member",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Deck ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "User ID of the member",
+                        "name": "userId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Make a member of a deck an editor or a viewer. Only the owner can do this.",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "slides"
+                ],
+                "summary": "Change the role of a member",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Deck ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "User ID of the member",
+                        "name": "userId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New role",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/slides.MemberRoleBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
                     "404": {
                         "description": "Not Found",
                         "schema": {
@@ -2001,7 +2541,7 @@ const docTemplate = `{
         },
         "/slides/{id}/ws": {
             "get": {
-                "description": "WebSocket for the owner of a deck. The first message is {\"type\": \"auth\", \"token\": accessToken, \"version\": n}, n being the version the client has. The server answers {\"type\": \"state\", \"title\", \"settings\"} then the updates since n, or {\"type\": \"reset\", \"version\", \"doc\"} when they are not kept.\nClients send {\"type\": \"push\", \"version\", \"updates\": [{\"clientID\", \"changes\"}]}, {\"type\": \"pull\", \"version\"}, {\"type\": \"title\", \"title\"}, {\"type\": \"settings\", \"settings\"} and {\"type\": \"presence\", \"version\", \"ranges\": [{\"anchor\", \"head\"}]}.\nThe server sends {\"type\": \"updates\", \"version\", \"updates\"} to every client, {\"type\": \"pushed\", \"ok\"} to the sender of a push, {\"type\": \"title\"}, {\"type\": \"settings\"}, {\"type\": \"presence\", \"peer\", \"name\", \"version\", \"ranges\"}, {\"type\": \"joined\", \"peer\", \"name\"}, {\"type\": \"left\", \"peer\"}, {\"type\": \"deleted\"} and {\"type\": \"error\", \"error\"}.",
+                "description": "WebSocket for the owner and the members of a deck. The first message is {\"type\": \"auth\", \"token\": accessToken, \"version\": n}, n being the version the client has. The server answers {\"type\": \"state\", \"title\", \"settings\", \"peer\", \"role\"} then the updates since n, or {\"type\": \"reset\", \"version\", \"doc\"} when they are not kept.\nClients send {\"type\": \"push\", \"version\", \"updates\": [{\"clientID\", \"changes\"}]}, {\"type\": \"pull\", \"version\"}, {\"type\": \"title\", \"title\"}, {\"type\": \"settings\", \"settings\"} and {\"type\": \"presence\", \"version\", \"ranges\": [{\"anchor\", \"head\"}]}.\nThe server sends {\"type\": \"updates\", \"version\", \"updates\"} to every client, {\"type\": \"pushed\", \"ok\"} to the sender of a push, {\"type\": \"title\"}, {\"type\": \"settings\"}, {\"type\": \"presence\", \"peer\", \"name\", \"version\", \"ranges\"}, {\"type\": \"joined\", \"peer\", \"name\"}, {\"type\": \"left\", \"peer\"}, {\"type\": \"role\", \"role\"} when the role of the client changes, {\"type\": \"deleted\"} and {\"type\": \"error\", \"error\"}. A refused push is answered with {\"type\": \"reset\", \"version\", \"doc\", \"error\"}. Viewers can only pull and send their presence.",
                 "tags": [
                     "slides"
                 ],
@@ -2573,6 +3113,12 @@ const docTemplate = `{
                 "slides.duplicated",
                 "slides.renamed",
                 "slides.deleted",
+                "slides.link_created",
+                "slides.link_revoked",
+                "slides.link_emailed",
+                "slides.joined",
+                "slides.member_role_changed",
+                "slides.member_removed",
                 "contact.sent",
                 "admin.role_changed",
                 "access.denied",
@@ -2600,6 +3146,12 @@ const docTemplate = `{
                 "SlidesDuplicated",
                 "SlidesRenamed",
                 "SlidesDeleted",
+                "SlidesLinkCreated",
+                "SlidesLinkRevoked",
+                "SlidesLinkEmailed",
+                "SlidesJoined",
+                "SlidesMemberRoleChanged",
+                "SlidesMemberRemoved",
                 "ContactSent",
                 "AdminRoleChanged",
                 "AccessDenied",
@@ -3192,12 +3744,195 @@ const docTemplate = `{
                         "$ref": "#/definitions/slides.OutlineEntry"
                     }
                 },
+                "ownerName": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string",
+                    "enum": [
+                        "owner",
+                        "editor",
+                        "viewer"
+                    ]
+                },
                 "title": {
                     "type": "string"
                 },
                 "updatedAt": {
                     "type": "string",
                     "format": "date-time"
+                }
+            }
+        },
+        "slides.DeckView": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "links": {
+                    "$ref": "#/definitions/slides.Links"
+                },
+                "members": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/slides.MemberView"
+                    }
+                },
+                "outline": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/slides.OutlineEntry"
+                    }
+                },
+                "revision": {
+                    "type": "integer"
+                },
+                "role": {
+                    "type": "string",
+                    "enum": [
+                        "owner",
+                        "editor",
+                        "viewer"
+                    ]
+                },
+                "settings": {
+                    "$ref": "#/definitions/slides.Settings"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "user": {
+                    "type": "string"
+                }
+            }
+        },
+        "slides.EditorSettings": {
+            "type": "object",
+            "required": [
+                "indent"
+            ],
+            "properties": {
+                "fontSize": {
+                    "type": "integer",
+                    "maximum": 24,
+                    "minimum": 10
+                },
+                "indent": {
+                    "type": "string",
+                    "enum": [
+                        "tab",
+                        "2",
+                        "4"
+                    ]
+                },
+                "lineNumbers": {
+                    "type": "boolean"
+                },
+                "lineWrapping": {
+                    "type": "boolean"
+                },
+                "vim": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "slides.EmailLinkBody": {
+            "type": "object",
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "maxLength": 254
+                }
+            }
+        },
+        "slides.JoinBody": {
+            "type": "object",
+            "required": [
+                "token"
+            ],
+            "properties": {
+                "token": {
+                    "type": "string",
+                    "maxLength": 100
+                }
+            }
+        },
+        "slides.JoinedDeck": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string",
+                    "enum": [
+                        "owner",
+                        "editor",
+                        "viewer"
+                    ]
+                }
+            }
+        },
+        "slides.Links": {
+            "type": "object",
+            "properties": {
+                "editor": {
+                    "type": "string"
+                },
+                "viewer": {
+                    "type": "string"
+                }
+            }
+        },
+        "slides.MemberRoleBody": {
+            "type": "object",
+            "required": [
+                "role"
+            ],
+            "properties": {
+                "role": {
+                    "type": "string",
+                    "enum": [
+                        "editor",
+                        "viewer"
+                    ]
+                }
+            }
+        },
+        "slides.MemberView": {
+            "type": "object",
+            "properties": {
+                "joinedAt": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string",
+                    "enum": [
+                        "editor",
+                        "viewer"
+                    ]
+                },
+                "user": {
+                    "type": "string"
                 }
             }
         },
@@ -3280,6 +4015,9 @@ const docTemplate = `{
                 },
                 "controls": {
                     "type": "boolean"
+                },
+                "editor": {
+                    "$ref": "#/definitions/slides.EditorSettings"
                 },
                 "height": {
                     "type": "integer",

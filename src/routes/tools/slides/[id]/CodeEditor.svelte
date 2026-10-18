@@ -3,8 +3,10 @@
 	import { getSyncedVersion, sendableUpdates } from '@codemirror/collab';
 	import { indentWithTab, redo as redoCommand, undo as undoCommand } from '@codemirror/commands';
 	import { html } from '@codemirror/lang-html';
-	import { Compartment, EditorState, Prec, Transaction } from '@codemirror/state';
+	import { indentUnit } from '@codemirror/language';
+	import { Compartment, EditorState, Prec, Transaction, type Extension } from '@codemirror/state';
 	import { EditorView, keymap } from '@codemirror/view';
+	import { vim } from '@replit/codemirror-vim';
 	import {
 		catppuccinFrappe,
 		catppuccinLatte,
@@ -25,11 +27,14 @@
 	} from './sourceMap';
 	import type { DeckSocket } from './socket';
 	import type { CurrentSlide, SlideEdit } from '$lib/components/deck/Slides.svelte';
+	import { defaultEditorSettings, type EditorSettings } from '$lib/components/deck/settings';
 	import { insertion, type BlockKind } from './blocks';
 
 	export let value: string;
 	export let version: number;
 	export let socket: DeckSocket;
+	export let readonly = false;
+	export let options: EditorSettings = defaultEditorSettings;
 
 	const dispatch = createEventDispatcher<{
 		change: string;
@@ -45,6 +50,19 @@
 		mocha: catppuccinMocha
 	};
 	const theme = new Compartment();
+	const access = new Compartment();
+	const keys = new Compartment();
+	const layout = new Compartment();
+
+	const keysFor = (options = defaultEditorSettings): Extension =>
+		options.vim ? vim({ status: true }) : [];
+	const layoutFor = (options = defaultEditorSettings): Extension => [
+		options.lineWrapping ? EditorView.lineWrapping : [],
+		options.lineNumbers ? [] : EditorView.theme({ '.cm-lineNumbers': { display: 'none' } }),
+		EditorView.theme({ '.cm-scroller': { fontSize: `${options.fontSize}px` } }),
+		indentUnit.of(options.indent === 'tab' ? '\t' : ' '.repeat(Number(options.indent))),
+		EditorState.tabSize.of(options.indent === 'tab' ? 4 : Number(options.indent))
+	];
 	const maxLength = 500_000;
 
 	let parent: HTMLDivElement;
@@ -54,13 +72,15 @@
 		return EditorState.create({
 			doc,
 			extensions: [
+				keys.of(keysFor(options)),
 				Prec.high(keymap.of([{ key: 'Mod-s', preventDefault: true, run: () => true }])),
 				basicSetup,
 				keymap.of([indentWithTab]),
 				html(),
-				EditorView.lineWrapping,
+				layout.of(layoutFor(options)),
 				EditorView.theme({ '&': { height: '100%' }, '.cm-scroller': { overflow: 'auto' } }),
 				theme.of(themes[$user.flavour] ?? catppuccinMocha),
+				access.of(EditorState.readOnly.of(readonly)),
 				presence,
 				sourceElements,
 				// The server refuses a longer deck, and would throw away every unsent change with it
@@ -191,6 +211,10 @@
 	});
 
 	$: view?.dispatch({ effects: theme.reconfigure(themes[$user.flavour] ?? catppuccinMocha) });
+	$: view?.dispatch({ effects: access.reconfigure(EditorState.readOnly.of(readonly)) });
+	$: view?.dispatch({
+		effects: [keys.reconfigure(keysFor(options)), layout.reconfigure(layoutFor(options))]
+	});
 </script>
 
 <div bind:this={parent} class="h-full" />

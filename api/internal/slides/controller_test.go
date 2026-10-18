@@ -217,6 +217,8 @@ func TestBackfillSettings(t *testing.T) {
 	old := primitive.NewObjectID()
 	owner := primitive.NewObjectID()
 	testutil.InsertRaw(t, "slides", bson.M{"_id": old, "user": owner, "title": "Old", "content": ""})
+	partial := primitive.NewObjectID()
+	testutil.InsertRaw(t, "slides", bson.M{"_id": partial, "user": owner, "title": "Partial", "content": "", "settings": bson.M{"theme": "sky"}})
 	styled := postDeck(t, owner, map[string]any{"title": "New"})
 	custom := DefaultSettings()
 	custom.Theme = "white"
@@ -224,7 +226,7 @@ func TestBackfillSettings(t *testing.T) {
 
 	filled, err := BackfillSettings(context.Background())
 	require.NoError(t, err)
-	assert.EqualValues(t, 1, filled)
+	assert.EqualValues(t, 2, filled)
 
 	deck, err := GetDeckByUserIdAndId(context.Background(), owner, old)
 	require.NoError(t, err)
@@ -232,4 +234,8 @@ func TestBackfillSettings(t *testing.T) {
 	deck, err = GetDeckByUserIdAndId(context.Background(), owner, styled.Id)
 	require.NoError(t, err)
 	assert.Equal(t, "white", deck.Settings.Theme)
+	deck, err = GetDeckByUserIdAndId(context.Background(), owner, partial)
+	require.NoError(t, err)
+	assert.Equal(t, "sky", deck.Settings.Theme, "settings saved before the editor ones are kept")
+	assert.Equal(t, DefaultEditorSettings(), deck.Settings.Editor)
 }

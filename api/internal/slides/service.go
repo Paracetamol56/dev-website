@@ -3,6 +3,7 @@ package slides
 import (
 	"context"
 	"dev/internal/audit"
+	"dev/internal/user"
 	"dev/internal/utils"
 	"errors"
 	"time"
@@ -22,20 +23,112 @@ func ListDecks(ctx context.Context, userId primitive.ObjectID, query DecksQuery)
 	if query.Limit == 0 {
 		query.Limit = DefaultLimit
 	}
-	decks, total, err := GetDecksByUserId(ctx, userId, query.Search, query.Page, query.Limit)
+	decks, total, err := GetDecks(ctx, userId, query.Search, query.Page, query.Limit)
 	if err != nil {
 		return nil, err
+	}
+	owners := []primitive.ObjectID{}
+	for i := range decks {
+		decks[i].Role = roleIn(decks[i].UserId, decks[i].Members, userId)
+		if decks[i].Role != RoleOwner {
+			owners = append(owners, decks[i].UserId)
+		}
+	}
+	names := displayNames(ctx, owners)
+	for i := range decks {
+		if decks[i].Role != RoleOwner {
+			decks[i].OwnerName = names[decks[i].UserId]
+		}
 	}
 	return &DeckPage{Items: decks, Total: total, Page: query.Page, Limit: query.Limit}, nil
 }
 
-// GetDeck answers not found for the decks of other users too
-func GetDeck(ctx context.Context, userId primitive.ObjectID, id primitive.ObjectID) (*Deck, error) {
-	deck, err := GetDeckByUserIdAndId(ctx, userId, id)
-	if errors.Is(err, mongo.ErrNoDocuments) {
-		return nil, utils.NotFound("Deck not found")
+func roleIn(owner primitive.ObjectID, members []Member, userId primitive.ObjectID) string {
+	if owner == userId {
+		return RoleOwner
 	}
-	return deck, err
+	for _, member := range members {
+		if member.UserId == userId {
+			return member.Role
+		}
+	}
+	return ""
+}
+
+func access(deck *Deck, userId primitive.ObjectID) string {
+	return roleIn(deck.UserId, deck.Members, userId)
+}
+
+func displayNames(ctx context.Context, ids []primitive.ObjectID) map[primitive.ObjectID]string {
+	names := map[primitive.ObjectID]string{}
+	if len(ids) == 0 {
+		return names
+	}
+	users, err := user.GetUsersByIds(ctx, ids)
+	if err != nil {
+		return names
+	}
+	for _, account := range users {
+		names[account.Id] = account.WebAuthnDisplayName()
+	}
+	return names
+}
+
+// deckAccess gives a deck with the role of the user in it, and answers not found to anyone else
+func deckAccess(ctx context.Context, userId primitive.ObjectID, id primitive.ObjectID) (*Deck, string, error) {
+	deck, err := GetDeckById(ctx, id)
+	if errors.Is(err, mongo.ErrNoDocuments) {
+		return nil, "", utils.NotFound("Deck not found")
+	}
+	if err != nil {
+		return nil, "", err
+	}
+	role := access(deck, userId)
+	if role == "" {
+		return nil, "", utils.NotFound("Deck not found")
+	}
+	return deck, role, nil
+}
+
+func ownedDeck(ctx context.Context, userId primitive.ObjectID, id primitive.ObjectID) (*Deck, error) {
+	deck, role, err := deckAccess(ctx, userId, id)
+	if err != nil {
+		return nil, err
+	}
+	if role != RoleOwner {
+		return nil, utils.Forbidden("Only the owner of the deck can do this")
+	}
+	return deck, nil
+}
+
+func GetDeck(ctx context.Context, userId primitive.ObjectID, id primitive.ObjectID) (*DeckView, error) {
+	deck, role, err := deckAccess(ctx, userId, id)
+	if err != nil {
+		return nil, err
+	}
+	return viewOf(ctx, deck, role), nil
+}
+
+func viewOf(ctx context.Context, deck *Deck, role string) *DeckView {
+	view := &DeckView{Deck: deck, Role: role}
+	if role != RoleOwner {
+		return view
+	}
+	view.Links = &deck.Links
+	view.Members = []MemberView{}
+	ids := []primitive.ObjectID{}
+	for _, member := range deck.Members {
+		ids = append(ids, member.UserId)
+	}
+	names := displayNames(ctx, ids)
+	for _, member := range deck.Members {
+		name, ok := names[member.UserId]
+		if !ok {
+			name = "Deleted account"
+		}
+		view.Members = append(view.Members, MemberView{Member: member, Name: name})
+	}
+	return view
 }
 
 func insertDeck(ctx context.Context, userId primitive.ObjectID, title string, content string, settings Settings) (*Deck, error) {
@@ -71,9 +164,12 @@ func AddDeck(ctx context.Context, userId primitive.ObjectID, body PostDeckBody) 
 }
 
 func DuplicateDeck(ctx context.Context, userId primitive.ObjectID, id primitive.ObjectID) (*Deck, error) {
-	original, err := GetDeck(ctx, userId, id)
+	original, role, err := deckAccess(ctx, userId, id)
 	if err != nil {
 		return nil, err
+	}
+	if role == RoleViewer {
+		return nil, utils.Forbidden("Viewers cannot duplicate this deck")
 	}
 	title := original.Title + " (copy)"
 	if len([]rune(title)) > 100 {
@@ -88,6 +184,9 @@ func DuplicateDeck(ctx context.Context, userId primitive.ObjectID, id primitive.
 }
 
 func RemoveDeck(ctx context.Context, userId primitive.ObjectID, id primitive.ObjectID) error {
+	if _, err := ownedDeck(ctx, userId, id); err != nil {
+		return err
+	}
 	result, err := DeleteDeck(ctx, userId, id)
 	if err != nil {
 		return err

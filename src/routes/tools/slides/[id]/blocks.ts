@@ -1,3 +1,4 @@
+import { indentUnit } from '@codemirror/language';
 import type { EditorState } from '@codemirror/state';
 import type { CurrentSlide } from '$lib/components/deck/Slides.svelte';
 import { sourceElements } from './sourceMap';
@@ -23,8 +24,17 @@ export type Insertion = { from: number; insert: string; focus: number | null };
 const indentAt = (state: EditorState, position: number) =>
 	state.doc.lineAt(position).text.match(/^\s*/)?.[0] ?? '';
 
-function place(at: number, indent: string, lines: string[], focus?: string): Insertion {
-	const insert = lines.map((line) => `\n${indent}${line}`).join('');
+// Blocks are written with tabs, then indented with the unit of the editor
+function place(
+	at: number,
+	indent: string,
+	unit: string,
+	lines: string[],
+	focus?: string
+): Insertion {
+	const insert = lines
+		.map((line) => `\n${indent}${line.replace(/^\t+/, (tabs) => unit.repeat(tabs.length))}`)
+		.join('');
 	const offset = focus ? insert.indexOf(focus) : -1;
 	return { from: at, insert, focus: offset < 0 ? null : at + offset };
 }
@@ -35,11 +45,12 @@ export function insertion(state: EditorState, kind: BlockKind, current: CurrentS
 	const stack = current.stack === null ? undefined : elements[current.stack];
 	const slide = current.slide === null ? undefined : elements[current.slide];
 	const block = blocks[kind];
+	const unit = state.facet(indentUnit);
 
 	if (kind !== 'slide' && slide && slide.contentTo > slide.contentFrom) {
 		let at = slide.contentTo;
 		while (at > slide.contentFrom && /\s/.test(state.sliceDoc(at - 1, at))) at--;
-		return place(at, indentAt(state, slide.from) + '\t', block.lines, block.focus);
+		return place(at, indentAt(state, slide.from) + unit, unit, block.lines, block.focus);
 	}
 
 	const lines =
@@ -48,7 +59,7 @@ export function insertion(state: EditorState, kind: BlockKind, current: CurrentS
 			: ['<section>', ...block.lines.map((line) => `\t${line}`), '</section>'];
 	const at = stack ? stack.to : state.doc.length;
 	const indent = stack ? indentAt(state, stack.from) : '';
-	const placed = place(at, indent, lines, block.focus);
+	const placed = place(at, indent, unit, lines, block.focus);
 	return at === 0
 		? { ...placed, insert: placed.insert.slice(1), focus: placed.focus && placed.focus - 1 }
 		: placed;

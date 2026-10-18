@@ -5,6 +5,7 @@
 		ArrowLeft,
 		Check,
 		Code,
+		Eye,
 		Heading,
 		Image,
 		List,
@@ -12,6 +13,7 @@
 		Pencil,
 		Presentation,
 		Redo2,
+		Share2,
 		SquarePlus,
 		Type,
 		Undo2,
@@ -21,7 +23,8 @@
 	import type { Readable } from 'svelte/store';
 	import ThemePopover from '$lib/components/ThemePopover.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
-	import { Tone } from '$lib/components/ui/styles';
+	import { ButtonVariant, Tone } from '$lib/components/ui/styles';
+	import type { Role } from '../types';
 	import type { BlockKind } from './blocks';
 	import { peerColour, type Peer } from './presence';
 	import type { Connection } from './socket';
@@ -30,9 +33,11 @@
 	export let connection: Readable<Connection>;
 	export let unsaved: boolean;
 	export let peers: Peer[];
+	export let role: Role;
 
 	const dispatch = createEventDispatcher<{
 		rename: void;
+		share: void;
 		present: void;
 		insert: BlockKind | 'image';
 		undo: void;
@@ -66,15 +71,24 @@
 		>
 			<ArrowLeft size="18" />
 		</a>
-		<button
-			type="button"
-			class="group flex min-w-0 max-w-xs items-center gap-2 rounded-md px-2 py-1 hover:bg-ctp-surface0"
-			on:click={() => dispatch('rename')}
-		>
-			<h1 class="truncate text-lg font-bold text-ctp-text">{title}</h1>
-			<Pencil size="14" class="shrink-0 text-ctp-subtext0 opacity-0 group-hover:opacity-100" />
-			<span class="sr-only">Rename</span>
-		</button>
+		{#if role === 'viewer'}
+			<h1 class="min-w-0 max-w-xs truncate px-2 py-1 text-lg font-bold text-ctp-text">{title}</h1>
+			<span
+				class="flex items-center gap-1 rounded-full bg-ctp-surface0 px-2 py-0.5 text-xs font-semibold text-ctp-subtext1"
+			>
+				<Eye size="12" /> View only
+			</span>
+		{:else}
+			<button
+				type="button"
+				class="group flex min-w-0 max-w-xs items-center gap-2 rounded-md px-2 py-1 hover:bg-ctp-surface0"
+				on:click={() => dispatch('rename')}
+			>
+				<h1 class="truncate text-lg font-bold text-ctp-text">{title}</h1>
+				<Pencil size="14" class="shrink-0 text-ctp-subtext0 opacity-0 group-hover:opacity-100" />
+				<span class="sr-only">Rename</span>
+			</button>
+		{/if}
 
 		<p class="flex items-center gap-1.5 text-sm text-ctp-subtext0" role="status">
 			{#if $connection === 'refused'}
@@ -105,6 +119,12 @@
 				</ul>
 			{/if}
 			<ThemePopover />
+			{#if role === 'owner'}
+				<Button variant={ButtonVariant.Soft} on:click={() => dispatch('share')}>
+					<Share2 size="18" />
+					Share
+				</Button>
+			{/if}
 			<Button tone={Tone.Accent} on:click={() => dispatch('present')}>
 				<Presentation size="18" />
 				Present
@@ -112,38 +132,46 @@
 		</div>
 	</div>
 
-	<div
-		use:melt={$root}
-		aria-label="Edit the deck"
-		class="flex flex-wrap items-center gap-1 rounded-md bg-ctp-base p-1 shadow-md shadow-ctp-crust"
-	>
-		{#each history as item}
-			<button
-				type="button"
-				class="tool"
-				aria-label={item.label}
-				title="{item.label} ({item.shortcut})"
-				use:melt={$button}
-				on:click={() => dispatch(item.action)}
-			>
-				<svelte:component this={item.icon} size="16" />
-			</button>
-		{/each}
-		<div class="mx-0.5 w-px self-stretch bg-ctp-surface1" use:melt={$separator} />
-		{#each inserts as item}
-			<button
-				type="button"
-				class="tool"
-				aria-label="Add {item.label.toLowerCase()}"
-				title="Add {item.label.toLowerCase()}"
-				use:melt={$button}
-				on:click={() => dispatch('insert', item.kind)}
-			>
-				<svelte:component this={item.icon} size="16" />
-				<span class="hidden md:inline">{item.label}</span>
-			</button>
-		{/each}
-	</div>
+	{#if role === 'viewer'}
+		<p
+			class="rounded-md bg-ctp-base px-3 py-2 text-sm text-ctp-subtext0 shadow-md shadow-ctp-crust"
+		>
+			You can follow this deck live. Ask its owner for an editor link to change it.
+		</p>
+	{:else}
+		<div
+			use:melt={$root}
+			aria-label="Edit the deck"
+			class="flex flex-wrap items-center gap-1 rounded-md bg-ctp-base p-1 shadow-md shadow-ctp-crust"
+		>
+			{#each history as item}
+				<button
+					type="button"
+					class="tool"
+					aria-label={item.label}
+					title="{item.label} ({item.shortcut})"
+					use:melt={$button}
+					on:click={() => dispatch(item.action)}
+				>
+					<svelte:component this={item.icon} size="16" />
+				</button>
+			{/each}
+			<div class="mx-0.5 w-px self-stretch bg-ctp-surface1" use:melt={$separator} />
+			{#each inserts as item}
+				<button
+					type="button"
+					class="tool"
+					aria-label="Add {item.label.toLowerCase()}"
+					title="Add {item.label.toLowerCase()}"
+					use:melt={$button}
+					on:click={() => dispatch('insert', item.kind)}
+				>
+					<svelte:component this={item.icon} size="16" />
+					<span class="hidden md:inline">{item.label}</span>
+				</button>
+			{/each}
+		</div>
+	{/if}
 </header>
 
 <style lang="postcss">

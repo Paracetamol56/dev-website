@@ -32,10 +32,16 @@ const (
 	WordCloudWordHidden  Action = "wordcloud.word_hidden"
 	WordCloudWordsMerged Action = "wordcloud.words_merged"
 
-	SlidesCreated    Action = "slides.created"
-	SlidesDuplicated Action = "slides.duplicated"
-	SlidesRenamed    Action = "slides.renamed"
-	SlidesDeleted    Action = "slides.deleted"
+	SlidesCreated           Action = "slides.created"
+	SlidesDuplicated        Action = "slides.duplicated"
+	SlidesRenamed           Action = "slides.renamed"
+	SlidesDeleted           Action = "slides.deleted"
+	SlidesLinkCreated       Action = "slides.link_created"
+	SlidesLinkRevoked       Action = "slides.link_revoked"
+	SlidesLinkEmailed       Action = "slides.link_emailed"
+	SlidesJoined            Action = "slides.joined"
+	SlidesMemberRoleChanged Action = "slides.member_role_changed"
+	SlidesMemberRemoved     Action = "slides.member_removed"
 
 	ContactSent Action = "contact.sent"
 

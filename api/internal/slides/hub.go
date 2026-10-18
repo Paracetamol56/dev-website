@@ -48,6 +48,7 @@ const (
 	flush
 	deleted
 	persist
+	accessChanged
 )
 
 type event struct {
@@ -55,6 +56,7 @@ type event struct {
 	client  *client
 	message clientMessage
 	done    chan struct{}
+	members []Member
 }
 
 // hub holds the document of an open deck. Only its goroutine touches its fields, so every
@@ -137,6 +139,16 @@ func (registry *registry) remove(id primitive.ObjectID) {
 	}
 }
 
+// access gives an open deck its new members, so it updates the role of its clients
+func (registry *registry) access(id primitive.ObjectID, members []Member) {
+	registry.mutex.Lock()
+	h := registry.hubs[id]
+	registry.mutex.Unlock()
+	if h != nil {
+		h.events <- event{kind: accessChanged, members: members}
+	}
+}
+
 // SaveAll saves the open decks, for a server that is about to stop
 func SaveAll(ctx context.Context) {
 	hubs.mutex.Lock()
@@ -184,6 +196,8 @@ func (h *hub) run() {
 		case persist:
 			h.save()
 			close(e.done)
+		case accessChanged:
+			h.updateAccess(e.members)
 		case deleted:
 			h.removed = true
 			h.broadcast(message("deleted", nil))
@@ -229,7 +243,10 @@ func (h *hub) broadcast(event map[string]any) {
 }
 
 func (h *hub) join(c *client, version int64) {
-	if h.failed || h.removed || h.deck.UserId != c.userId {
+	if !h.failed {
+		c.role = access(h.deck, c.userId)
+	}
+	if h.failed || h.removed || c.role == "" {
 		c.send(message("error", map[string]any{"error": "Deck not found"}))
 		c.send(closing{closeNotFound, "deck not found"})
 		return
@@ -238,7 +255,7 @@ func (h *hub) join(c *client, version int64) {
 	c.peer = h.peers
 	h.broadcast(message("joined", map[string]any{"peer": c.peer, "name": c.name}))
 	h.clients[c] = true
-	c.send(message("state", map[string]any{"title": h.deck.Title, "settings": h.deck.Settings, "peer": c.peer}))
+	c.send(message("state", map[string]any{"title": h.deck.Title, "settings": h.deck.Settings, "peer": c.peer, "role": c.role}))
 	h.catchUp(c, version)
 }
 
@@ -252,7 +269,37 @@ func (h *hub) catchUp(c *client, version int64) {
 	c.send(message("updates", map[string]any{"version": version, "updates": missing}))
 }
 
+// updateAccess disconnects the clients who are not members anymore, and tells the others their role
+func (h *hub) updateAccess(members []Member) {
+	if h.failed {
+		return
+	}
+	h.deck.Members = members
+	for c := range h.clients {
+		role := access(h.deck, c.userId)
+		switch {
+		case role == "":
+			delete(h.clients, c)
+			h.broadcast(message("left", map[string]any{"peer": c.peer}))
+			c.send(closing{closeRemoved, "access removed"})
+		case role != c.role:
+			c.role = role
+			c.send(message("role", map[string]any{"role": role}))
+		}
+	}
+}
+
 func (h *hub) receive(c *client, incoming clientMessage) {
+	if c.role == RoleViewer {
+		switch incoming.Type {
+		case "push":
+			h.refuse(c, "You can only view this deck, your last changes were not kept")
+			return
+		case "title", "settings":
+			c.send(message("error", map[string]any{"error": "You can only view this deck"}))
+			return
+		}
+	}
 	switch incoming.Type {
 	case "push":
 		h.push(c, incoming.Version, incoming.Updates)

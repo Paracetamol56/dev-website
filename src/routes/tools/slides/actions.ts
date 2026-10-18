@@ -1,7 +1,7 @@
 import axios from 'axios';
 import api from '$lib/api';
 import { addToast } from '$lib/toast';
-import type { Deck } from './types';
+import type { Deck, LinkRole, Links } from './types';
 
 export function errorMessage(error: unknown, fallback: string): string {
 	if (axios.isAxiosError(error) && typeof error.response?.data?.error === 'string') {
@@ -40,3 +40,35 @@ export const deleteDeck = (id: string) =>
 		await api.callWithAuth('DELETE', `/slides/${id}`);
 		return true;
 	}, 'The deck could not be deleted');
+
+export const joinUrl = (token: string) => `${location.origin}/tools/slides/join/${token}`;
+
+export const createLink = (id: string, role: LinkRole) =>
+	run(
+		async () => (await api.callWithAuth('PUT', `/slides/${id}/links/${role}`)).data as Links,
+		'The link could not be created'
+	);
+
+export const revokeLink = (id: string, role: LinkRole) =>
+	run(async () => {
+		await api.callWithAuth('DELETE', `/slides/${id}/links/${role}`);
+		return true;
+	}, 'The link could not be turned off');
+
+export const emailLink = (id: string, role: LinkRole, email: string) =>
+	run(async () => {
+		await api.callWithAuth('POST', `/slides/${id}/links/${role}/email`, { email });
+		return true;
+	}, 'The email could not be sent');
+
+export const setMemberRole = (id: string, userId: string, role: LinkRole) =>
+	run(async () => {
+		await api.callWithAuth('PATCH', `/slides/${id}/members/${userId}`, { role });
+		return true;
+	}, 'The role could not be changed');
+
+export const removeMember = (id: string, userId: string) =>
+	run(async () => {
+		await api.callWithAuth('DELETE', `/slides/${id}/members/${userId}`);
+		return true;
+	}, 'The member could not be removed');

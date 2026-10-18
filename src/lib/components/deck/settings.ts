@@ -16,6 +16,23 @@ export type DeckSettings = {
 	markdown: boolean;
 	highlight: boolean;
 	highlightTheme: string;
+	editor: EditorSettings;
+};
+
+export type EditorSettings = {
+	vim: boolean;
+	lineWrapping: boolean;
+	lineNumbers: boolean;
+	fontSize: number;
+	indent: 'tab' | '2' | '4';
+};
+
+export const defaultEditorSettings: EditorSettings = {
+	vim: false,
+	lineWrapping: true,
+	lineNumbers: true,
+	fontSize: 14,
+	indent: 'tab'
 };
 
 export type Option = { value: string; label: string };
@@ -37,8 +54,15 @@ export const defaultSettings: DeckSettings = {
 	height: 700,
 	markdown: true,
 	highlight: true,
-	highlightTheme: 'monokai'
+	highlightTheme: 'monokai',
+	editor: defaultEditorSettings
 };
+
+export const indents: Option[] = [
+	{ value: 'tab', label: 'Tabs' },
+	{ value: '2', label: '2 spaces' },
+	{ value: '4', label: '4 spaces' }
+];
 
 export const themes: Option[] = [
 	{ value: 'black', label: 'Black' },
