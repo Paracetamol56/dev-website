@@ -32,6 +32,11 @@ const (
 	WordCloudWordHidden  Action = "wordcloud.word_hidden"
 	WordCloudWordsMerged Action = "wordcloud.words_merged"
 
+	SlidesCreated    Action = "slides.created"
+	SlidesDuplicated Action = "slides.duplicated"
+	SlidesRenamed    Action = "slides.renamed"
+	SlidesDeleted    Action = "slides.deleted"
+
 	ContactSent Action = "contact.sent"
 
 	AdminRoleChanged Action = "admin.role_changed"
@@ -43,6 +48,7 @@ const (
 const (
 	TargetUser      = "user"
 	TargetWordCloud = "wordcloud"
+	TargetSlides    = "slides"
 	TargetContact   = "contact"
 	TargetAdmin     = "admin"
 )

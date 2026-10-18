@@ -12,6 +12,7 @@ import (
 	"dev/internal/icon"
 	"dev/internal/middlewares"
 	"dev/internal/ormi"
+	"dev/internal/slides"
 	"dev/internal/user"
 	"dev/internal/utils"
 	"dev/internal/wordcloud"
@@ -47,6 +48,7 @@ func InitRouter() *gin.Engine {
 	wordCloud := new(wordcloud.Controller)
 	chipController := new(chip.Controller)
 	ormiController := new(ormi.Controller)
+	slidesController := new(slides.Controller)
 	userController := new(user.Controller)
 
 	apiGroup := r.Group("/api")
@@ -107,6 +109,16 @@ func InitRouter() *gin.Engine {
 			ormiGroup.POST("", ormiController.PostTodo)
 			ormiGroup.PATCH("/:id", ormiController.PatchTodo)
 			ormiGroup.DELETE("/:id", ormiController.DeleteTodo)
+		}
+		apiGroup.GET("/slides/:id/ws", slidesController.WSDeck)
+		slidesGroup := apiGroup.Group("/slides")
+		{
+			slidesGroup.Use(middlewares.JwtAuthMiddleware())
+			slidesGroup.GET("", slidesController.GetDecks)
+			slidesGroup.POST("", slidesController.PostDeck)
+			slidesGroup.GET("/:id", slidesController.GetDeck)
+			slidesGroup.POST("/:id/duplicate", slidesController.PostDeckDuplicate)
+			slidesGroup.DELETE("/:id", slidesController.DeleteDeck)
 		}
 		userGroup := apiGroup.Group("/users")
 		{

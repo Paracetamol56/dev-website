@@ -1,0 +1,4464 @@
+[
+	{
+		"doc": "<section>\té😀\nxé</h1>😀é😀\nx",
+		"changes": [
+			13,
+			[
+				0,
+				"",
+				"é"
+			],
+			[
+				3
+			],
+			12
+		],
+		"result": "<section>\té😀\né</h1>😀é😀\nx"
+	},
+	{
+		"doc": "",
+		"changes": [],
+		"result": ""
+	},
+	{
+		"doc": "\t<section>",
+		"changes": [
+			[
+				2
+			],
+			1,
+			[
+				1
+			],
+			4,
+			[
+				2
+			]
+		],
+		"result": "sctio"
+	},
+	{
+		"doc": "😀aé😀\nx",
+		"changes": [
+			[
+				0,
+				"é😀",
+				"x"
+			],
+			6,
+			[
+				2
+			]
+		],
+		"result": "é😀\nx😀aé😀"
+	},
+	{
+		"doc": "a 中文😀 é</h1>\té中文",
+		"changes": [
+			5,
+			[
+				2
+			],
+			1,
+			[
+				3,
+				"\t<section></h1>"
+			],
+			5,
+			[
+				1,
+				"</h1>"
+			]
+		],
+		"result": "a 中文\ud83dé\t<section></h1>1>\té中</h1>"
+	},
+	{
+		"doc": "éé😀\nx\n",
+		"changes": [
+			3,
+			[
+				0,
+				"😀"
+			],
+			2,
+			[
+				2
+			],
+			[
+				0,
+				"é中文é"
+			]
+		],
+		"result": "éé\ud83d😀\ude00\né中文é"
+	},
+	{
+		"doc": "\né\t\na é😀\nx\t中文",
+		"changes": [
+			9,
+			[
+				1
+			],
+			4
+		],
+		"result": "\né\t\na é😀x\t中文"
+	},
+	{
+		"doc": "",
+		"changes": [],
+		"result": ""
+	},
+	{
+		"doc": "</h1>😀",
+		"changes": [
+			3,
+			[
+				1,
+				"",
+				""
+			],
+			3,
+			[
+				0,
+				"</h1></h1>"
+			]
+		],
+		"result": "</h\n>😀</h1></h1>"
+	},
+	{
+		"doc": "\n😀",
+		"changes": [
+			2,
+			[
+				1
+			]
+		],
+		"result": "\n\ud83d"
+	},
+	{
+		"doc": "a</h1>😀",
+		"changes": [
+			3,
+			[
+				2,
+				"<section>é\t"
+			],
+			[
+				2,
+				"é"
+			],
+			1
+		],
+		"result": "a</<section>é\té\ude00"
+	},
+	{
+		"doc": "\t😀\n</h1>中文<section>\t",
+		"changes": [
+			3,
+			[
+				2,
+				"中文\té😀",
+				"x"
+			],
+			13,
+			[
+				3,
+				"<section>"
+			],
+			[
+				0,
+				"é😀",
+				"x",
+				"\t"
+			]
+		],
+		"result": "\t😀中文\té😀\nx/h1>中文<sectio<section>é😀\nx\n\t"
+	},
+	{
+		"doc": "\n",
+		"changes": [
+			[
+				1,
+				"\t<section> "
+			]
+		],
+		"result": "\t<section> "
+	},
+	{
+		"doc": "😀",
+		"changes": [
+			[
+				1,
+				"  "
+			],
+			1
+		],
+		"result": "  \ude00"
+	},
+	{
+		"doc": "éé😀\nx</h1><section><section><section><section>\n\n",
+		"changes": [
+			25,
+			[
+				1,
+				"é😀",
+				"x<section>"
+			],
+			23
+		],
+		"result": "éé😀\nx</h1><section><secté😀\nx<section>on><section><section>\n\n"
+	},
+	{
+		"doc": "a",
+		"changes": [
+			1,
+			[
+				0,
+				"</h1>"
+			]
+		],
+		"result": "a</h1>"
+	},
+	{
+		"doc": "\t",
+		"changes": [
+			[
+				0,
+				"a中文"
+			],
+			1
+		],
+		"result": "a中文\t"
+	},
+	{
+		"doc": "é😀\nx </h1>\t</h1>éaaa",
+		"changes": [
+			6,
+			[
+				3
+			],
+			5,
+			[
+				2,
+				"a",
+				"",
+				""
+			],
+			5
+		],
+		"result": "é😀\nx 1>\t</a\n\n>éaaa"
+	},
+	{
+		"doc": "中文😀</h1>\t中文é😀\nx</h1>\t\n<section> ",
+		"changes": [
+			11,
+			[
+				3,
+				"</h1>"
+			],
+			8,
+			[
+				2,
+				"\t"
+			],
+			[
+				2,
+				"中文 ",
+				""
+			],
+			8
+		],
+		"result": "中文😀</h1>\t中</h1>\ude00\nx</h1>\t中文 \nection> "
+	},
+	{
+		"doc": "é😀\nx\té😀\nxé😀中文<section>😀é😀\nx ",
+		"changes": [
+			16,
+			[
+				3,
+				"<section>"
+			],
+			1,
+			[
+				2
+			],
+			2,
+			[
+				0,
+				"</h1><section>a"
+			],
+			9
+		],
+		"result": "é😀\nx\té😀\nxé😀中文<section>con</h1><section>a>😀é😀\nx "
+	},
+	{
+		"doc": "aé",
+		"changes": [
+			[
+				1,
+				"\t"
+			],
+			1
+		],
+		"result": "\té"
+	},
+	{
+		"doc": "中文\t\naé😀\nx😀<section>",
+		"changes": [
+			2,
+			[
+				3,
+				"éaa"
+			],
+			[
+				2,
+				"</h1>"
+			],
+			14
+		],
+		"result": "中文éaa</h1>\ude00\nx😀<section>"
+	},
+	{
+		"doc": "😀😀中文</h1>",
+		"changes": [
+			[
+				3,
+				" <section>中文"
+			],
+			1,
+			[
+				2
+			],
+			2,
+			[
+				3
+			]
+		],
+		"result": " <section>中文\ude00</"
+	},
+	{
+		"doc": "é</h1>",
+		"changes": [
+			[
+				1,
+				"😀中文"
+			],
+			[
+				4
+			],
+			1
+		],
+		"result": "😀中文>"
+	},
+	{
+		"doc": "</h1>😀a\n  😀\t<section>éé😀\nx",
+		"changes": [
+			4,
+			[
+				4
+			],
+			6,
+			[
+				2,
+				"é😀",
+				"x"
+			],
+			13
+		],
+		"result": "</h1\n  😀\té😀\nxection>éé😀\nx"
+	},
+	{
+		"doc": "中文",
+		"changes": [
+			[
+				1
+			],
+			[
+				0,
+				"<section><section>😀<section>"
+			],
+			[
+				1
+			],
+			[
+				0,
+				"é😀",
+				"x\ta"
+			]
+		],
+		"result": "<section><section>😀<section>é😀\nx\ta"
+	},
+	{
+		"doc": "</h1><section></h1><section><section></h1>a",
+		"changes": [
+			[
+				2
+			],
+			14,
+			[
+				2,
+				"é😀",
+				"x"
+			],
+			21,
+			[
+				1
+			],
+			3
+		],
+		"result": "h1><section></é😀\nx><section><section></1>a"
+	},
+	{
+		"doc": "<section><section><section> é ",
+		"changes": [
+			17,
+			[
+				2,
+				"中文中文"
+			],
+			9,
+			[
+				0,
+				"é😀",
+				"x"
+			],
+			1,
+			[
+				1
+			]
+		],
+		"result": "<section><section中文中文section> é😀\nxé"
+	},
+	{
+		"doc": "\t中文\téa中文a<section>\té😀\nx ",
+		"changes": [
+			9,
+			[
+				2
+			],
+			10,
+			[
+				1,
+				"😀é"
+			],
+			3
+		],
+		"result": "\t中文\téa中文aection>\té\ud83d😀é\nx "
+	},
+	{
+		"doc": "😀",
+		"changes": [
+			1,
+			[
+				1,
+				" "
+			],
+			[
+				0,
+				"",
+				"<section>😀</h1>\t"
+			]
+		],
+		"result": "\ud83d \n<section>😀</h1>\t"
+	},
+	{
+		"doc": "中文é</h1>aé😀\nx ",
+		"changes": [
+			2,
+			[
+				2,
+				"</h1>é😀",
+				"x"
+			],
+			5,
+			[
+				3,
+				"é中文"
+			],
+			3
+		],
+		"result": "中文</h1>é😀\nx/h1>aé中文\nx "
+	},
+	{
+		"doc": " aaa中文aa</h1>a ",
+		"changes": [
+			[
+				1,
+				"é"
+			],
+			9,
+			[
+				1,
+				"<section></h1>"
+			],
+			[
+				2
+			],
+			2
+		],
+		"result": "éaaa中文aa</<section></h1>a "
+	},
+	{
+		"doc": "</h1>éé ",
+		"changes": [
+			2,
+			[
+				3,
+				"</h1>"
+			],
+			[
+				0,
+				"é😀",
+				"x",
+				"中文"
+			],
+			[
+				2
+			],
+			1
+		],
+		"result": "</</h1>é😀\nx\n中文 "
+	},
+	{
+		"doc": "\n",
+		"changes": [
+			[
+				1
+			],
+			[
+				0,
+				"中文"
+			]
+		],
+		"result": "中文"
+	},
+	{
+		"doc": "中文é😀\nx\n",
+		"changes": [
+			3,
+			[
+				1
+			],
+			1,
+			[
+				3,
+				"\t</h1>"
+			],
+			[
+				0,
+				"</h1>"
+			]
+		],
+		"result": "中文é\ude00\t</h1></h1>"
+	},
+	{
+		"doc": "é😀\nx<section>éa \n\n",
+		"changes": [
+			2,
+			[
+				2
+			],
+			15
+		],
+		"result": "é\ud83dx<section>éa \n\n"
+	},
+	{
+		"doc": "",
+		"changes": [
+			[
+				0,
+				"é😀",
+				"x"
+			]
+		],
+		"result": "é😀\nx"
+	},
+	{
+		"doc": "\taé\n\t",
+		"changes": [
+			[
+				3
+			],
+			[
+				2,
+				"<section>",
+				"é"
+			]
+		],
+		"result": "<section>\né"
+	},
+	{
+		"doc": "</h1></h1>中文</h1>é😀\nx</h1>",
+		"changes": [
+			10,
+			[
+				1,
+				"\t😀</h1>"
+			],
+			2,
+			[
+				2,
+				"<section>中文"
+			],
+			10,
+			[
+				1,
+				"<section>",
+				""
+			],
+			1
+		],
+		"result": "</h1></h1>\t😀</h1>文<<section>中文1>é😀\nx</h<section>\n>"
+	},
+	{
+		"doc": "<section>a",
+		"changes": [
+			[
+				0,
+				"</h1><section>",
+				""
+			],
+			10
+		],
+		"result": "</h1><section>\n<section>a"
+	},
+	{
+		"doc": " <section>\n 😀</h1>😀é\t\né",
+		"changes": [
+			[
+				4
+			],
+			12,
+			[
+				3
+			],
+			2,
+			[
+				0,
+				"<section>"
+			],
+			4
+		],
+		"result": "ction>\n 😀</😀<section>é\t\né"
+	},
+	{
+		"doc": "<section><section>a中文",
+		"changes": [
+			[
+				3,
+				"😀éa"
+			],
+			8,
+			[
+				3
+			],
+			1,
+			[
+				3,
+				"\t😀 "
+			],
+			3
+		],
+		"result": "😀éaction><si\t😀 a中文"
+	},
+	{
+		"doc": "é😀\nxé😀\nxaé😀\nxé😀\nx a\t😀</h1>\n",
+		"changes": [
+			9,
+			[
+				3,
+				"😀a"
+			],
+			20
+		],
+		"result": "é😀\nxé😀\n😀a😀\nxé😀\nx a\t😀</h1>\n"
+	},
+	{
+		"doc": "a中文\n中文中文 é\n😀",
+		"changes": [
+			8,
+			[
+				2,
+				"</h1>a"
+			],
+			3
+		],
+		"result": "a中文\n中文中文</h1>a\n😀"
+	},
+	{
+		"doc": "é😀\nxé😀\nx<section>\t😀<section>é中文é😀",
+		"changes": [
+			16,
+			[
+				2
+			],
+			5,
+			[
+				2,
+				"",
+				""
+			],
+			[
+				0,
+				"\t<section> "
+			],
+			12
+		],
+		"result": "é😀\nxé😀\nx<secti>\t😀<\n\t<section> ction>é中文é😀"
+	},
+	{
+		"doc": "<section>",
+		"changes": [
+			[
+				1,
+				"<section>"
+			],
+			3,
+			[
+				0,
+				"<section>中文中文"
+			],
+			3,
+			[
+				1,
+				"中文"
+			],
+			1
+		],
+		"result": "<section>sec<section>中文中文tio中文>"
+	},
+	{
+		"doc": "",
+		"changes": [],
+		"result": ""
+	},
+	{
+		"doc": "</h1><section>\né😀\nx</h1>\n \t",
+		"changes": [
+			11,
+			[
+				1
+			],
+			7,
+			[
+				1,
+				"中文😀"
+			],
+			8
+		],
+		"result": "</h1><sectin>\né😀\n中文😀</h1>\n \t"
+	},
+	{
+		"doc": " </h1>中文\t中文</h1></h1>",
+		"changes": [
+			18,
+			[
+				1
+			],
+			2
+		],
+		"result": " </h1>中文\t中文</h1></1>"
+	},
+	{
+		"doc": "é😀é\n中文<section> \t",
+		"changes": [
+			5,
+			[
+				3,
+				"a"
+			],
+			3,
+			[
+				2
+			],
+			[
+				3,
+				"😀"
+			],
+			[
+				2,
+				"</h1>中文"
+			]
+		],
+		"result": "é😀é\nasec😀</h1>中文"
+	},
+	{
+		"doc": "中文\ta\t",
+		"changes": [
+			[
+				1,
+				"</h1></h1>é"
+			],
+			4,
+			[
+				0,
+				"<section>",
+				"</h1>"
+			]
+		],
+		"result": "</h1></h1>é文\ta\t<section>\n</h1>"
+	},
+	{
+		"doc": "\t",
+		"changes": [
+			[
+				1
+			]
+		],
+		"result": ""
+	},
+	{
+		"doc": "中文é😀\nx\n é</h1><section></h1>\n<section>",
+		"changes": [
+			19,
+			[
+				2
+			],
+			6,
+			[
+				3
+			],
+			9
+		],
+		"result": "中文é😀\nx\n é</h1><secon></h<section>"
+	},
+	{
+		"doc": "é\ta",
+		"changes": [
+			1,
+			[
+				0,
+				"😀"
+			],
+			1,
+			[
+				1,
+				"中文éa"
+			]
+		],
+		"result": "é😀\t中文éa"
+	},
+	{
+		"doc": " </h1>a😀😀\t<section>é😀",
+		"changes": [
+			1,
+			[
+				2,
+				"中文"
+			],
+			15,
+			[
+				2,
+				"\t"
+			],
+			2,
+			[
+				2,
+				"é"
+			]
+		],
+		"result": " 中文h1>a😀😀\t<secti\t>éé"
+	},
+	{
+		"doc": " 中文😀 a\n</h1>é😀\nx中文  ",
+		"changes": [
+			17,
+			[
+				1
+			],
+			4,
+			[
+				0,
+				"中文",
+				""
+			]
+		],
+		"result": " 中文😀 a\n</h1>é😀\n中文  中文\n"
+	},
+	{
+		"doc": "é",
+		"changes": [
+			[
+				0,
+				" \t\t"
+			],
+			1
+		],
+		"result": " \t\té"
+	},
+	{
+		"doc": "<section>😀中文",
+		"changes": [
+			7,
+			[
+				3,
+				"中文 é"
+			],
+			3
+		],
+		"result": "<sectio中文 é\ude00中文"
+	},
+	{
+		"doc": "</h1>\t",
+		"changes": [
+			4,
+			[
+				1
+			],
+			1
+		],
+		"result": "</h1\t"
+	},
+	{
+		"doc": "\t😀aaé😀中文",
+		"changes": [
+			4,
+			[
+				3
+			],
+			[
+				1,
+				"</h1>a\t"
+			],
+			2
+		],
+		"result": "\t😀a</h1>a\t中文"
+	},
+	{
+		"doc": "</h1>",
+		"changes": [
+			[
+				1
+			],
+			1,
+			[
+				1,
+				"<section>a"
+			],
+			[
+				1
+			],
+			1
+		],
+		"result": "/<section>a>"
+	},
+	{
+		"doc": "中文\té😀\nx<section>é😀\nx",
+		"changes": [
+			21,
+			[
+				0,
+				"</h1>é😀",
+				"x",
+				""
+			],
+			1
+		],
+		"result": "中文\té😀\nx<section>é😀\n</h1>é😀\nx\nx"
+	},
+	{
+		"doc": "</h1>😀<section>😀\n<section>é",
+		"changes": [
+			10,
+			[
+				0,
+				"😀"
+			],
+			13,
+			[
+				0,
+				"é😀",
+				"x<section>a"
+			],
+			6
+		],
+		"result": "</h1>😀<se😀ction>😀\n<secé😀\nx<section>ation>é"
+	},
+	{
+		"doc": "éé\t😀</h1><section>",
+		"changes": [
+			3,
+			[
+				0,
+				"<section></h1>"
+			],
+			2,
+			[
+				2,
+				"<section>"
+			],
+			4,
+			[
+				1,
+				"",
+				"😀"
+			],
+			1,
+			[
+				3,
+				"\té😀",
+				"xé"
+			],
+			3
+		],
+		"result": "éé\t<section></h1>😀<section>h1><\n😀e\té😀\nxéon>"
+	},
+	{
+		"doc": "\t a</h1>中文😀éa<section>😀\t",
+		"changes": [
+			8,
+			[
+				1,
+				"\t",
+				""
+			],
+			7,
+			[
+				0,
+				"é😀",
+				"x"
+			],
+			4,
+			[
+				2,
+				"é😀",
+				"x 😀"
+			],
+			4
+		],
+		"result": "\t a</h1>\t\n文😀éa<sé😀\nxectié😀\nx 😀>😀\t"
+	},
+	{
+		"doc": "a",
+		"changes": [
+			1
+		],
+		"result": "a"
+	},
+	{
+		"doc": "",
+		"changes": [
+			[
+				0,
+				"",
+				""
+			]
+		],
+		"result": "\n"
+	},
+	{
+		"doc": "中文",
+		"changes": [
+			[
+				0,
+				"",
+				"😀"
+			],
+			1,
+			[
+				1
+			]
+		],
+		"result": "\n😀中"
+	},
+	{
+		"doc": "<section>",
+		"changes": [
+			4,
+			[
+				0,
+				"é中文"
+			],
+			5,
+			[
+				0,
+				"<section>é😀",
+				"x"
+			]
+		],
+		"result": "<secé中文tion><section>é😀\nx"
+	},
+	{
+		"doc": "éé😀\nx",
+		"changes": [
+			1,
+			[
+				0,
+				"a "
+			],
+			1,
+			[
+				3
+			],
+			[
+				1,
+				"a"
+			],
+			[
+				0,
+				"",
+				""
+			]
+		],
+		"result": "éa éa\n"
+	},
+	{
+		"doc": " <section>é😀\nx \té <section>",
+		"changes": [
+			5,
+			[
+				2
+			],
+			6,
+			[
+				0,
+				"</h1>中文😀"
+			],
+			15
+		],
+		"result": " <secon>é😀</h1>中文😀\nx \té <section>"
+	},
+	{
+		"doc": "</h1>",
+		"changes": [
+			5,
+			[
+				0,
+				"<section>"
+			]
+		],
+		"result": "</h1><section>"
+	},
+	{
+		"doc": "😀😀😀é中文",
+		"changes": [
+			9
+		],
+		"result": "😀😀😀é中文"
+	},
+	{
+		"doc": "<section></h1>é😀\nx中文<section> </h1><section>a😀é",
+		"changes": [
+			17,
+			[
+				3
+			],
+			8,
+			[
+				2
+			],
+			8,
+			[
+				3,
+				"",
+				""
+			],
+			6,
+			[
+				2
+			]
+		],
+		"result": "<section></h1>é😀文<sectio </h1><s\nion>a\ud83d"
+	},
+	{
+		"doc": "",
+		"changes": [],
+		"result": ""
+	},
+	{
+		"doc": "😀中文",
+		"changes": [
+			1,
+			[
+				2
+			],
+			1
+		],
+		"result": "\ud83d文"
+	},
+	{
+		"doc": "</h1>é é😀\nxaaa中文é😀\nx\n",
+		"changes": [
+			4,
+			[
+				1
+			],
+			11,
+			[
+				1
+			],
+			3,
+			[
+				1
+			],
+			2
+		],
+		"result": "</h1é é😀\nxaaa中é😀x\n"
+	},
+	{
+		"doc": "é😀\nx  a\n<section>é😀\nx",
+		"changes": [
+			21,
+			[
+				2,
+				"</h1>中文"
+			]
+		],
+		"result": "é😀\nx  a\n<section>é😀</h1>中文"
+	},
+	{
+		"doc": "a ",
+		"changes": [
+			2
+		],
+		"result": "a "
+	},
+	{
+		"doc": "\t😀a中文<section>éé😀\nx\n\né",
+		"changes": [
+			2,
+			[
+				3
+			],
+			13,
+			[
+				0,
+				"</h1></h1>😀"
+			],
+			[
+				3,
+				"é\t中文"
+			],
+			1,
+			[
+				0,
+				"😀"
+			],
+			2
+		],
+		"result": "\t\ud83d文<section>éé\ud83d</h1></h1>😀é\t中文\n😀\né"
+	},
+	{
+		"doc": "é😀\nx</h1>é😀\nxéé😀\nx\né😀\nxé",
+		"changes": [
+			2,
+			[
+				1
+			],
+			25
+		],
+		"result": "é\ud83d\nx</h1>é😀\nxéé😀\nx\né😀\nxé"
+	},
+	{
+		"doc": "\téé😀\nxa",
+		"changes": [
+			8
+		],
+		"result": "\téé😀\nxa"
+	},
+	{
+		"doc": "😀</h1></h1>",
+		"changes": [
+			[
+				3
+			],
+			[
+				0,
+				" "
+			],
+			5,
+			[
+				2,
+				"<section>a"
+			],
+			[
+				1
+			],
+			1
+		],
+		"result": " /h1><<section>a>"
+	},
+	{
+		"doc": "",
+		"changes": [
+			[
+				0,
+				"é😀",
+				"x é😀",
+				"xé😀",
+				"xé😀\t</h1>"
+			]
+		],
+		"result": "é😀\nx é😀\nxé😀\nxé😀\t</h1>"
+	},
+	{
+		"doc": "",
+		"changes": [],
+		"result": ""
+	},
+	{
+		"doc": "\né😀\nxa😀</h1>a",
+		"changes": [
+			3,
+			[
+				3
+			],
+			9
+		],
+		"result": "\né\ud83da😀</h1>a"
+	},
+	{
+		"doc": " <section>",
+		"changes": [
+			[
+				2,
+				"éé😀",
+				"x"
+			],
+			8
+		],
+		"result": "éé😀\nxsection>"
+	},
+	{
+		"doc": "\né😀\nx\na<section>",
+		"changes": [
+			13,
+			[
+				1,
+				" </h1>"
+			],
+			2,
+			[
+				1
+			]
+		],
+		"result": "\né😀\nx\na<sect </h1>on"
+	},
+	{
+		"doc": "中文a\n中文<section></h1><section>😀</h1>\n",
+		"changes": [
+			9,
+			[
+				0,
+				"</h1>é😀",
+				"x\t"
+			],
+			1,
+			[
+				1,
+				"é "
+			],
+			1,
+			[
+				2,
+				"<section>😀",
+				""
+			],
+			[
+				0,
+				"\t"
+			],
+			23
+		],
+		"result": "中文a\n中文<se</h1>é😀\nx\tcé i<section>😀\n\t></h1><section>😀</h1>\n"
+	},
+	{
+		"doc": "é😀\nx<section>\n😀\té\n",
+		"changes": [
+			1,
+			[
+				3,
+				"<section>"
+			],
+			15,
+			[
+				1
+			]
+		],
+		"result": "é<section>x<section>\n😀\té"
+	},
+	{
+		"doc": "a\t é😀\nxa中文éaé",
+		"changes": [
+			14
+		],
+		"result": "a\t é😀\nxa中文éaé"
+	},
+	{
+		"doc": "",
+		"changes": [
+			[
+				0,
+				"",
+				"\t中文"
+			]
+		],
+		"result": "\n\t中文"
+	},
+	{
+		"doc": "é a</h1></h1>\n</h1>😀",
+		"changes": [
+			3,
+			[
+				2,
+				"é😀",
+				"x</h1>"
+			],
+			8,
+			[
+				2
+			],
+			6
+		],
+		"result": "é aé😀\nx</h1>h1></h1>/h1>😀"
+	},
+	{
+		"doc": "é\n",
+		"changes": [
+			[
+				0,
+				"é😀",
+				"x"
+			],
+			2
+		],
+		"result": "é😀\nxé\n"
+	},
+	{
+		"doc": "<section>\t\té中文中文\té",
+		"changes": [
+			6,
+			[
+				1,
+				"😀é😀",
+				"x"
+			],
+			[
+				1
+			],
+			10
+		],
+		"result": "<secti😀é😀\nx>\t\té中文中文\té"
+	},
+	{
+		"doc": "",
+		"changes": [
+			[
+				0,
+				"😀"
+			]
+		],
+		"result": "😀"
+	},
+	{
+		"doc": "aé😀\nxéé😀 ",
+		"changes": [
+			1,
+			[
+				1
+			],
+			9,
+			[
+				0,
+				"é"
+			]
+		],
+		"result": "a😀\nxéé😀 é"
+	},
+	{
+		"doc": " 😀😀\n😀中文",
+		"changes": [
+			8,
+			[
+				1
+			],
+			1
+		],
+		"result": " 😀😀\n😀文"
+	},
+	{
+		"doc": "\té😀\nxé😀\nx<section>中文",
+		"changes": [
+			14,
+			[
+				2,
+				"中文中文😀"
+			],
+			6
+		],
+		"result": "\té😀\nxé😀\nx<se中文中文😀ion>中文"
+	},
+	{
+		"doc": "\n😀😀a中文<section>éé😀\nx<section>😀\t",
+		"changes": [
+			6,
+			[
+				3,
+				"</h1>"
+			],
+			7,
+			[
+				0,
+				"aé😀",
+				"x"
+			],
+			19
+		],
+		"result": "\n😀😀a</h1>sectionaé😀\nx>éé😀\nx<section>😀\t"
+	},
+	{
+		"doc": "é中文é",
+		"changes": [
+			[
+				1
+			],
+			3
+		],
+		"result": "中文é"
+	},
+	{
+		"doc": "中文中文</h1>😀é😀\nx😀</h1>",
+		"changes": [
+			5,
+			[
+				1,
+				"aé😀",
+				"xé"
+			],
+			17
+		],
+		"result": "中文中文<aé😀\nxéh1>😀é😀\nx😀</h1>"
+	},
+	{
+		"doc": "é😀\nx",
+		"changes": [
+			3,
+			[
+				0,
+				"<section>"
+			],
+			2
+		],
+		"result": "é😀<section>\nx"
+	},
+	{
+		"doc": "中文 </h1>é\t\t\né😀\nx</h1>\n😀",
+		"changes": [
+			25,
+			[
+				0,
+				" a"
+			]
+		],
+		"result": "中文 </h1>é\t\t\né😀\nx</h1>\n😀 a"
+	},
+	{
+		"doc": "</h1>\t\n😀 a<section>😀\t<section>",
+		"changes": [
+			20,
+			[
+				1
+			],
+			11
+		],
+		"result": "</h1>\t\n😀 a<section>\ude00\t<section>"
+	},
+	{
+		"doc": "\t",
+		"changes": [
+			1,
+			[
+				0,
+				"a a"
+			]
+		],
+		"result": "\ta a"
+	},
+	{
+		"doc": "中文</h1> </h1>é😀\nxé😀\nxé<section>\na",
+		"changes": [
+			13,
+			[
+				3
+			],
+			11,
+			[
+				0,
+				"",
+				"😀中文"
+			],
+			8
+		],
+		"result": "中文</h1> </h1>\nxé😀\nxé<se\n😀中文ction>\na"
+	},
+	{
+		"doc": "éé😀\nxa",
+		"changes": [
+			3,
+			[
+				1,
+				"\t</h1>中文"
+			],
+			[
+				2,
+				"</h1>\t"
+			],
+			[
+				1,
+				"a"
+			]
+		],
+		"result": "éé\ud83d\t</h1>中文</h1>\ta"
+	},
+	{
+		"doc": "é😀\nx</h1>é😀\nx",
+		"changes": [
+			13,
+			[
+				1
+			],
+			1
+		],
+		"result": "é😀\nx</h1>é😀x"
+	},
+	{
+		"doc": "é😀\nxé😀\nx中文<section>😀😀a",
+		"changes": [
+			6,
+			[
+				0,
+				"",
+				"<section>"
+			],
+			20
+		],
+		"result": "é😀\nxé\n<section>😀\nx中文<section>😀😀a"
+	},
+	{
+		"doc": "é ",
+		"changes": [
+			2
+		],
+		"result": "é "
+	},
+	{
+		"doc": "",
+		"changes": [],
+		"result": ""
+	},
+	{
+		"doc": "a😀</h1></h1>\t中文\n</h1>a中文a",
+		"changes": [
+			9,
+			[
+				0,
+				"é😀",
+				"x"
+			],
+			12,
+			[
+				2,
+				"é\t"
+			],
+			3
+		],
+		"result": "a😀</h1><é😀\nx/h1>\t中文\n</h1é\t中文a"
+	},
+	{
+		"doc": "\né",
+		"changes": [
+			[
+				2
+			],
+			[
+				0,
+				"\t<section>é😀",
+				"x"
+			]
+		],
+		"result": "\t<section>é😀\nx"
+	},
+	{
+		"doc": "\t\n",
+		"changes": [
+			[
+				1,
+				"\t 中文"
+			],
+			[
+				1
+			],
+			[
+				0,
+				"<section></h1></h1>"
+			]
+		],
+		"result": "\t 中文<section></h1></h1>"
+	},
+	{
+		"doc": "",
+		"changes": [
+			[
+				0,
+				"\t中文\t"
+			]
+		],
+		"result": "\t中文\t"
+	},
+	{
+		"doc": "é😀\nxé😀\nx😀é😀\nxé😀\nx中文a",
+		"changes": [
+			9,
+			[
+				3
+			],
+			6,
+			[
+				2,
+				" a"
+			],
+			5
+		],
+		"result": "é😀\nxé😀\né😀\nxé a\nx中文a"
+	},
+	{
+		"doc": "é",
+		"changes": [
+			1,
+			[
+				0,
+				"aé😀",
+				"xé😀",
+				"xé</h1>"
+			]
+		],
+		"result": "éaé😀\nxé😀\nxé</h1>"
+	},
+	{
+		"doc": "\n<section>😀 aaé😀\nx</h1>\n",
+		"changes": [
+			21,
+			[
+				2,
+				"",
+				"😀"
+			],
+			3
+		],
+		"result": "\n<section>😀 aaé😀\nx<\n😀1>\n"
+	},
+	{
+		"doc": "é\t</h1>",
+		"changes": [
+			7
+		],
+		"result": "é\t</h1>"
+	},
+	{
+		"doc": "a<section>éa",
+		"changes": [
+			3,
+			[
+				3,
+				"",
+				"</h1>"
+			],
+			4,
+			[
+				0,
+				"</h1>aa"
+			],
+			2
+		],
+		"result": "a<s\n</h1>ion></h1>aaéa"
+	},
+	{
+		"doc": "</h1>\t\né😀\nx\n中文é😀\nx中文",
+		"changes": [
+			13,
+			[
+				0,
+				"<section>😀"
+			],
+			1,
+			[
+				3
+			],
+			5
+		],
+		"result": "</h1>\t\né😀\nx\n<section>😀中\ude00\nx中文"
+	},
+	{
+		"doc": "\t<section>中文é<section>😀 </h1>",
+		"changes": [
+			[
+				3
+			],
+			1,
+			[
+				1
+			],
+			9,
+			[
+				0,
+				" 😀"
+			],
+			6,
+			[
+				0,
+				"é😀",
+				"x中文é"
+			],
+			10
+		],
+		"result": "etion>中文é< 😀sectioé😀\nx中文én>😀 </h1>"
+	},
+	{
+		"doc": "",
+		"changes": [
+			[
+				0,
+				"",
+				""
+			]
+		],
+		"result": "\n"
+	},
+	{
+		"doc": "</h1>é</h1>éé",
+		"changes": [
+			4,
+			[
+				0,
+				"é",
+				"😀"
+			],
+			9
+		],
+		"result": "</h1é\n😀>é</h1>éé"
+	},
+	{
+		"doc": "中文a\t",
+		"changes": [
+			2,
+			[
+				1
+			],
+			1
+		],
+		"result": "中文\t"
+	},
+	{
+		"doc": "<section>\t</h1>\ta😀\t",
+		"changes": [
+			3,
+			[
+				2
+			],
+			1,
+			[
+				3
+			],
+			6,
+			[
+				0,
+				"<section>\t😀"
+			],
+			5
+		],
+		"result": "<sei\t</h1><section>\t😀\ta😀\t"
+	},
+	{
+		"doc": "中文\n<section></h1></h1>\t ",
+		"changes": [
+			2,
+			[
+				0,
+				"中文é😀",
+				"xé"
+			],
+			3,
+			[
+				3,
+				"é",
+				""
+			],
+			9,
+			[
+				1
+			],
+			6
+		],
+		"result": "中文中文é😀\nxé\n<sé\nion></h1>/h1>\t "
+	},
+	{
+		"doc": "\n</h1>a</h1>😀中文</h1>é",
+		"changes": [
+			7,
+			[
+				3
+			],
+			10,
+			[
+				2
+			]
+		],
+		"result": "\n</h1>a1>😀中文</h1"
+	},
+	{
+		"doc": "é😀\naé😀\nx😀 <section></h1>é\t",
+		"changes": [
+			2,
+			[
+				1,
+				"中文é"
+			],
+			5,
+			[
+				2
+			],
+			15,
+			[
+				3
+			],
+			1
+		],
+		"result": "é\ud83d中文é\naé😀😀 <section></h\t"
+	},
+	{
+		"doc": "</h1>é\n\n😀</h1>é😀\nxé中文\n",
+		"changes": [
+			[
+				2,
+				"",
+				""
+			],
+			16,
+			[
+				0,
+				"",
+				""
+			],
+			6
+		],
+		"result": "\nh1>é\n\n😀</h1>é😀\n\nxé中文\n"
+	},
+	{
+		"doc": "",
+		"changes": [
+			[
+				0,
+				"</h1> 😀😀"
+			]
+		],
+		"result": "</h1> 😀😀"
+	},
+	{
+		"doc": "\n\na中文😀<section>é\n😀é😀\nx",
+		"changes": [
+			8,
+			[
+				2,
+				"é😀",
+				"x a"
+			],
+			11,
+			[
+				3
+			],
+			1
+		],
+		"result": "\n\na中文😀<é😀\nx action>é\n😀éx"
+	},
+	{
+		"doc": "é😀\nx\n",
+		"changes": [
+			[
+				4
+			],
+			2,
+			[
+				0,
+				"<section>",
+				"</h1>"
+			]
+		],
+		"result": "x\n<section>\n</h1>"
+	},
+	{
+		"doc": "\ta<section>中文a😀é😀",
+		"changes": [
+			4,
+			[
+				3
+			],
+			2,
+			[
+				2
+			],
+			7,
+			[
+				1,
+				"aé",
+				""
+			]
+		],
+		"result": "\ta<sio中文a😀é\ud83daé\n"
+	},
+	{
+		"doc": "é ",
+		"changes": [
+			[
+				2
+			]
+		],
+		"result": ""
+	},
+	{
+		"doc": "\t\taaé😀\nx\t中文é\n",
+		"changes": [
+			2,
+			[
+				1
+			],
+			7,
+			[
+				3
+			],
+			[
+				0,
+				"</h1></h1>é"
+			],
+			1
+		],
+		"result": "\t\taé😀\nx\t</h1></h1>é\n"
+	},
+	{
+		"doc": "é😀\nx",
+		"changes": [
+			1,
+			[
+				4
+			]
+		],
+		"result": "é"
+	},
+	{
+		"doc": "中文😀中文 😀😀éaaa中文",
+		"changes": [
+			6,
+			[
+				3,
+				"</h1>éé😀",
+				"x"
+			],
+			8
+		],
+		"result": "中文😀中文</h1>éé😀\nx😀éaaa中文"
+	},
+	{
+		"doc": "\t</h1>\né😀\nxa</h1>é",
+		"changes": [
+			14,
+			[
+				1
+			],
+			4
+		],
+		"result": "\t</h1>\né😀\nxa<h1>é"
+	},
+	{
+		"doc": "aaa\t\na中文",
+		"changes": [
+			[
+				0,
+				"中文中文",
+				""
+			],
+			1,
+			[
+				2,
+				"</h1> "
+			],
+			2,
+			[
+				2
+			],
+			1
+		],
+		"result": "中文中文\na</h1> \t\n文"
+	},
+	{
+		"doc": "ééé😀\nx中文\né éa😀a",
+		"changes": [
+			3,
+			[
+				1,
+				"</h1> "
+			],
+			4,
+			[
+				2,
+				" "
+			],
+			[
+				0,
+				"é\t"
+			],
+			7
+		],
+		"result": "ééé</h1> \ude00\nx中 é\té éa😀a"
+	},
+	{
+		"doc": " 中文<section>",
+		"changes": [
+			6,
+			[
+				1,
+				"😀中文"
+			],
+			1,
+			[
+				2,
+				"a",
+				""
+			],
+			[
+				2,
+				"é😀",
+				"x"
+			]
+		],
+		"result": " 中文<se😀中文ta\né😀\nx"
+	},
+	{
+		"doc": "aé😀\nx\n",
+		"changes": [
+			3,
+			[
+				0,
+				"\t😀😀"
+			],
+			[
+				2
+			],
+			1,
+			[
+				1
+			],
+			[
+				0,
+				"\t😀"
+			]
+		],
+		"result": "aé\ud83d\t😀😀x\t😀"
+	},
+	{
+		"doc": "",
+		"changes": [
+			[
+				0,
+				"a ",
+				""
+			]
+		],
+		"result": "a \n"
+	},
+	{
+		"doc": "<section></h1></h1>",
+		"changes": [
+			[
+				3
+			],
+			[
+				0,
+				"\t"
+			],
+			1,
+			[
+				1,
+				"中文<section>"
+			],
+			4,
+			[
+				3,
+				"ééa"
+			],
+			7
+		],
+		"result": "\tc中文<section>ion>ééa1></h1>"
+	},
+	{
+		"doc": " \n中文\taé😀\nx",
+		"changes": [
+			3,
+			[
+				1
+			],
+			7
+		],
+		"result": " \n中\taé😀\nx"
+	},
+	{
+		"doc": "</h1>\té😀\nx\n\n中文",
+		"changes": [
+			9,
+			[
+				1,
+				"",
+				"",
+				""
+			],
+			[
+				1,
+				"\t"
+			],
+			1,
+			[
+				0,
+				" </h1> "
+			],
+			[
+				3,
+				"</h1>😀"
+			]
+		],
+		"result": "</h1>\té😀\n\n\t\n </h1> </h1>😀"
+	},
+	{
+		"doc": "é<section><section>é",
+		"changes": [
+			20,
+			[
+				0,
+				"a "
+			]
+		],
+		"result": "é<section><section>éa "
+	},
+	{
+		"doc": "\té😀\nx中文é😀\nx",
+		"changes": [
+			6,
+			[
+				1,
+				"a",
+				"",
+				""
+			],
+			1,
+			[
+				1,
+				"中文"
+			],
+			[
+				1,
+				"😀"
+			],
+			1,
+			[
+				2
+			]
+		],
+		"result": "\té😀\nxa\n\n文中文😀\ude00"
+	},
+	{
+		"doc": "中文éé😀\nx",
+		"changes": [
+			1,
+			[
+				1
+			],
+			2,
+			[
+				1,
+				" "
+			],
+			3
+		],
+		"result": "中éé \ude00\nx"
+	},
+	{
+		"doc": "é😀\nxé",
+		"changes": [
+			[
+				2,
+				"é</h1>中文"
+			],
+			4
+		],
+		"result": "é</h1>中文\ude00\nxé"
+	},
+	{
+		"doc": "</h1>中文\t\t<section>\t😀</h1>中文\n中文",
+		"changes": [
+			1,
+			[
+				1,
+				"\ta<section>"
+			],
+			6,
+			[
+				2,
+				"",
+				"",
+				""
+			],
+			19,
+			[
+				0,
+				"<section>a "
+			],
+			2
+		],
+		"result": "<\ta<section>h1>中文\t\n\nsection>\t😀</h1>中文\n<section>a 中文"
+	},
+	{
+		"doc": "éé😀\nx</h1></h1>",
+		"changes": [
+			3,
+			[
+				0,
+				"中文<section>"
+			],
+			1,
+			[
+				3
+			],
+			9
+		],
+		"result": "éé\ud83d中文<section>\ude00/h1></h1>"
+	},
+	{
+		"doc": "<section> ",
+		"changes": [
+			5,
+			[
+				1,
+				"",
+				""
+			],
+			2,
+			[
+				2
+			]
+		],
+		"result": "<sect\non"
+	},
+	{
+		"doc": "<section></h1>é😀\nxé😀\nxé😀\t</h1>中文",
+		"changes": [
+			10,
+			[
+				3
+			],
+			1,
+			[
+				1,
+				"",
+				"<section>"
+			],
+			[
+				1,
+				"é😀",
+				"x<section>",
+				""
+			],
+			19
+		],
+		"result": "<section><>\n<section>é😀\nx<section>\n\ude00\nxé😀\nxé😀\t</h1>中文"
+	},
+	{
+		"doc": "",
+		"changes": [
+			[
+				0,
+				"中文",
+				""
+			]
+		],
+		"result": "中文\n"
+	},
+	{
+		"doc": "中文é😀\nx<section>é😀\nx\n中文é",
+		"changes": [
+			1,
+			[
+				0,
+				"<section>中文😀"
+			],
+			20,
+			[
+				3
+			],
+			1
+		],
+		"result": "中<section>中文😀文é😀\nx<section>é😀\nxé"
+	},
+	{
+		"doc": "中文aé😀\nx </h1>\t</h1>",
+		"changes": [
+			9,
+			[
+				2
+			],
+			5,
+			[
+				0,
+				"",
+				""
+			],
+			4
+		],
+		"result": "中文aé😀\nx h1>\t<\n/h1>"
+	},
+	{
+		"doc": " \n 😀",
+		"changes": [
+			2,
+			[
+				2
+			],
+			1
+		],
+		"result": " \n\ude00"
+	},
+	{
+		"doc": "é",
+		"changes": [
+			1,
+			[
+				0,
+				"\t"
+			]
+		],
+		"result": "é\t"
+	},
+	{
+		"doc": "é</h1>😀é<section>é😀\nx<section> a",
+		"changes": [
+			2,
+			[
+				3
+			],
+			3,
+			[
+				0,
+				"😀 <section>"
+			],
+			6,
+			[
+				2,
+				"</h1>"
+			],
+			18
+		],
+		"result": "é<>😀😀 <section>é<sect</h1>n>é😀\nx<section> a"
+	},
+	{
+		"doc": "😀😀é😀\nx é😀\nx\né😀\nxé😀\nx\n",
+		"changes": [
+			12,
+			[
+				3,
+				"a"
+			],
+			5,
+			[
+				1
+			],
+			6
+		],
+		"result": "😀😀é😀\nx é\ud83da\né😀\né😀\nx\n"
+	},
+	{
+		"doc": "\t😀a aa中文中文",
+		"changes": [
+			2,
+			[
+				0,
+				"\t "
+			],
+			8,
+			[
+				1
+			]
+		],
+		"result": "\t\ud83d\t \ude00a aa中文中"
+	},
+	{
+		"doc": "a中文<section>a",
+		"changes": [
+			4,
+			[
+				0,
+				"é😀",
+				"x中文\t"
+			],
+			4,
+			[
+				2
+			],
+			1,
+			[
+				1
+			],
+			1
+		],
+		"result": "a中文<é😀\nx中文\tsectna"
+	},
+	{
+		"doc": "😀</h1> \né中文 ",
+		"changes": [
+			6,
+			[
+				1,
+				" 中文 "
+			],
+			[
+				3
+			],
+			3
+		],
+		"result": "😀</h1 中文 中文 "
+	},
+	{
+		"doc": "",
+		"changes": [],
+		"result": ""
+	},
+	{
+		"doc": "é😀\nxé😀\nxa\n中文<section>é",
+		"changes": [
+			6,
+			[
+				1
+			],
+			3,
+			[
+				0,
+				"é😀",
+				"xé😀",
+				"x"
+			],
+			14
+		],
+		"result": "é😀\nxé\ude00\nxé😀\nxé😀\nxa\n中文<section>é"
+	},
+	{
+		"doc": "</h1><section>\n😀éé😀\nx</h1>",
+		"changes": [
+			9,
+			[
+				3,
+				"<section>😀"
+			],
+			3,
+			[
+				2
+			],
+			11
+		],
+		"result": "</h1><sec<section>😀n>\néé😀\nx</h1>"
+	},
+	{
+		"doc": "\n<section> \n😀éé😀\nx",
+		"changes": [
+			7,
+			[
+				1
+			],
+			1,
+			[
+				2,
+				"a</h1>"
+			],
+			9
+		],
+		"result": "\n<sectina</h1>\n😀éé😀\nx"
+	},
+	{
+		"doc": "é😀\nx</h1> a\n",
+		"changes": [
+			12,
+			[
+				1,
+				"",
+				" \t"
+			]
+		],
+		"result": "é😀\nx</h1> a\n \t"
+	},
+	{
+		"doc": "😀中文</h1>😀 <section> ",
+		"changes": [
+			7,
+			[
+				2
+			],
+			13
+		],
+		"result": "😀中文</h😀 <section> "
+	},
+	{
+		"doc": "😀\té<section>",
+		"changes": [
+			10,
+			[
+				3
+			]
+		],
+		"result": "😀\té<secti"
+	},
+	{
+		"doc": "</h1>中文\t😀\n</h1>😀a \n",
+		"changes": [
+			13,
+			[
+				1,
+				"a</h1>"
+			],
+			3,
+			[
+				3
+			],
+			[
+				0,
+				"</h1>a"
+			],
+			1
+		],
+		"result": "</h1>中文\t😀\n</a</h1>1>\ud83d</h1>a\n"
+	},
+	{
+		"doc": "\n中文<section>😀éé😀\nxé😀\nxa😀😀",
+		"changes": [
+			1,
+			[
+				3,
+				"</h1>é😀",
+				"x"
+			],
+			1,
+			[
+				1,
+				"😀"
+			],
+			3,
+			[
+				3,
+				"",
+				""
+			],
+			4,
+			[
+				3
+			],
+			11
+		],
+		"result": "\n</h1>é😀\nxs😀cti\n😀ééxé😀\nxa😀😀"
+	},
+	{
+		"doc": "é😀\nx\té😀\nx</h1> a</h1>\t😀<section>",
+		"changes": [
+			24,
+			[
+				1
+			],
+			10
+		],
+		"result": "é😀\nx\té😀\nx</h1> a</h1>\t\ude00<section>"
+	},
+	{
+		"doc": "😀😀中文é😀\nxé中文",
+		"changes": [
+			5,
+			[
+				2,
+				"a"
+			],
+			4,
+			[
+				2,
+				"中文</h1>é"
+			],
+			1
+		],
+		"result": "😀😀中a😀\nx中文</h1>é文"
+	},
+	{
+		"doc": "\naé\né😀\nx😀中文中文é😀\nx\t",
+		"changes": [
+			3,
+			[
+				0,
+				" é "
+			],
+			18
+		],
+		"result": "\naé é \né😀\nx😀中文中文é😀\nx\t"
+	},
+	{
+		"doc": "a\n<section></h1>\n<section>中文<section> é",
+		"changes": [
+			39
+		],
+		"result": "a\n<section></h1>\n<section>中文<section> é"
+	},
+	{
+		"doc": "é😀\nx",
+		"changes": [
+			3,
+			[
+				2,
+				"\t😀"
+			],
+			[
+				0,
+				"aéé😀",
+				"x",
+				"中文aa\t"
+			]
+		],
+		"result": "é😀\t😀aéé😀\nx\n中文aa\t"
+	},
+	{
+		"doc": "<section>😀😀\né😀\nxé😀\nxé",
+		"changes": [
+			6,
+			[
+				1,
+				"中文"
+			],
+			12,
+			[
+				3,
+				"é"
+			],
+			3
+		],
+		"result": "<secti中文n>😀😀\né😀\nxé\nxé"
+	},
+	{
+		"doc": "\té😀\nx<section></h1>中文é<section></h1>",
+		"changes": [
+			14,
+			[
+				3
+			],
+			[
+				1,
+				" <section>"
+			],
+			9,
+			[
+				1,
+				"é "
+			],
+			9
+		],
+		"result": "\té😀\nx<section <section>1>中文é<secé ion></h1>"
+	},
+	{
+		"doc": "é😀\nx\n中文中文é\né</h1>😀\t",
+		"changes": [
+			3,
+			[
+				2
+			],
+			[
+				1,
+				"<section>"
+			],
+			15
+		],
+		"result": "é😀<section>中文中文é\né</h1>😀\t"
+	},
+	{
+		"doc": "aé\t",
+		"changes": [
+			2,
+			[
+				0,
+				"",
+				""
+			],
+			1
+		],
+		"result": "aé\n\t"
+	},
+	{
+		"doc": "\t😀😀",
+		"changes": [
+			1,
+			[
+				0,
+				"\t😀</h1>"
+			],
+			2,
+			[
+				2
+			]
+		],
+		"result": "\t\t😀</h1>😀"
+	},
+	{
+		"doc": "\na</h1>é😀\nx",
+		"changes": [
+			[
+				0,
+				"</h1>"
+			],
+			12
+		],
+		"result": "</h1>\na</h1>é😀\nx"
+	},
+	{
+		"doc": "\n 中文中文 é",
+		"changes": [
+			4,
+			[
+				0,
+				"é😀",
+				"x",
+				""
+			],
+			2,
+			[
+				2,
+				"\té😀",
+				"xé"
+			]
+		],
+		"result": "\n 中文é😀\nx\n中文\té😀\nxé"
+	},
+	{
+		"doc": " 😀é</h1>é😀\nx\t中文\t中文",
+		"changes": [
+			12,
+			[
+				2
+			],
+			6,
+			[
+				0,
+				"😀"
+			]
+		],
+		"result": " 😀é</h1>é😀\t中文\t中文😀"
+	},
+	{
+		"doc": "\té\t",
+		"changes": [
+			2,
+			[
+				1
+			]
+		],
+		"result": "\té"
+	},
+	{
+		"doc": "",
+		"changes": [],
+		"result": ""
+	},
+	{
+		"doc": "é😀\nx😀中文\t",
+		"changes": [
+			4,
+			[
+				0,
+				"",
+				"</h1>"
+			],
+			2,
+			[
+				1
+			],
+			3
+		],
+		"result": "é😀\n\n</h1>x\ud83d中文\t"
+	},
+	{
+		"doc": "</h1>é😀\nx中文中文",
+		"changes": [
+			12,
+			[
+				2,
+				"<section></h1>a"
+			],
+			[
+				0,
+				"\t</h1>中文"
+			]
+		],
+		"result": "</h1>é😀\nx中文<section></h1>a\t</h1>中文"
+	},
+	{
+		"doc": "😀éé<section><section><section>\t ",
+		"changes": [
+			24,
+			[
+				3,
+				"aé😀",
+				"x"
+			],
+			3,
+			[
+				0,
+				"é😀",
+				"x é😀",
+				"x"
+			],
+			3
+		],
+		"result": "😀éé<section><section><saé😀\nxioné😀\nx é😀\nx>\t "
+	},
+	{
+		"doc": "</h1>",
+		"changes": [
+			4,
+			[
+				1,
+				"<section>"
+			]
+		],
+		"result": "</h1<section>"
+	},
+	{
+		"doc": "\n😀é😀\nx</h1>é😀\nxé😀😀\n\n中文",
+		"changes": [
+			5,
+			[
+				2
+			],
+			7,
+			[
+				2,
+				"\taa"
+			],
+			[
+				1
+			],
+			10
+		],
+		"result": "\n😀é\ud83dx</h1>é\taaxé😀😀\n\n中文"
+	},
+	{
+		"doc": "<section>é\t😀</h1>a",
+		"changes": [
+			3,
+			[
+				2
+			],
+			6,
+			[
+				1
+			],
+			3,
+			[
+				1
+			],
+			3
+		],
+		"result": "<seion>é\t\ude00</1>a"
+	},
+	{
+		"doc": "中文中文a 中文😀\t<section>😀中文",
+		"changes": [
+			7,
+			[
+				0,
+				"😀中文"
+			],
+			17
+		],
+		"result": "中文中文a 中😀中文文😀\t<section>😀中文"
+	},
+	{
+		"doc": "\n中文\n<section>é<section><section> é😀\nx</h1>",
+		"changes": [
+			7,
+			[
+				2
+			],
+			21,
+			[
+				3,
+				"</h1> ",
+				""
+			],
+			[
+				2
+			],
+			3,
+			[
+				1,
+				"  😀"
+			],
+			4
+		],
+		"result": "\n中文\n<seion>é<section><sectio</h1> \n\ude00\nx  😀/h1>"
+	},
+	{
+		"doc": "é😀\nx</h1><section>é",
+		"changes": [
+			3,
+			[
+				2
+			],
+			1,
+			[
+				1,
+				"<section>"
+			],
+			3,
+			[
+				2,
+				"中文é"
+			],
+			5,
+			[
+				0,
+				"é"
+			],
+			3
+		],
+		"result": "é😀<<section>h1>中文éectioén>é"
+	},
+	{
+		"doc": "é😀\nx</h1>",
+		"changes": [
+			1,
+			[
+				3,
+				"a中文"
+			],
+			4,
+			[
+				1
+			],
+			1
+		],
+		"result": "éa中文x</h>"
+	},
+	{
+		"doc": "\taé😀\nx中文</h1>\n",
+		"changes": [
+			[
+				0,
+				"a",
+				"é😀",
+				"x"
+			],
+			1,
+			[
+				1
+			],
+			13
+		],
+		"result": "a\né😀\nx\té😀\nx中文</h1>\n"
+	},
+	{
+		"doc": "<section><section>\n\n<section>é\n\na</h1>",
+		"changes": [
+			8,
+			[
+				3
+			],
+			10,
+			[
+				3,
+				"<section>"
+			],
+			14
+		],
+		"result": "<sectionection>\n\n<<section>tion>é\n\na</h1>"
+	},
+	{
+		"doc": "",
+		"changes": [
+			[
+				0,
+				"😀"
+			]
+		],
+		"result": "😀"
+	},
+	{
+		"doc": "😀",
+		"changes": [
+			[
+				2
+			]
+		],
+		"result": ""
+	},
+	{
+		"doc": "éé😀\nx",
+		"changes": [
+			2,
+			[
+				0,
+				"<section>",
+				""
+			],
+			3,
+			[
+				1,
+				"中文"
+			]
+		],
+		"result": "éé<section>\n😀\n中文"
+	},
+	{
+		"doc": "é \t中文\t\n",
+		"changes": [
+			3,
+			[
+				2
+			],
+			2
+		],
+		"result": "é \t\t\n"
+	},
+	{
+		"doc": "",
+		"changes": [
+			[
+				0,
+				"\t中文é😀",
+				"x"
+			]
+		],
+		"result": "\t中文é😀\nx"
+	},
+	{
+		"doc": "</h1>é😀\nx\né</h1>",
+		"changes": [
+			1,
+			[
+				1
+			],
+			9,
+			[
+				5
+			],
+			1
+		],
+		"result": "<h1>é😀\nx\n>"
+	},
+	{
+		"doc": "中文</h1>\t😀中文é😀\nx",
+		"changes": [
+			3,
+			[
+				3
+			],
+			1,
+			[
+				2,
+				"😀é"
+			],
+			6,
+			[
+				2
+			]
+		],
+		"result": "中文<>😀é\ude00中文é😀"
+	},
+	{
+		"doc": "😀\t\t</h1></h1>",
+		"changes": [
+			14,
+			[
+				0,
+				"a😀"
+			]
+		],
+		"result": "😀\t\t</h1></h1>a😀"
+	},
+	{
+		"doc": "é\n",
+		"changes": [
+			[
+				2,
+				"<section>"
+			]
+		],
+		"result": "<section>"
+	},
+	{
+		"doc": "  é😀\nx\t\né\té😀\nx",
+		"changes": [
+			11,
+			[
+				1
+			],
+			4,
+			[
+				0,
+				"\t中文"
+			]
+		],
+		"result": "  é😀\nx\t\né\t😀\nx\t中文"
+	},
+	{
+		"doc": "😀",
+		"changes": [
+			[
+				2,
+				"中文</h1>"
+			],
+			[
+				0,
+				" </h1>"
+			]
+		],
+		"result": "中文</h1> </h1>"
+	},
+	{
+		"doc": "é ",
+		"changes": [
+			1,
+			[
+				1,
+				"é😀",
+				"x"
+			]
+		],
+		"result": "éé😀\nx"
+	},
+	{
+		"doc": " é😀\n",
+		"changes": [
+			[
+				1,
+				"a"
+			],
+			3,
+			[
+				1
+			],
+			[
+				0,
+				"a<section>"
+			]
+		],
+		"result": "aé😀a<section>"
+	},
+	{
+		"doc": "中文<section>中文😀中文aa<section>\t\n\t",
+		"changes": [
+			14,
+			[
+				2
+			],
+			1,
+			[
+				3,
+				"é<section>"
+			],
+			[
+				0,
+				"<section>😀"
+			],
+			11
+		],
+		"result": "中文<section>中文\ud83d文é<section><section>😀section>\t\n\t"
+	},
+	{
+		"doc": "<section>a\té </h1>",
+		"changes": [
+			1,
+			[
+				3
+			],
+			10,
+			[
+				1,
+				"a"
+			],
+			[
+				2,
+				"aé😀",
+				"x"
+			],
+			1
+		],
+		"result": "<tion>a\té <aaé😀\nx>"
+	},
+	{
+		"doc": "中文a😀中文é",
+		"changes": [
+			3,
+			[
+				2,
+				"</h1>é\t"
+			],
+			3
+		],
+		"result": "中文a</h1>é\t中文é"
+	},
+	{
+		"doc": "中文</h1>😀é😀\nx中文中文<section> 中文😀",
+		"changes": [
+			32
+		],
+		"result": "中文</h1>😀é😀\nx中文中文<section> 中文😀"
+	},
+	{
+		"doc": "a😀\né\n\té\t ",
+		"changes": [
+			2,
+			[
+				2,
+				"é😀",
+				"x😀",
+				""
+			],
+			4,
+			[
+				1,
+				"</h1>\t "
+			],
+			1
+		],
+		"result": "a\ud83dé😀\nx😀\né\n\té</h1>\t  "
+	},
+	{
+		"doc": "aaéé😀\nx\t😀a\t\n",
+		"changes": [
+			7,
+			[
+				2
+			],
+			[
+				1,
+				"😀\t"
+			],
+			4
+		],
+		"result": "aaéé😀\n😀\t\ude00a\t\n"
+	},
+	{
+		"doc": "",
+		"changes": [
+			[
+				0,
+				"\t<section>é😀",
+				"x"
+			]
+		],
+		"result": "\t<section>é😀\nx"
+	},
+	{
+		"doc": "😀é中文a",
+		"changes": [
+			6
+		],
+		"result": "😀é中文a"
+	},
+	{
+		"doc": " é",
+		"changes": [
+			[
+				2,
+				"\té😀",
+				"x"
+			],
+			[
+				0,
+				"",
+				""
+			]
+		],
+		"result": "\té😀\nx\n"
+	},
+	{
+		"doc": "</h1>",
+		"changes": [
+			1,
+			[
+				0,
+				"é😀",
+				"x\t",
+				""
+			],
+			2,
+			[
+				1
+			],
+			[
+				0,
+				"😀",
+				""
+			],
+			[
+				1,
+				"😀"
+			]
+		],
+		"result": "<é😀\nx\t\n/h😀\n😀"
+	},
+	{
+		"doc": "a\t<section><section>\t中文\té😀\nx\n",
+		"changes": [
+			12,
+			[
+				0,
+				" "
+			],
+			18
+		],
+		"result": "a\t<section>< section>\t中文\té😀\nx\n"
+	},
+	{
+		"doc": "a中文中文😀<section><section>😀\t中文</h1>a",
+		"changes": [
+			9,
+			[
+				1
+			],
+			25,
+			[
+				1,
+				"éé😀",
+				"x"
+			]
+		],
+		"result": "a中文中文😀<sction><section>😀\t中文</h1>éé😀\nx"
+	},
+	{
+		"doc": "中文 ",
+		"changes": [
+			2,
+			[
+				1,
+				"é"
+			],
+			[
+				0,
+				"😀"
+			]
+		],
+		"result": "中文é😀"
+	},
+	{
+		"doc": "</h1><section>\n </h1></h1>",
+		"changes": [
+			9,
+			[
+				1
+			],
+			9,
+			[
+				3,
+				"中文"
+			],
+			4
+		],
+		"result": "</h1><secion>\n </h中文/h1>"
+	},
+	{
+		"doc": "</h1>é\n\né😀\nx\n é😀\nxé\t",
+		"changes": [
+			10,
+			[
+				2,
+				" "
+			],
+			10
+		],
+		"result": "</h1>é\n\né\ud83d x\n é😀\nxé\t"
+	},
+	{
+		"doc": "é</h1>",
+		"changes": [
+			2,
+			[
+				4
+			]
+		],
+		"result": "é<"
+	},
+	{
+		"doc": "é <section>😀</h1>😀<section> ",
+		"changes": [
+			1,
+			[
+				2,
+				"aa\t"
+			],
+			25,
+			[
+				2,
+				"<section> "
+			]
+		],
+		"result": "éaa\tsection>😀</h1>😀<section<section> "
+	},
+	{
+		"doc": "",
+		"changes": [
+			[
+				0,
+				"aa"
+			]
+		],
+		"result": "aa"
+	},
+	{
+		"doc": "😀\ta😀\n中文a\t<section>",
+		"changes": [
+			16,
+			[
+				2
+			],
+			[
+				1,
+				"aé😀",
+				"x "
+			],
+			1
+		],
+		"result": "😀\ta😀\n中文a\t<sectaé😀\nx >"
+	},
+	{
+		"doc": "",
+		"changes": [
+			[
+				0,
+				"</h1></h1>\t"
+			]
+		],
+		"result": "</h1></h1>\t"
+	},
+	{
+		"doc": " 中文<section></h1>",
+		"changes": [
+			1,
+			[
+				3
+			],
+			10,
+			[
+				3,
+				"<section>"
+			]
+		],
+		"result": " section></<section>"
+	},
+	{
+		"doc": "é😀\nxé😀\nxé😀\nxa中文😀\n中文<section>é",
+		"changes": [
+			5,
+			[
+				1,
+				"é"
+			],
+			3,
+			[
+				3,
+				"é é"
+			],
+			13,
+			[
+				0,
+				"\té😀",
+				"x",
+				""
+			],
+			7,
+			[
+				0,
+				" 中文😀"
+			],
+			1
+		],
+		"result": "é😀\nxé😀\né é\ude00\nxa中文😀\n中文<s\té😀\nx\nection> 中文😀é"
+	},
+	{
+		"doc": "中文中文中文\n<section>😀😀é</h1>😀",
+		"changes": [
+			12,
+			[
+				1,
+				"中文中文"
+			],
+			15
+		],
+		"result": "中文中文中文\n<sect中文中文on>😀😀é</h1>😀"
+	},
+	{
+		"doc": "\né😀\nx\n中文😀\t😀😀\t",
+		"changes": [
+			17
+		],
+		"result": "\né😀\nx\n中文😀\t😀😀\t"
+	},
+	{
+		"doc": "a\n😀<section><section></h1>\t</h1></h1>",
+		"changes": [
+			5,
+			[
+				0,
+				"ééé"
+			],
+			28,
+			[
+				2
+			],
+			3
+		],
+		"result": "a\n😀<ééésection><section></h1>\t</h1>h1>"
+	},
+	{
+		"doc": "\t</h1>中文\t</h1><section>",
+		"changes": [
+			23
+		],
+		"result": "\t</h1>中文\t</h1><section>"
+	},
+	{
+		"doc": "",
+		"changes": [
+			[
+				0,
+				"é<section>"
+			]
+		],
+		"result": "é<section>"
+	},
+	{
+		"doc": "</h1>a</h1> \né😀\nxa</h1>a😀",
+		"changes": [
+			1,
+			[
+				2,
+				"\té😀",
+				"x"
+			],
+			18,
+			[
+				1
+			],
+			[
+				2,
+				"é😀",
+				"x中文"
+			],
+			3
+		],
+		"result": "<\té😀\nx1>a</h1> \né😀\nxa</é😀\nx中文a😀"
+	},
+	{
+		"doc": "</h1>é😀\nxé😀\nxaé😀\nx<section><section>a中文中文",
+		"changes": [
+			19,
+			[
+				3
+			],
+			6,
+			[
+				3
+			],
+			13
+		],
+		"result": "</h1>é😀\nxé😀\nxaé😀sectiosection>a中文中文"
+	},
+	{
+		"doc": "éa</h1>aé\néa中文é😀\nx",
+		"changes": [
+			9,
+			[
+				1
+			],
+			9
+		],
+		"result": "éa</h1>aééa中文é😀\nx"
+	},
+	{
+		"doc": "</h1>中文<section>\ta é😀\nxa</h1>\n\n",
+		"changes": [
+			16,
+			[
+				0,
+				"",
+				"😀"
+			],
+			2,
+			[
+				2
+			],
+			2,
+			[
+				1
+			],
+			9
+		],
+		"result": "</h1>中文<section>\n😀\ta😀xa</h1>\n\n"
+	},
+	{
+		"doc": "</h1>\taaé😀\nx中文aéa",
+		"changes": [
+			[
+				0,
+				"é😀",
+				"x"
+			],
+			1,
+			[
+				0,
+				"\t"
+			],
+			12,
+			[
+				3
+			],
+			[
+				0,
+				"é😀",
+				"x"
+			],
+			2
+		],
+		"result": "é😀\nx<\t/h1>\taaé😀\nxé😀\nxéa"
+	},
+	{
+		"doc": " é😀\nx\t\t",
+		"changes": [
+			7,
+			[
+				1
+			]
+		],
+		"result": " é😀\nx\t"
+	},
+	{
+		"doc": "😀😀</h1>😀",
+		"changes": [
+			2,
+			[
+				2
+			],
+			7
+		],
+		"result": "😀</h1>😀"
+	},
+	{
+		"doc": "é \n\n\t</h1>é😀",
+		"changes": [
+			13,
+			[
+				0,
+				" "
+			]
+		],
+		"result": "é \n\n\t</h1>é😀 "
+	},
+	{
+		"doc": "é<section>😀中文中文\né中文\na",
+		"changes": [
+			2,
+			[
+				1,
+				"a",
+				""
+			],
+			11,
+			[
+				1,
+				"é "
+			],
+			[
+				3
+			],
+			4
+		],
+		"result": "é<a\nection>😀中文é 中文\na"
+	},
+	{
+		"doc": " é",
+		"changes": [
+			1,
+			[
+				1,
+				"é😀",
+				"xé😀",
+				"x<section>"
+			]
+		],
+		"result": " é😀\nxé😀\nx<section>"
+	},
+	{
+		"doc": "",
+		"changes": [
+			[
+				0,
+				"\t</h1>",
+				""
+			]
+		],
+		"result": "\t</h1>\n"
+	},
+	{
+		"doc": "</h1>\n😀<section> é\n\ta\n",
+		"changes": [
+			5,
+			[
+				1,
+				"a\t"
+			],
+			17
+		],
+		"result": "</h1>a\t😀<section> é\n\ta\n"
+	},
+	{
+		"doc": "😀 中文é<section>中文</h1>\té😀\nx 😀",
+		"changes": [
+			23,
+			[
+				1,
+				"</h1>"
+			],
+			6,
+			[
+				1
+			]
+		],
+		"result": "😀 中文é<section>中文</h1>\t</h1>😀\nx \ud83d"
+	},
+	{
+		"doc": "é",
+		"changes": [
+			1,
+			[
+				0,
+				"\té中文</h1>"
+			]
+		],
+		"result": "é\té中文</h1>"
+	},
+	{
+		"doc": "",
+		"changes": [],
+		"result": ""
+	},
+	{
+		"doc": "😀éé😀\nx",
+		"changes": [
+			5,
+			[
+				2,
+				"中文</h1> "
+			],
+			[
+				1,
+				"中文😀"
+			]
+		],
+		"result": "😀éé\ud83d中文</h1> 中文😀"
+	},
+	{
+		"doc": "中文😀é😀\nx</h1>a</h1>\ta\n\t",
+		"changes": [
+			13,
+			[
+				2,
+				"</h1>a中文"
+			],
+			[
+				1,
+				"</h1>中文\t"
+			],
+			2,
+			[
+				0,
+				"",
+				" "
+			],
+			5,
+			[
+				0,
+				"😀"
+			],
+			1
+		],
+		"result": "中文😀é😀\nx</h1</h1>a中文</h1>中文\t/h\n 1>\ta\n😀\t"
+	},
+	{
+		"doc": "é😀a😀<section>é😀\nxaé😀\nx 😀</h1>",
+		"changes": [
+			3,
+			[
+				0,
+				"é😀",
+				"x"
+			],
+			31
+		],
+		"result": "é😀é😀\nxa😀<section>é😀\nxaé😀\nx 😀</h1>"
+	},
+	{
+		"doc": "a\t é😀\nx😀</h1>\né😀\nx</h1>中文\t",
+		"changes": [
+			2,
+			[
+				3
+			],
+			1,
+			[
+				2,
+				" <section><section>"
+			],
+			5,
+			[
+				3
+			],
+			7,
+			[
+				1
+			],
+			5
+		],
+		"result": "a\t\ude00 <section><section>😀</hé😀\nx</1>中文\t"
+	},
+	{
+		"doc": "😀<section></h1>😀éa😀a  ",
+		"changes": [
+			19,
+			[
+				1
+			],
+			[
+				0,
+				"é</h1>\t"
+			],
+			[
+				1
+			],
+			4
+		],
+		"result": "😀<section></h1>😀éé</h1>\t\ude00a  "
+	},
+	{
+		"doc": "",
+		"changes": [],
+		"result": ""
+	},
+	{
+		"doc": "aé a<section>😀中文\n\t\n",
+		"changes": [
+			5,
+			[
+				2
+			],
+			[
+				0,
+				"</h1></h1>"
+			],
+			[
+				1
+			],
+			12
+		],
+		"result": "aé a<</h1></h1>tion>😀中文\n\t\n"
+	},
+	{
+		"doc": "é\n中文 é😀\nxa\t\n",
+		"changes": [
+			9,
+			[
+				3
+			],
+			1
+		],
+		"result": "é\n中文 é😀\n\n"
+	},
+	{
+		"doc": "  😀a</h1>é😀\nxa\n \t",
+		"changes": [
+			9,
+			[
+				0,
+				"<section></h1>"
+			],
+			5,
+			[
+				3,
+				"é"
+			],
+			2
+		],
+		"result": "  😀a</h1<section></h1>>é😀\né \t"
+	},
+	{
+		"doc": "é😀\nx</h1></h1>\té😀é中文 é",
+		"changes": [
+			7,
+			[
+				1
+			],
+			5,
+			[
+				2
+			],
+			9
+		],
+		"result": "é😀\nx</1></h\té😀é中文 é"
+	},
+	{
+		"doc": "",
+		"changes": [
+			[
+				0,
+				"",
+				"  </h1>"
+			]
+		],
+		"result": "\n  </h1>"
+	},
+	{
+		"doc": "é\t",
+		"changes": [
+			[
+				2
+			]
+		],
+		"result": ""
+	},
+	{
+		"doc": "\né😀\nxé😀\nx\n😀",
+		"changes": [
+			3,
+			[
+				2
+			],
+			6,
+			[
+				2
+			],
+			1
+		],
+		"result": "\né\ud83dxé😀\nx\ude00"
+	},
+	{
+		"doc": "中文\n\t</h1>a中文\t",
+		"changes": [
+			7,
+			[
+				1
+			],
+			4,
+			[
+				1
+			]
+		],
+		"result": "中文\n\t</h>a中文"
+	},
+	{
+		"doc": "é中文\n中文é😀\nx中文中文\na \t",
+		"changes": [
+			10,
+			[
+				3,
+				"\t",
+				""
+			],
+			6
+		],
+		"result": "é中文\n中文é😀\n\t\n中文\na \t"
+	},
+	{
+		"doc": "é😀\nx",
+		"changes": [
+			[
+				1,
+				"</h1>中文"
+			],
+			2,
+			[
+				1,
+				"\t"
+			],
+			[
+				1,
+				"<section>"
+			]
+		],
+		"result": "</h1>中文😀\t<section>"
+	},
+	{
+		"doc": "éé😀\nx\té😀\nx\n",
+		"changes": [
+			[
+				3,
+				"é\t"
+			],
+			[
+				0,
+				" "
+			],
+			1,
+			[
+				3
+			],
+			6
+		],
+		"result": "é\t \ude00é😀\nx\n"
+	},
+	{
+		"doc": "é\n😀é😀\nx",
+		"changes": [
+			3,
+			[
+				3
+			],
+			[
+				0,
+				"\t</h1>a"
+			],
+			3
+		],
+		"result": "é\n\ud83d\t</h1>a\ude00\nx"
+	},
+	{
+		"doc": "é<section><section></h1> <section><section>",
+		"changes": [
+			20,
+			[
+				1,
+				"é😀",
+				"x",
+				" "
+			],
+			[
+				2
+			],
+			20
+		],
+		"result": "é<section><section><é😀\nx\n > <section><section>"
+	},
+	{
+		"doc": "",
+		"changes": [
+			[
+				0,
+				"é😀",
+				"x<section>"
+			]
+		],
+		"result": "é😀\nx<section>"
+	},
+	{
+		"doc": " <section>a",
+		"changes": [
+			1,
+			[
+				2,
+				"中文",
+				""
+			],
+			3,
+			[
+				2,
+				"a"
+			],
+			[
+				2,
+				"a"
+			],
+			1
+		],
+		"result": " 中文\nectaaa"
+	},
+	{
+		"doc": "中文",
+		"changes": [
+			1,
+			[
+				1,
+				"é😀",
+				"x😀中文"
+			]
+		],
+		"result": "中é😀\nx😀中文"
+	},
+	{
+		"doc": "é😀\nx😀",
+		"changes": [
+			4,
+			[
+				2,
+				"\t<section></h1>"
+			],
+			1
+		],
+		"result": "é😀\n\t<section></h1>\ude00"
+	},
+	{
+		"doc": "\t",
+		"changes": [
+			1
+		],
+		"result": "\t"
+	},
+	{
+		"doc": "\té😀\nx<section>é<section>",
+		"changes": [
+			13,
+			[
+				3,
+				"a</h1>😀"
+			],
+			9
+		],
+		"result": "\té😀\nx<sectioa</h1>😀<section>"
+	},
+	{
+		"doc": " é😀\nx</h1>aa<section>中文😀😀 é😀\nx",
+		"changes": [
+			6,
+			[
+				3,
+				"😀 中文"
+			],
+			[
+				2,
+				"é😀",
+				"x中文\t"
+			],
+			3,
+			[
+				3,
+				"",
+				"",
+				""
+			],
+			17
+		],
+		"result": " é😀\nx😀 中文é😀\nx中文\taa<\n\ntion>中文😀😀 é😀\nx"
+	},
+	{
+		"doc": "a",
+		"changes": [
+			[
+				1
+			],
+			[
+				0,
+				"\t"
+			]
+		],
+		"result": "\t"
+	},
+	{
+		"doc": " é😀\nx😀😀</h1></h1>é",
+		"changes": [
+			11,
+			[
+				2,
+				"<section>中文"
+			],
+			8
+		],
+		"result": " é😀\nx😀😀<<section>中文1></h1>é"
+	},
+	{
+		"doc": "<section> aé😀\nxa",
+		"changes": [
+			5,
+			[
+				2
+			],
+			10
+		],
+		"result": "<sectn> aé😀\nxa"
+	},
+	{
+		"doc": "a",
+		"changes": [
+			1
+		],
+		"result": "a"
+	},
+	{
+		"doc": "\n\t",
+		"changes": [
+			1,
+			[
+				1,
+				"\t<section>"
+			],
+			[
+				0,
+				"é</h1>"
+			]
+		],
+		"result": "\n\t<section>é</h1>"
+	},
+	{
+		"doc": "",
+		"changes": [],
+		"result": ""
+	},
+	{
+		"doc": "aé😀\nxa😀 \t\t\t ",
+		"changes": [
+			4,
+			[
+				2
+			],
+			6,
+			[
+				2,
+				"",
+				""
+			]
+		],
+		"result": "aé😀a😀 \t\t\n"
+	},
+	{
+		"doc": "😀😀</h1>é",
+		"changes": [
+			4,
+			[
+				2,
+				"é😀",
+				"x\t"
+			],
+			[
+				3
+			],
+			1,
+			[
+				0,
+				"\t<section>中文"
+			]
+		],
+		"result": "😀😀é😀\nx\té\t<section>中文"
+	},
+	{
+		"doc": "é\t\né😀\nx",
+		"changes": [
+			7,
+			[
+				1,
+				"\té😀",
+				"xé😀",
+				"x"
+			]
+		],
+		"result": "é\t\né😀\n\té😀\nxé😀\nx"
+	},
+	{
+		"doc": "</h1>\n",
+		"changes": [
+			[
+				4
+			],
+			[
+				0,
+				"",
+				""
+			],
+			2
+		],
+		"result": "\n>\n"
+	},
+	{
+		"doc": "<section>中文",
+		"changes": [
+			5,
+			[
+				2,
+				"</h1>éé😀",
+				"x"
+			],
+			4
+		],
+		"result": "<sect</h1>éé😀\nxn>中文"
+	},
+	{
+		"doc": "é😀\nx中文é</h1>\t😀é😀\nx\né😀\nx\t</h1>",
+		"changes": [
+			7,
+			[
+				3
+			],
+			1,
+			[
+				2
+			],
+			8,
+			[
+				1,
+				"",
+				"中文😀"
+			],
+			7,
+			[
+				3,
+				"  ",
+				""
+			],
+			1
+		],
+		"result": "é😀\nx中文h\t😀é😀\nx\n中文😀é😀\nx\t<  \n>"
+	},
+	{
+		"doc": "<section>\né<section>é😀\nx\n \t",
+		"changes": [
+			16,
+			[
+				3,
+				"a😀"
+			],
+			9
+		],
+		"result": "<section>\né<secta😀>é😀\nx\n \t"
+	},
+	{
+		"doc": "",
+		"changes": [
+			[
+				0,
+				"😀a😀"
+			]
+		],
+		"result": "😀a😀"
+	},
+	{
+		"doc": "</h1>😀é😀\nx",
+		"changes": [
+			[
+				6
+			],
+			6
+		],
+		"result": "\ude00é😀\nx"
+	},
+	{
+		"doc": "\n中文</h1> é😀\té😀\nx",
+		"changes": [
+			2,
+			[
+				2,
+				"aé"
+			],
+			14
+		],
+		"result": "\n中aé/h1> é😀\té😀\nx"
+	},
+	{
+		"doc": " ",
+		"changes": [
+			1,
+			[
+				0,
+				"😀😀"
+			]
+		],
+		"result": " 😀😀"
+	}
+]

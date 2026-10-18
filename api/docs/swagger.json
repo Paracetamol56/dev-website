@@ -1494,6 +1494,359 @@
 				}
 			}
 		},
+		"/slides": {
+			"get": {
+				"security": [
+					{
+						"Bearer": []
+					}
+				],
+				"description": "List a page of the slide decks of the authenticated user, without their content, last updated first",
+				"produces": ["application/json"],
+				"tags": ["slides"],
+				"summary": "List slide decks",
+				"parameters": [
+					{
+						"type": "string",
+						"description": "Only return decks whose title contains this text",
+						"name": "search",
+						"in": "query"
+					},
+					{
+						"minimum": 1,
+						"type": "integer",
+						"default": 1,
+						"description": "Page number",
+						"name": "page",
+						"in": "query"
+					},
+					{
+						"maximum": 100,
+						"minimum": 1,
+						"type": "integer",
+						"default": 12,
+						"description": "Number of decks per page",
+						"name": "limit",
+						"in": "query"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/slides.DeckPage"
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"schema": {
+							"type": "object",
+							"additionalProperties": {
+								"type": "string"
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"schema": {
+							"type": "object",
+							"additionalProperties": {
+								"type": "string"
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"schema": {
+							"type": "object",
+							"additionalProperties": {
+								"type": "string"
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"security": [
+					{
+						"Bearer": []
+					}
+				],
+				"description": "Create a slide deck, with a first slide when no content is given",
+				"consumes": ["application/json"],
+				"produces": ["application/json"],
+				"tags": ["slides"],
+				"summary": "Create a slide deck",
+				"parameters": [
+					{
+						"description": "Deck",
+						"name": "body",
+						"in": "body",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/slides.PostDeckBody"
+						}
+					}
+				],
+				"responses": {
+					"201": {
+						"description": "Created",
+						"schema": {
+							"$ref": "#/definitions/slides.Deck"
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"schema": {
+							"type": "object",
+							"additionalProperties": {
+								"type": "string"
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"schema": {
+							"type": "object",
+							"additionalProperties": {
+								"type": "string"
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"schema": {
+							"type": "object",
+							"additionalProperties": {
+								"type": "string"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/slides/{id}": {
+			"get": {
+				"security": [
+					{
+						"Bearer": []
+					}
+				],
+				"description": "Get a slide deck of the authenticated user, with its content",
+				"produces": ["application/json"],
+				"tags": ["slides"],
+				"summary": "Get a slide deck",
+				"parameters": [
+					{
+						"type": "string",
+						"description": "Deck ID",
+						"name": "id",
+						"in": "path",
+						"required": true
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/slides.Deck"
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"schema": {
+							"type": "object",
+							"additionalProperties": {
+								"type": "string"
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"schema": {
+							"type": "object",
+							"additionalProperties": {
+								"type": "string"
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"schema": {
+							"type": "object",
+							"additionalProperties": {
+								"type": "string"
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"schema": {
+							"type": "object",
+							"additionalProperties": {
+								"type": "string"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"security": [
+					{
+						"Bearer": []
+					}
+				],
+				"description": "Delete a slide deck of the authenticated user for good",
+				"tags": ["slides"],
+				"summary": "Delete a slide deck",
+				"parameters": [
+					{
+						"type": "string",
+						"description": "Deck ID",
+						"name": "id",
+						"in": "path",
+						"required": true
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"400": {
+						"description": "Bad Request",
+						"schema": {
+							"type": "object",
+							"additionalProperties": {
+								"type": "string"
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"schema": {
+							"type": "object",
+							"additionalProperties": {
+								"type": "string"
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"schema": {
+							"type": "object",
+							"additionalProperties": {
+								"type": "string"
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"schema": {
+							"type": "object",
+							"additionalProperties": {
+								"type": "string"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/slides/{id}/duplicate": {
+			"post": {
+				"security": [
+					{
+						"Bearer": []
+					}
+				],
+				"description": "Create a copy of a slide deck of the authenticated user",
+				"produces": ["application/json"],
+				"tags": ["slides"],
+				"summary": "Duplicate a slide deck",
+				"parameters": [
+					{
+						"type": "string",
+						"description": "Deck ID",
+						"name": "id",
+						"in": "path",
+						"required": true
+					}
+				],
+				"responses": {
+					"201": {
+						"description": "Created",
+						"schema": {
+							"$ref": "#/definitions/slides.Deck"
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"schema": {
+							"type": "object",
+							"additionalProperties": {
+								"type": "string"
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"schema": {
+							"type": "object",
+							"additionalProperties": {
+								"type": "string"
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"schema": {
+							"type": "object",
+							"additionalProperties": {
+								"type": "string"
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"schema": {
+							"type": "object",
+							"additionalProperties": {
+								"type": "string"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/slides/{id}/ws": {
+			"get": {
+				"description": "WebSocket for the owner of a deck. The first message is {\"type\": \"auth\", \"token\": accessToken, \"version\": n}, n being the version the client has. The server answers {\"type\": \"state\", \"title\", \"settings\"} then the updates since n, or {\"type\": \"reset\", \"version\", \"doc\"} when they are not kept.\nClients send {\"type\": \"push\", \"version\", \"updates\": [{\"clientID\", \"changes\"}]}, {\"type\": \"pull\", \"version\"}, {\"type\": \"title\", \"title\"}, {\"type\": \"settings\", \"settings\"} and {\"type\": \"presence\", \"version\", \"ranges\": [{\"anchor\", \"head\"}]}.\nThe server sends {\"type\": \"updates\", \"version\", \"updates\"} to every client, {\"type\": \"pushed\", \"ok\"} to the sender of a push, {\"type\": \"title\"}, {\"type\": \"settings\"}, {\"type\": \"presence\", \"peer\", \"name\", \"version\", \"ranges\"}, {\"type\": \"joined\", \"peer\", \"name\"}, {\"type\": \"left\", \"peer\"}, {\"type\": \"deleted\"} and {\"type\": \"error\", \"error\"}.",
+				"tags": ["slides"],
+				"summary": "Edit a slide deck live",
+				"parameters": [
+					{
+						"type": "string",
+						"description": "Deck ID",
+						"name": "id",
+						"in": "path",
+						"required": true
+					}
+				],
+				"responses": {
+					"101": {
+						"description": "Switching Protocols"
+					},
+					"400": {
+						"description": "Bad Request",
+						"schema": {
+							"type": "object",
+							"additionalProperties": {
+								"type": "string"
+							}
+						}
+					}
+				}
+			}
+		},
 		"/users/{id}": {
 			"get": {
 				"security": [
@@ -1991,6 +2344,10 @@
 				"wordcloud.deleted",
 				"wordcloud.word_hidden",
 				"wordcloud.words_merged",
+				"slides.created",
+				"slides.duplicated",
+				"slides.renamed",
+				"slides.deleted",
 				"contact.sent",
 				"admin.role_changed",
 				"access.denied",
@@ -2014,6 +2371,10 @@
 				"WordCloudDeleted",
 				"WordCloudWordHidden",
 				"WordCloudWordsMerged",
+				"SlidesCreated",
+				"SlidesDuplicated",
+				"SlidesRenamed",
+				"SlidesDeleted",
 				"ContactSent",
 				"AdminRoleChanged",
 				"AccessDenied",
@@ -2501,6 +2862,211 @@
 				},
 				"todo": {
 					"type": "integer"
+				}
+			}
+		},
+		"slides.Deck": {
+			"type": "object",
+			"properties": {
+				"content": {
+					"type": "string"
+				},
+				"createdAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"id": {
+					"type": "string"
+				},
+				"outline": {
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/slides.OutlineEntry"
+					}
+				},
+				"revision": {
+					"type": "integer"
+				},
+				"settings": {
+					"$ref": "#/definitions/slides.Settings"
+				},
+				"title": {
+					"type": "string"
+				},
+				"updatedAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"user": {
+					"type": "string"
+				}
+			}
+		},
+		"slides.DeckPage": {
+			"type": "object",
+			"properties": {
+				"items": {
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/slides.DeckSummary"
+					}
+				},
+				"limit": {
+					"type": "integer"
+				},
+				"page": {
+					"type": "integer"
+				},
+				"total": {
+					"type": "integer"
+				}
+			}
+		},
+		"slides.DeckSummary": {
+			"type": "object",
+			"properties": {
+				"createdAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"id": {
+					"type": "string"
+				},
+				"outline": {
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/slides.OutlineEntry"
+					}
+				},
+				"title": {
+					"type": "string"
+				},
+				"updatedAt": {
+					"type": "string",
+					"format": "date-time"
+				}
+			}
+		},
+		"slides.OutlineEntry": {
+			"type": "object",
+			"properties": {
+				"from": {
+					"type": "integer"
+				},
+				"title": {
+					"type": "string"
+				},
+				"to": {
+					"type": "integer"
+				},
+				"vertical": {
+					"type": "integer"
+				}
+			}
+		},
+		"slides.PostDeckBody": {
+			"type": "object",
+			"required": ["title"],
+			"properties": {
+				"content": {
+					"type": "string",
+					"maxLength": 500000
+				},
+				"title": {
+					"type": "string",
+					"maxLength": 100,
+					"minLength": 1
+				}
+			}
+		},
+		"slides.Settings": {
+			"type": "object",
+			"required": [
+				"autoAnimateEasing",
+				"backgroundTransition",
+				"highlightTheme",
+				"theme",
+				"transition",
+				"transitionSpeed"
+			],
+			"properties": {
+				"autoAnimate": {
+					"type": "boolean"
+				},
+				"autoAnimateDuration": {
+					"type": "number",
+					"maximum": 10,
+					"minimum": 0.1
+				},
+				"autoAnimateEasing": {
+					"type": "string",
+					"enum": ["ease", "linear", "ease-in", "ease-out", "ease-in-out"]
+				},
+				"backgroundTransition": {
+					"type": "string",
+					"enum": ["none", "fade", "slide", "convex", "concave", "zoom"]
+				},
+				"center": {
+					"type": "boolean"
+				},
+				"controls": {
+					"type": "boolean"
+				},
+				"height": {
+					"type": "integer",
+					"maximum": 2160,
+					"minimum": 240
+				},
+				"highlight": {
+					"type": "boolean"
+				},
+				"highlightTheme": {
+					"type": "string",
+					"enum": ["monokai", "zenburn"]
+				},
+				"loop": {
+					"type": "boolean"
+				},
+				"markdown": {
+					"type": "boolean"
+				},
+				"progress": {
+					"type": "boolean"
+				},
+				"slideNumber": {
+					"type": "boolean"
+				},
+				"theme": {
+					"type": "string",
+					"enum": [
+						"black",
+						"white",
+						"league",
+						"beige",
+						"night",
+						"serif",
+						"simple",
+						"solarized",
+						"moon",
+						"dracula",
+						"sky",
+						"blood",
+						"black-contrast",
+						"white-contrast"
+					]
+				},
+				"transition": {
+					"type": "string",
+					"enum": ["none", "fade", "slide", "convex", "concave", "zoom"]
+				},
+				"transitionSpeed": {
+					"type": "string",
+					"enum": ["default", "fast", "slow"]
+				},
+				"width": {
+					"type": "integer",
+					"maximum": 3840,
+					"minimum": 320
 				}
 			}
 		},

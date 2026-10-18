@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"dev/internal/slides"
 	"errors"
 	"flag"
 	"log"
@@ -58,5 +59,6 @@ func Run() {
 	if err := server.Shutdown(ctx); err != nil {
 		log.Fatalln("Server forced to shutdown:", err)
 	}
+	slides.SaveAll(ctx)
 	log.Println("Server exiting")
 }
